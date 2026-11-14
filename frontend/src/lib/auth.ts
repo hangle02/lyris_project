@@ -3,13 +3,24 @@
 import type { AccountOut, AuthState } from "../types.ts";
 import type { Route } from "./router.ts";
 
-/** Which screen the app shows. "setup" and "forceChange" have no route: the gate shows them over any hash. */
-export type Gate = "setup" | "login" | "signup" | "forceChange" | "app";
+/**
+ * Which screen the app shows. "setup", "forceChange" and "terms" have no route: the gate shows them over
+ * any hash. "public": a page open to everyone (the legal pages), whatever the sign-in state.
+ */
+export type Gate = "setup" | "login" | "signup" | "forceChange" | "terms" | "public" | "app";
+
+/** Routes anyone can open, signed in or not, also before the owner setup: "#/privacy", "#/terms". */
+export function isPublicRoute(route: Route): boolean {
+  return route.name === "legal";
+}
 
 export function gateOf(state: AuthState, route: Route): Gate {
+  if (isPublicRoute(route)) return "public";
   if (state.setup_required) return "setup";
   if (!state.account) return route.name === "signup" ? "signup" : "login";
   if (state.account.must_change_password) return "forceChange";
+  // docs/compliance.md §3: an account that has not agreed to the current Terms is asked once.
+  if (state.account.terms_required) return "terms";
   return "app";
 }
 

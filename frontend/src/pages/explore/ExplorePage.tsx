@@ -7,6 +7,7 @@ import { cx } from "../../components/ui/logic";
 import { useAuthAccount } from "../../hooks/useAuth";
 import { clearPendingDraft } from "../../lib/draftStore";
 import { navigate, routeHref } from "../../lib/router";
+import { chipPosition, track, vibeCode } from "../../lib/track";
 import type { CardSummary, PublicCardSummary, TemplateInfo } from "../../types";
 import {
   buildItems,
@@ -21,6 +22,7 @@ import {
   heroImageUrl,
   withoutHero,
   vibeLabel,
+  normalizeTag,
 } from "./logic";
 import type { ExploreItem } from "./logic";
 
@@ -58,6 +60,7 @@ function Hero({ template, imageUrl }: { template: TemplateInfo; imageUrl: string
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
           <a
             href={routeHref(templateEntryRoute(template, true))}
+            onClick={() => track("story_start_clicked", { source: "template" })}
             className="relative z-10 inline-flex h-11 items-center justify-center rounded-full bg-accent px-5 text-[15px] font-semibold text-on-accent transition-colors duration-150 hover:bg-accent-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             Bước vào câu chuyện
@@ -182,6 +185,10 @@ export function ExplorePage() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    track("explore_viewed");
+  }, []);
+
   const items = useMemo(() => (cards && templates ? buildItems(cards, templates) : []), [cards, templates]);
   const vibes = useMemo(() => (templates ? buildVibes(items, templates) : []), [items, templates]);
   const shown = useMemo(() => filterByVibe(items, vibe), [items, vibe]);
@@ -237,8 +244,19 @@ export function ExplorePage() {
                 <Chip selected={vibe === null} onClick={() => setVibe(null)}>
                   Tất cả
                 </Chip>
-                {vibes.map((v) => (
-                  <Chip key={v} selected={vibe === v} onClick={() => setVibe(vibe === v ? null : v)}>
+                {vibes.map((v, i) => (
+                  <Chip
+                    key={v}
+                    selected={vibe === v}
+                    onClick={() => {
+                      if (vibe !== v) {
+                        // The vibe's code and the chip's place, never the tag's words.
+                        const templateVibes = (templates ?? []).flatMap((t) => t.vibes);
+                        track("vibe_filter_used", { vibe: vibeCode(v, templateVibes, normalizeTag), position: chipPosition(i) });
+                      }
+                      setVibe(vibe === v ? null : v);
+                    }}
+                  >
                     {vibeLabel(v)}
                   </Chip>
                 ))}

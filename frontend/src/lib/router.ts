@@ -1,6 +1,6 @@
 // Hash router nhỏ cho Lyris: "#/" (Tương tác), "#/explore", "#/chat/12", "#/studio", "#/studio/new",
 // "#/studio/12", "#/personas", "#/character/12", "#/character/template/<slug>", "#/me", "#/u/<handle>",
-// "#/login", "#/signup?code=LYR-…", "#/admin" (Phase 4b) và "#/new-story?card=12" cũ (chuyển sang profile nhân vật). Không cần thư viện; mọi đường dẫn lạ
+// "#/login", "#/signup?code=LYR-…", "#/admin" (Phase 4b), "#/privacy", "#/terms" (ra mắt) và "#/new-story?card=12" cũ (chuyển sang profile nhân vật). Không cần thư viện; mọi đường dẫn lạ
 // đưa về hub.
 import { useSyncExternalStore } from "react";
 import { formatInvite, normalizeCode } from "./inviteCode.ts";
@@ -43,7 +43,15 @@ export type Route =
    */
   | { name: "signup"; code: string | null }
   /** "#/admin": "Quản lý tài khoản", owner only (a member is sent to the hub). */
-  | { name: "admin" };
+  | { name: "admin" }
+  /**
+   * "#/privacy" and "#/terms" (docs/compliance.md §3): the Privacy Policy and the Terms. Open to
+   * everyone, signed in or not, also before the owner setup.
+   */
+  | { name: "legal"; doc: LegalDocName };
+
+/** The two legal pages. */
+export type LegalDocName = "terms" | "privacy";
 
 /** Whose profile "#/character/..." shows: a saved card, or a template by slug. */
 export type CharacterTarget = { kind: "card"; id: number } | { kind: "template"; slug: string };
@@ -141,6 +149,9 @@ export function parseRoute(hash: string): Route {
       return second === undefined ? { name: "signup", code: normalizeCode(params.get("code")) } : DEFAULT_ROUTE;
     case "admin":
       return second === undefined ? { name: "admin" } : DEFAULT_ROUTE;
+    case "privacy":
+    case "terms":
+      return second === undefined ? { name: "legal", doc: head } : DEFAULT_ROUTE;
     case "u": {
       const handle = parseHandle(second);
       return handle === null ? DEFAULT_ROUTE : { name: "profile", handle };
@@ -175,6 +186,8 @@ export function routeHref(r: Route): string {
       return r.code === null ? "#/signup" : `#/signup?code=${formatInvite(r.code)}`;
     case "admin":
       return "#/admin";
+    case "legal":
+      return r.doc === "privacy" ? "#/privacy" : "#/terms";
     case "character": {
       const path =
         r.target.kind === "card" ? `#/character/${r.target.id}` : `#/character/template/${encodeURIComponent(r.target.slug)}`;
@@ -245,12 +258,44 @@ export function replaceRoute(r: Route | string): void {
   window.dispatchEvent(new HashChangeEvent("hashchange"));
 }
 
-function subscribe(onChange: () => void): () => void {
-  window.addEventListener("hashchange", onChange);
-  window.addEventListener("popstate", onChange);
+/**
+ * Navigation guards (the Studio editor's "unsaved changes" prompt) run BEFORE any useRoute subscriber
+ * hears about a hash change. They must: when a subscriber re-renders first, React can unmount the
+ * guarded page (and remove its own window listeners) before the browser calls them — a real link click
+ * or the Back button then left the page without asking. A guard returns false when it cancelled the
+ * navigation (it has put the old hash back); subscribers are then not notified.
+ */
+type NavigationGuard = () => boolean;
+const guards = new Set<NavigationGuard>();
+const subscribers = new Set<() => void>();
+
+/** Registers a guard; returns the function that removes it. */
+export function addNavigationGuard(guard: NavigationGuard): () => void {
+  guards.add(guard);
   return () => {
-    window.removeEventListener("hashchange", onChange);
-    window.removeEventListener("popstate", onChange);
+    guards.delete(guard);
+  };
+}
+
+/** One hash change: guards first (any false cancels), then every subscriber. Exported for tests. */
+export function runNavigation(): void {
+  for (const guard of [...guards]) if (!guard()) return;
+  for (const onChange of [...subscribers]) onChange();
+}
+
+/** useRoute's subscription (useSyncExternalStore). Exported for tests. */
+export function subscribeRoute(onChange: () => void): () => void {
+  if (subscribers.size === 0) {
+    window.addEventListener("hashchange", runNavigation);
+    window.addEventListener("popstate", runNavigation);
+  }
+  subscribers.add(onChange);
+  return () => {
+    subscribers.delete(onChange);
+    if (subscribers.size === 0) {
+      window.removeEventListener("hashchange", runNavigation);
+      window.removeEventListener("popstate", runNavigation);
+    }
   };
 }
 
@@ -276,7 +321,7 @@ function routeFor(hash: string): Route {
 
 /** Current route; re-renders on hashchange. */
 export function useRoute(): Route {
-  const hash = useSyncExternalStore(subscribe, getHash, getServerHash);
+  const hash = useSyncExternalStore(subscribeRoute, getHash, getServerHash);
   return routeFor(hash);
 }
 

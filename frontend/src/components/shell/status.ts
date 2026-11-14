@@ -77,7 +77,7 @@ export function memorySearchRow(
  * wrong, without "Ollama" or "model" (the details live under Nâng cao).
  */
 export function plainMachineLine(level: HealthLevel): string | null {
-  if (level === "down") return "Lyris chưa kết nối được phần trả lời trên máy này, nên nhân vật tạm thời chưa trả lời được.";
+  if (level === "down") return "Lyris chưa kết nối được phần trả lời, nên nhân vật tạm thời chưa trả lời được.";
   if (level === "warn") return "Máy chưa sẵn sàng để trả lời. Mở mục Nâng cao bên dưới để xem chi tiết.";
   return null;
 }

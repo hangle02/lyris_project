@@ -27,6 +27,6 @@ Từ 640px: hộp thoại giữa màn hình, ảnh to hơn.
 
 ## Tính năng
 
-- [Nhân vật công khai](../features/nhan-vat-cong-khai.md)
+- [Nhân vật công khai](../features/F31-nhan-vat-cong-khai.md)
 
 Chi tiết: [auth.md §7.3](../../docs/auth.md).

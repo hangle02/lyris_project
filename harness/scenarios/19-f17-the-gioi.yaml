@@ -1,0 +1,26 @@
+# F17 — sổ thế giới: nhắc từ khoá thì nhân vật dùng đúng chi tiết; mục 'Chỉ bạn biết' không bao giờ lộ.
+id: f17-the-gioi
+title: Mục thế giới được dùng đúng, mục Chỉ bạn biết không lộ
+note: >-
+  Card seed có hai mục thế giới. Mục "Quán chè bà Tư" (mọi người biết) có chi tiết riêng (chè bưởi, chè khúc
+  bạch, nước cốt dừa, hẻm 42). Mục "Lá thư chưa gửi" chỉ {{user}} biết, cùng từ khoá "quán chè". Lâm Vãn nhắc
+  quán chè bà Tư: câu trả lời phải dùng ít nhất một chi tiết của mục đầu, và không có chi tiết nào của mục
+  {{user}}. Prompt cũng được kiểm: mục đầu có trong prompt, mục {{user}} không bao giờ vào prompt.
+mode: story
+lore:
+  - title: "Quán chè bà Tư"
+    category: place
+    keys: ["quán chè bà Tư", "bà Tư", "quán chè"]
+    known_by: ["*"]
+    content: "Quán chè bà Tư nằm cuối hẻm 42 sau cổng trường, chỉ bán hai món: chè bưởi và chè khúc bạch. Bà Tư lúc nào cũng cho Lạc Dương thêm một muỗng nước cốt dừa, vì năm nhất anh từng sửa giúp bà cái quạt trần."
+  - title: "Lá thư chưa gửi"
+    keys: ["quán chè", "lá thư"]
+    known_by: ["{{user}}"]
+    content: "{{user}} từng viết một lá thư tỏ tình gửi Lạc Dương ở quán chè bà Tư, rồi giấu dưới đáy hộp bút màu xanh, chưa bao giờ đưa."
+input: "*Tớ kéo tay áo cậu, chỉ về phía cổng sau.* Lát tan học mình ghé quán chè bà Tư không? Cậu hay ăn món gì ở đó nhỉ, tớ quên mất rồi."
+judge: false
+checks:
+  required_any: ["chè bưởi", "khúc bạch", "nước cốt dừa", "hẻm 42", "quạt trần"]
+  forbidden_phrases: ["lá thư", "hộp bút"]
+  prompt_includes: ["Quán chè bà Tư", "chè khúc bạch"]
+  prompt_excludes: ["lá thư", "hộp bút"]

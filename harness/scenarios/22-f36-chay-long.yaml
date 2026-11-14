@@ -1,0 +1,9 @@
+# F36 — harness: run_eval.py chạy trọn trên Ollama thật và lưu báo cáo vào harness/results/.
+id: f36-chay-long
+title: run_eval chạy trọn và lưu báo cáo
+kind: nested_eval
+note: >-
+  Chạy lồng run_eval (cùng --model, --ollama-url, --no-judge) trên ba kịch bản rẻ khác loại (trả lời DM, tóm
+  tắt, gợi ý). Phải thoát 0, ghi report.md và raw.json vào harness/results/ có đủ ba kịch bản, không lỗi sinh.
+  Lỗi máy của từng kịch bản không tính ở đây (thuộc tính năng sở hữu kịch bản đó).
+ids: [05-dm, f10-tom-tat, f15-goi-y]

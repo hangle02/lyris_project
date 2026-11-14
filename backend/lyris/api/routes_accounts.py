@@ -13,9 +13,12 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from lyris.accounts import AccountInputError, normalize_handle, validate_account_update
+from lyris.analytics import store as analytics_store
+from lyris.analytics.tracker import allow_device, device_anon, forget_device, tracker_of
 from lyris.api.deps import CurrentAccount, account_id_of, current_account, is_owner
 from lyris.api.routes_lyris import installed_template_ids
 from lyris.api.routes_studio import CardSummary, card_summary, image_file_response, read_body
+from lyris.compliance import legal
 from lyris.config import Settings
 from lyris.db.repo import AccountImage, HandleTaken, NotFound, Repo
 from lyris.models import Account
@@ -40,6 +43,20 @@ class AccountOut(Account):
     card_count: int
     story_count: int
     persona_count: int
+    # Event tracking (docs/tracking-plan.md): true = đã tắt "Chia sẻ dữ liệu sử dụng ẩn danh để cải thiện Lyris".
+    analytics_opt_out: bool = False
+    # docs/compliance.md §3: lần đồng ý Điều khoản / Chính sách quyền riêng tư.
+    terms_required: bool = False
+    terms_accepted_at: str | None = None
+    privacy_version: str | None = None
+    legal_version: str = legal.LEGAL_VERSION
+
+
+class AccountPatch(BaseModel):
+    """Body của PATCH /api/account: cài đặt riêng của tài khoản (hiện chỉ có chia sẻ dữ liệu sử dụng)."""
+
+    model_config = ConfigDict(extra="forbid")
+    analytics_opt_out: bool | None = None
 
 
 class AccountBody(BaseModel):
@@ -93,6 +110,10 @@ def account_out(repo: Repo, account: Account) -> AccountOut:
     """`card_count` không tính nhân vật mẫu đã cài (docs/phase3.md §7)."""
     account_id = account_id_of(account)
     counts = repo.account_counts(account_id)
+    with repo.locked() as conn:
+        opted_out = analytics_store.opted_out(conn, account_id)
+        accepted_at, accepted_version = legal.accepted_version(conn, account_id)
+        terms_required = legal.terms_required(conn, account_id)
     return AccountOut(
         **account.model_dump(),
         avatar_url=_image_url("/api/account/avatar", account.avatar),
@@ -100,6 +121,10 @@ def account_out(repo: Repo, account: Account) -> AccountOut:
         card_count=own_card_count(repo, account_id, counts["card_count"]),
         story_count=counts["story_count"],
         persona_count=counts["persona_count"],
+        analytics_opt_out=opted_out,
+        terms_required=terms_required,
+        terms_accepted_at=accepted_at,
+        privacy_version=accepted_version,
     )
 
 
@@ -173,6 +198,30 @@ async def update_account(request: Request, body: AccountBody, account: CurrentAc
     except HandleTaken as exc:
         raise taken from exc
     return account_out(repo, saved)
+
+
+@router.patch("/account", response_model=AccountOut)
+async def patch_account(request: Request, body: AccountPatch, account: CurrentAccount) -> AccountOut:
+    """Tắt/bật chia sẻ dữ liệu sử dụng. Tắt: xoá mọi sự kiện đã lưu của tài khoản, kể cả sự kiện lúc chưa đăng nhập
+    trên các thiết bị của tài khoản (chưa gửi thì không bao giờ gửi), và ngừng ghi; thiết bị này đổi định danh và
+    được đánh dấu không chia sẻ (không ghi gì cả khi đã đăng xuất). Chỉ còn một dòng `analytics_opt_out` không gắn
+    tài khoản để đếm tỉ lệ tắt. Bật lại: gỡ dấu không chia sẻ của thiết bị này."""
+    repo = _repo(request)
+    account_id = account_id_of(account)
+    if body.analytics_opt_out is not None:
+        with repo.transaction():
+            before = analytics_store.opted_out(repo.conn, account_id)
+            analytics_store.set_opt_out(
+                repo.conn, account_id, body.analytics_opt_out, device_anon=device_anon(request)
+            )
+        if body.analytics_opt_out:
+            forget_device(request, opt_out=True)
+        else:
+            allow_device(request)
+        tracker = tracker_of(request)
+        if body.analytics_opt_out and not before and tracker is not None:
+            tracker.record_opt_out()
+    return account_out(repo, repo.get_account(account_id))
 
 
 @router.put("/account/avatar", response_model=AccountOut)

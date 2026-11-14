@@ -1,0 +1,14 @@
+# F07 — kiểu Thought 'Lồng trong truyện' (inline, mặc định của story).
+id: f07-thought-long
+title: Thought lồng trong truyện (inline)
+note: >-
+  Story kiểu 'Lồng trong truyện': câu trả lời có 2-4 dòng [Thought: ...], không có hai Thought đứng liền
+  nhau, không có Thought chưa đóng.
+mode: story
+thought_style: inline
+input: "*Tớ ngáp một cái, kéo chồng đề cương lại gần.* Còn hai chương nữa thôi. Cậu ôn tới đâu rồi? Giảng tớ phần đạo hàm riêng được không?"
+judge: false
+checks:
+  min_thoughts: 2
+  max_thoughts: 4
+  no_adjacent_thoughts: true

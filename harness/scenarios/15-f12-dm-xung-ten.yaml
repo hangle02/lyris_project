@@ -1,0 +1,41 @@
+# F12 — Story và DM chung một dòng thời gian: tên nói qua tin nhắn, sang Story vẫn nhớ.
+id: f12-dm-xung-ten
+title: Xưng tên qua DM, sang Story không nói "chưa nói tên với ai"
+note: >-
+  Card tiem_sach_cu: Tần Dương và Hạ Vy gặp ở tiệm sách mà chưa biết tên nhau; tối đó nhắn tin (lượt DM),
+  Tần Dương xưng tên. Sáng hôm sau ở Story Mode, Hạ Vy gọi tên anh. Thought (và cả câu trả lời) không được
+  nói kiểu "mình chưa nói tên với ai", "sao cô ấy biết tên mình", "không ai biết tên mình".
+mode: story
+card: tiem_sach_cu.json
+history:
+  - role: assistant
+    content: "Mưa đầu đông dội lộp độp trên mái tôn của tiệm sách cũ phố Đặng Dung.\n\nNgười thanh niên sau quầy đẩy chiếc ghế đẩu gỗ ra phía cô gái ướt nửa vai.\n\n[Thought: Lại một người trú mưa. Chắc lát tạnh là đi thôi.]\n\n\"Em cứ ngồi đợi. Mưa này chắc nửa tiếng nữa mới ngớt.\""
+  - role: user
+    content: "*Em ngồi đọc tập thơ tới khi mưa tạnh rồi vội vàng chạy ra bến xe buýt, quên luôn chiếc ô vàng dựng ở góc tiệm.*"
+  - role: assistant
+    content: "Lúc đóng cửa tiệm, anh mới thấy chiếc ô màu vàng gãy một nan dựng ở góc. Anh lau khô, treo nó lên móc sau quầy.\n\n[Thought: Cô gái đọc thơ. Chắc mai sẽ quay lại lấy.]"
+  - role: user
+    mode: dm
+    content: "Dạ chào anh, em là người để quên ô ở tiệm sách hôm nay 😅 Em xin số trên tấm danh thiếp ở quầy. Anh tên gì để em lưu số ạ?"
+  - role: assistant
+    mode: dm
+    content: "Tần Dương. Ô của em anh treo sau quầy rồi."
+  - role: user
+    mode: dm
+    content: "Dạ em cảm ơn anh Dương nhiều nha. Em tên Hạ Vy. Sáng mai em ghé lấy ô được không anh?"
+  - role: assistant
+    mode: dm
+    content: "Được. Tiệm mở lúc tám giờ."
+input: "*Sáng hôm sau, em đẩy cửa tiệm sách bước vào, chuông cửa reo leng keng. Em vẫy tay về phía quầy, cười tươi.* Anh Dương ơi, em tới lấy ô nè! Hôm qua làm phiền anh quá."
+judge: false
+checks:
+  min_thoughts: 1
+  # Mỗi mẫu dừng ở dấu câu hoặc `]` (hết Thought). Test: backend/tests/test_run_eval_kinds.py (F12_LEAKS / F12_OK).
+  forbidden_patterns:
+    - "chưa (hề |từng |bao giờ |có |kịp )?(nói|cho|tiết lộ|giới thiệu|xưng)[^.!?\\]]{0,30}tên"
+    - "(sao|làm sao|từ đâu|ở đâu|bằng cách nào)[^.!?\\]]{0,25}biết[^.!?\\]]{0,12}tên"
+    - "(chưa|không|chẳng) (ai|người nào)[^.!?\\]]{0,20}biết[^.!?\\]]{0,12}tên"
+    - "biết tên[^.!?\\]]{0,20}(từ lúc nào|từ bao giờ|từ khi nào|lúc nào|bao giờ|khi nào|từ đâu|ở đâu)"
+    - "(đâu có|có bao giờ|đã bao giờ|chẳng hề|không hề)[^.!?\\]]{0,10}(nói|cho|xưng|tiết lộ|giới thiệu)[^.!?\\]]{0,20}tên"
+    - "(nói|xưng|tiết lộ)[^.!?\\]]{0,10}tên[^.!?\\]]{0,25}đâu"
+    - "(?<!\\w)ai (đã |đã từng )?(nói|cho|kể|tiết lộ)[^.!?\\]]{0,30}tên"

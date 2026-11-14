@@ -21,6 +21,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 
+from lyris.analytics import track
 from lyris.api.deps import CurrentAccount, account_id_of, current_account
 from lyris.api.sse import EventStreamResponse, event_stream_response
 from lyris.chat.gate import GATE_TIMEOUT_DETAIL, AccountBusy, GateTimeout, GenerationGate, Ticket
@@ -699,8 +700,15 @@ async def list_cards(request: Request, account: CurrentAccount) -> list[CardSumm
     return [card_summary(repo, c, account) for c in repo.list_cards(account_id=account_id_of(account))]
 
 
+CreatedVia = Literal["form", "ai_draft", "import"]
+
+
 @router.post("/cards", response_model=CardOut)
-async def create_card(request: Request, body: CardCreate, account: CurrentAccount) -> CardOut:
+async def create_card(
+    request: Request, body: CardCreate, account: CurrentAccount, via: CreatedVia = "form", with_avatar: bool = False
+) -> CardOut:
+    """`via` (tuỳ chọn, chỉ cho số liệu): card đến từ form, bản nháp AI hay file nhập. `with_avatar` (chỉ cho số
+    liệu): trình sửa sẽ tải ảnh lên ngay sau khi tạo (`PUT /cards/{id}/avatar`), nên `has_avatar` là true."""
     repo = _repo(request)
     account_id = account_id_of(account)
     card = validate_card(body.card).model_copy(update={"id": None, "uid": None, "avatar": None})
@@ -718,7 +726,16 @@ async def create_card(request: Request, body: CardCreate, account: CurrentAccoun
         name = avatars.claim_temp(_avatars_dir(request), body.avatar_token, created.id, account_id)
         if name:
             created = repo.set_card_avatar(created.id, name, account_id=account_id)
+    _track_card_created(request, created, via, with_avatar=with_avatar)
     return card_out(repo, created, account)
+
+
+def _track_card_created(request: Request, card: CharacterCard, via: str, *, with_avatar: bool = False) -> None:
+    visibility = "public" if card.visibility == "public" else "private"
+    has_avatar = bool(card.avatar) or with_avatar
+    track(request, "character_created", {"via": via, "visibility": visibility, "has_avatar": has_avatar})
+    if visibility == "public":
+        track(request, "character_published")
 
 
 # Các đường dẫn cố định (/cards/import, /cards/draft, ...) khai báo trước /cards/{card_id}.
@@ -990,6 +1007,8 @@ async def update_card(request: Request, card_id: int, body: CharacterCard, accou
     with repo.transaction():
         updated = repo.update_card(card_id, card, account_id=account_id)
         _save_card_book(request, card_id, extensions)
+    if updated.visibility == "public" and current.visibility != "public":
+        track(request, "character_published")
     return card_out(repo, updated, account)
 
 
@@ -1036,6 +1055,7 @@ async def duplicate_card(request: Request, card_id: int, account: CurrentAccount
             name = None
         if name:
             created = repo.set_card_avatar(created.id, name, account_id=account_id)
+    _track_card_created(request, created, "duplicate")
     return card_out(repo, created, account)
 
 
@@ -1122,7 +1142,9 @@ async def list_personas(request: Request, account: CurrentAccount) -> list[Perso
 @router.post("/personas", response_model=PersonaOut)
 async def create_persona(request: Request, body: PersonaBody, account: CurrentAccount) -> PersonaOut:
     repo = _repo(request)
-    return persona_out(repo, repo.create_persona(validate_persona(body), account_id=account_id_of(account)))
+    created = repo.create_persona(validate_persona(body), account_id=account_id_of(account))
+    track(request, "persona_created")
+    return persona_out(repo, created)
 
 
 @router.put("/personas/{persona_id}", response_model=PersonaOut)

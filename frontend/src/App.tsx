@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppShell } from "./components/shell";
+import { useAccount } from "./hooks/useAccount";
 import { refreshAuth, startAuth, useAuth } from "./hooks/useAuth";
 import { gateOf, isAuthRoute, rememberNext } from "./lib/auth";
 import type { Gate } from "./lib/auth";
 import { legacyRedirect, replaceRoute, routeHref, useRoute } from "./lib/router";
 import type { Route } from "./lib/router";
 import { AdminPage } from "./pages/admin/AdminPage";
-import { AuthSplash, ForcePasswordPage, LoginPage, SetupPage, SignupPage } from "./pages/auth";
+import { AuthSplash, ForcePasswordPage, LoginPage, SetupPage, SignupPage, TermsPage } from "./pages/auth";
 import { CharacterPage } from "./pages/character/CharacterPage";
 import { ChatPage } from "./pages/chat/ChatPage";
 import { ExplorePage } from "./pages/explore/ExplorePage";
 import { HubPage } from "./pages/hub/HubPage";
+import { LegalPage } from "./pages/legal/LegalPage";
 import { PersonasPage } from "./pages/PersonasPage";
 import { ProfilePage } from "./pages/profile";
 import { CardEditorPage, CardListPage } from "./pages/studio";
+import { displayMode, noteRoute, setTrackingConsent, track } from "./lib/track";
 
 /** Browser tab title per screen; the chat sets its own (the character's name). */
 function titleOf(route: Route): string | null {
@@ -43,6 +46,9 @@ function titleOf(route: Route): string | null {
       return "Tạo tài khoản · Lyris";
     case "admin":
       return "Quản lý tài khoản · Lyris";
+    case "legal":
+      // LegalPage sets its own title.
+      return null;
   }
 }
 
@@ -69,6 +75,36 @@ export default function App() {
     startAuth();
   }, []);
 
+  // Usage tracking (docs/tracking-plan.md §7): the previous screen (for "from" of a profile view).
+  useEffect(() => {
+    noteRoute(route.name);
+  }, [route]);
+
+  // Who may be tracked: signed out (or a temporary password) only sends the pre-sign-in events; a
+  // signed-in account waits for its "Chia sẻ dữ liệu sử dụng ẩn danh" choice (TrackingConsent below).
+  const account = auth.state?.account ?? null;
+  const fullSignIn = account !== null && !account.must_change_password;
+  useEffect(() => {
+    if (!auth.state) return;
+    if (fullSignIn) setTrackingConsent({ signedIn: true });
+    else setTrackingConsent({ signedIn: false, optOut: null });
+  }, [auth.state, fullSignIn]);
+
+  // "app_opened" once per load, after the first answer of /auth/me.
+  const opened = useRef(false);
+  useEffect(() => {
+    if (!auth.state || opened.current) return;
+    opened.current = true;
+    let standalone = false;
+    try {
+      standalone = window.matchMedia("(display-mode: standalone)").matches;
+    } catch {
+      standalone = false;
+    }
+    const ios = (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    track("app_opened", { display_mode: displayMode(standalone, ios), authed: fullSignIn });
+  }, [auth.state, fullSignIn]);
+
   const gate: Gate | null = auth.state ? gateOf(auth.state, route) : null;
 
   useEffect(() => {
@@ -81,6 +117,9 @@ export default function App() {
       replaceRoute({ name: "hub" });
     }
   }, [gate, route, auth.state]);
+
+  // The legal pages open for everyone, at once (no need to wait for the sign-in answer).
+  if (route.name === "legal") return <LegalPage doc={route.doc} />;
 
   if (!auth.state) {
     return (
@@ -99,13 +138,36 @@ export default function App() {
       return <SetupPage needsProfile={auth.state.setup_needs_profile} />;
     case "forceChange":
       return <ForcePasswordPage />;
+    case "terms":
+      return <TermsPage />;
+    case "public":
+      // Drawn above (route "legal").
+      return null;
     case "signup":
       return <SignupPage code={route.name === "signup" ? route.code : null} />;
     case "login":
       return <LoginPage />;
     default:
-      return <AppRoutes route={route} isOwner={auth.state.account?.role === "owner"} />;
+      return (
+        <>
+          <TrackingConsent />
+          <AppRoutes route={route} isOwner={auth.state.account?.role === "owner"} />
+        </>
+      );
   }
+}
+
+/**
+ * Signed in: hands the account's "Chia sẻ dữ liệu sử dụng ẩn danh" choice to the tracker (events wait
+ * until it is known; turned off, nothing is sent and what waits is dropped).
+ */
+function TrackingConsent() {
+  const { account } = useAccount();
+  const optOut = account ? account.analytics_opt_out === true : null;
+  useEffect(() => {
+    if (optOut !== null) setTrackingConsent({ optOut });
+  }, [optOut]);
+  return null;
 }
 
 /**
@@ -183,6 +245,9 @@ function AppRoutes({ route, isOwner }: { route: Route; isOwner: boolean }) {
     case "login":
     case "signup":
       // Signed in: the gate moves these to the hub.
+      return null;
+    case "legal":
+      // Drawn by App before the gate.
       return null;
   }
 }

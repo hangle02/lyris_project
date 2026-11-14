@@ -2,14 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { api, errorMessage, errorTechnical } from "../../api/client";
 import { Button, InlineAlert, TextField } from "../../components/ui";
-import { applyAuth, refreshAuth, takeNextHash } from "../../hooks/useAuth";
+import { applyAuth, refreshAuth, takeNextHash, useAuth } from "../../hooks/useAuth";
+import { CONSENT_MISSING } from "../../lib/compliance";
 import { normalizeCode } from "../../lib/inviteCode";
 import { confirmError, newPasswordErrors, PASSWORD_HINT, passwordError } from "../../lib/passwordRules";
 import { cleanDisplayName, displayNameError, HANDLE_MAX, HANDLE_MIN, handleError, normalizeHandle } from "../profile/logic";
 import { AuthLayout, PasswordField } from "./AuthLayout";
+import { ConsentField, LegalLinks } from "./ConsentField";
 import { authFieldOf, SETUP_INTRO } from "./logic";
 
-type Key = "code" | "display_name" | "handle" | "password" | "confirm";
+type Key = "code" | "display_name" | "handle" | "password" | "confirm" | "consent";
 type Errors = Partial<Record<Key, string>>;
 
 const BAD_CODE = "Mã thiết lập gồm 12 ký tự, ví dụ 7KQ2-M9XD-4TPA.";
@@ -30,12 +32,15 @@ export function SetupPage({ needsProfile }: { needsProfile: boolean }) {
   const [errors, setErrors] = useState<Errors>({});
   const [general, setGeneral] = useState<{ text: string; technical: string | null } | null>(null);
   const [sending, setSending] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const legalVersion = useAuth().state?.legal_version;
   const refs = {
     code: useRef<HTMLInputElement>(null),
     display_name: useRef<HTMLInputElement>(null),
     handle: useRef<HTMLInputElement>(null),
     password: useRef<HTMLInputElement>(null),
     confirm: useRef<HTMLInputElement>(null),
+    consent: useRef<HTMLInputElement>(null),
   };
 
   useEffect(() => {
@@ -71,9 +76,10 @@ export function SetupPage({ needsProfile }: { needsProfile: boolean }) {
     const pw = newPasswordErrors(password, confirm, { handle: ownHandle });
     if (pw.password) found.password = pw.password;
     if (pw.confirm) found.confirm = pw.confirm;
+    if (!agreed) found.consent = CONSENT_MISSING;
     setErrors(found);
     setTouched({ code: true, display_name: true, handle: true, password: true, confirm: true });
-    const first = (["code", "display_name", "handle", "password", "confirm"] as const).find((k) => found[k]);
+    const first = (["code", "display_name", "handle", "password", "confirm", "consent"] as const).find((k) => found[k]);
     if (first) return refs[first].current?.focus();
     setSending(true);
     setGeneral(null);
@@ -82,10 +88,24 @@ export function SetupPage({ needsProfile }: { needsProfile: boolean }) {
         setup_code: code.trim(),
         password,
         ...(needsProfile ? { display_name: cleanDisplayName(name), handle: h } : {}),
+        accept_terms: true,
+        terms_version: legalVersion,
       });
       applyAuth(state, { next: takeNextHash(), navigate: true });
     } catch (err) {
       const status = (err as { status?: number }).status;
+      const errCode = (err as { code?: string | null }).code ?? null;
+      if (errCode === "terms_required" || errCode === "terms_outdated") {
+        // Outdated: read the new version; the box must be ticked again.
+        if (errCode === "terms_outdated") {
+          void refreshAuth();
+          setAgreed(false);
+        }
+        setErrors({ consent: errorMessage(err) });
+        refs.consent.current?.focus();
+        setSending(false);
+        return;
+      }
       // 409: set up meanwhile (another tab, the Mac's command): the gate moves on to the login page.
       if (status === 409) {
         void refreshAuth();
@@ -190,6 +210,16 @@ export function SetupPage({ needsProfile }: { needsProfile: boolean }) {
           error={shown("confirm")}
           disabled={sending}
         />
+        <ConsentField
+          ref={refs.consent}
+          checked={agreed}
+          onChange={(v) => {
+            setAgreed(v);
+            clear("consent");
+          }}
+          error={errors.consent}
+          disabled={sending}
+        />
         <div className="flex flex-col gap-3 pt-1">
           <Button type="submit" variant="primary" block loading={sending}>
             Lưu và vào Lyris
@@ -197,6 +227,7 @@ export function SetupPage({ needsProfile }: { needsProfile: boolean }) {
           {general && <InlineAlert tone="error" text={general.text} technical={general.technical} />}
         </div>
       </form>
+      <LegalLinks />
     </AuthLayout>
   );
 }

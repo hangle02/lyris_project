@@ -13,6 +13,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BACKEND="$ROOT/backend"
 FRONTEND="$ROOT/frontend"
 UVICORN="$BACKEND/.venv/bin/uvicorn"
+# Email liên hệ của nhóm vận hành (trang đăng nhập + văn bản pháp lý). Đặt LYRIS_CONTACT khác để đổi.
+export LYRIS_CONTACT="${LYRIS_CONTACT:-lethuhang.cv@gmail.com}"
 
 if [[ ! -x "$UVICORN" ]]; then
   echo "Không thấy $UVICORN. Hãy tạo môi trường backend: cd backend && uv sync" >&2

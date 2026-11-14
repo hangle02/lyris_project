@@ -38,12 +38,12 @@ Từ 640px: header gộp thành một hàng. Từ 1024px: hàng header rộng 96
 
 ## Tính năng
 
-- [Chế độ Story](../features/che-do-story.md)
-- [Thẻ suy nghĩ](../features/the-suy-nghi.md), [Đọc suy nghĩ](../features/doc-suy-nghi.md)
-- [Thao tác tin nhắn](../features/thao-tac-tin-nhan.md)
-- [Định dạng lượt người chơi](../features/dinh-dang-luot-nguoi-choi.md), [Chỉ đạo ẩn](../features/chi-dao-an.md)
-- [DM và Story chung dòng thời gian](../features/dm-story-chung-dong-thoi-gian.md)
-- [Dùng chung máy](../features/dung-chung-may.md)
-- [Ẩn chữ kỹ thuật](../features/an-chu-ky-thuat.md)
+- [Chế độ Story](../features/F01-che-do-story.md)
+- [Thẻ suy nghĩ](../features/F07-the-suy-nghi.md), [Đọc suy nghĩ](../features/F08-doc-suy-nghi.md)
+- [Thao tác tin nhắn](../features/F06-thao-tac-tin-nhan.md)
+- [Định dạng lượt người chơi](../features/F04-dinh-dang-luot-nguoi-choi.md), [Chỉ đạo ẩn](../features/F05-chi-dao-an.md)
+- [DM và Story chung dòng thời gian](../features/F12-dm-story-chung-dong-thoi-gian.md)
+- [Dùng chung máy](../features/F32-dung-chung-may.md)
+- [Ẩn chữ kỹ thuật](../features/F27-an-chu-ky-thuat.md)
 
 Chi tiết: [DESIGN.md](../../DESIGN.md) mục 6, [design-impl.md §6.2 và §15](../../docs/design-impl.md), [phase3.md](../../docs/phase3.md), [auth.md §5.5](../../docs/auth.md) (hàng đợi).

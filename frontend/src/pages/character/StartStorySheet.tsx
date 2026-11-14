@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AI_DISCLAIMER } from "../../lib/compliance";
 import type { FormEvent, ReactNode, RefObject } from "react";
 import { api, errorMessage, errorTechnical } from "../../api/client";
 import { Avatar } from "../../components/Avatar";
@@ -159,7 +160,11 @@ function QuickPersona({ startOpen, onCreated }: { startOpen: boolean; onCreated:
   };
 
   return (
-    <form onSubmit={(e) => void submit(e)} className="flex w-full flex-col gap-4 rounded-card border border-edge bg-bg p-4">
+    <form
+      aria-label="Tạo persona mới"
+      onSubmit={(e) => void submit(e)}
+      className="flex w-full flex-col gap-4 rounded-card border border-edge bg-bg p-4"
+    >
       <TextField label="Tên persona" value={name} onChange={setName} maxLength={80} disabled={saving} />
       <ChoiceGroup label="Giới tính" options={GENDER_OPTIONS} value={gender} onChange={setGender} disabled={saving} />
       <TextArea
@@ -343,6 +348,7 @@ export function StartStorySheet({ open, onClose, card, cardId, ensureCardId, sty
       <Button variant="primary" block onClick={() => void start()} disabled={!canStart} loading={creating} className="sm:w-auto">
         {ENTER_LABEL}
       </Button>
+      <p className="text-center text-[12px] leading-snug text-muted sm:text-right">{AI_DISCLAIMER}</p>
     </div>
   );
 

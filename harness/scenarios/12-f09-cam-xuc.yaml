@@ -1,0 +1,60 @@
+# F09 — ma trận cảm xúc: trích xuất thật (extract_turn) + kiểm tra của app (validate) cho từng loại lượt.
+id: f09-cam-xuc
+title: Cảm xúc tăng giảm đúng chiều theo tình huống
+kind: extract
+note: >-
+  Mỗi case là một lượt (người chơi + câu trả lời của Lạc Dương, có Thought). Chạy đúng lời gọi trích xuất của
+  việc nền rồi kiểm tra chiều thay đổi SAU khi app lọc (giống số được lưu): ghen, nói dối, quên hẹn thì tin cậy
+  (trust) giảm; xin lỗi thật lòng thì khoảng cách (aversion) giảm và tin cậy tăng; chào buổi sáng, nhờ giảng
+  bài thì không chỉ số nào đổi.
+mode: story
+cases:
+  - name: ghen
+    turn:
+      - role: user
+        content: "*Tớ vừa đi vừa cười, giơ điện thoại lên khoe.* Học trưởng Chu nhắn rủ tớ cuối tuần đi xem phim riêng hai người đó! Anh ấy còn khen tớ cười dễ thương nữa."
+      - role: assistant
+        content: "Lạc Dương liếc qua màn hình, rồi nhìn thẳng về phía trước, bước chân chậm lại nửa nhịp.\n\n[Thought: Riêng hai người. Cô ấy cười tươi như vậy chỉ vì một tin nhắn của người khác.]\n\n\"Ừ.\" Anh đưa tay xách luôn túi sách của cô, giọng đều đều. \"Cuối tuần cậu còn bài tập nhóm chưa làm xong.\"\n\n[Thought: Mình lấy tư cách gì mà cấm cô ấy đi chứ.]"
+    expect:
+      delta: {trust: down}
+  - name: noi-doi
+    turn:
+      - role: user
+        content: "*Tớ gãi đầu, không dám nhìn cậu.* À... tối qua tớ bảo bị sốt nên không đi ăn với cậu được. Thật ra tớ đi hát karaoke với lớp. Cậu thấy ảnh trên nhóm lớp rồi hả?"
+      - role: assistant
+        content: "Lạc Dương đặt điện thoại xuống bàn, màn hình vẫn sáng tấm ảnh cô cầm micro cười rạng rỡ.\n\n[Thought: Mình còn mua cháo, đứng dưới ký túc xá nửa tiếng chờ cô ấy trả lời tin nhắn.]\n\n\"Thấy rồi.\" Anh im lặng một lúc lâu. \"Lần sau không muốn đi thì cứ nói thẳng. Không cần bịa là bị ốm.\"\n\n[Thought: Hoá ra cô ấy cũng nói dối mình được dễ dàng như vậy.]"
+    expect:
+      delta: {trust: down}
+  - name: quen-hen
+    turn:
+      - role: user
+        content: "*Tớ nhắn tin lúc chín giờ tối.* Ơ, chiều nay mình hẹn đi hiệu sách à? Tớ quên béng mất, tớ lỡ đi trà sữa với nhóm bạn cùng phòng rồi. Để hôm khác nhé!"
+      - role: assistant
+        content: "Lạc Dương đứng trước cửa hiệu sách đã kéo cửa cuốn, tay cầm hai vé hội thảo sách mà cô từng nói rất muốn đi.\n\n[Thought: Mình đứng đây từ bốn giờ. Cô ấy còn không nhớ.]\n\nAnh gõ lại một dòng rồi xoá, cuối cùng chỉ gửi đi hai chữ.\n\n\"Không sao.\"\n\n[Thought: Lần nào cũng là mình nhớ, còn cô ấy thì quên.]"
+    expect:
+      delta: {trust: down}
+  - name: xin-loi
+    before: {trust: 40, aversion: 35}
+    turn:
+      - role: user
+        content: "*Tớ đứng trước cửa phòng cậu, cúi đầu, hai tay vò vạt áo.* Lạc Dương, chuyện hôm qua là tớ sai. Tớ không nên nói dối cậu rồi đi chơi với người khác. Tớ thật lòng xin lỗi. Cậu đừng giận tớ nữa được không?"
+      - role: assistant
+        content: "Lạc Dương nhìn cô rất lâu, ánh mắt lạnh nhạt mấy hôm nay dần dịu xuống.\n\n[Thought: Cô ấy chạy qua cả khu ký túc xá chỉ để nói câu này. Mắt còn đỏ.]\n\nAnh thở ra một hơi, đưa tay xoa nhẹ mái tóc rối của cô.\n\n\"Biết sai là được rồi. Lần sau có chuyện gì cứ nói thật với tớ.\"\n\n[Thought: Thôi, giận cô ấy lâu hơn nữa thì người khó chịu vẫn là mình.]"
+    expect:
+      delta: {aversion: down, trust: up}
+  - name: chao-buoi-sang
+    turn:
+      - role: user
+        content: "*Tớ ngáp dài, đặt cặp xuống chỗ ngồi cạnh cậu.* Chào buổi sáng! Hôm nay cậu tới thư viện sớm thế."
+      - role: assistant
+        content: "Lạc Dương đẩy cốc sữa đậu nành còn ấm sang phía cô, mắt vẫn không rời trang sách.\n\n[Thought: Lại ngủ dậy muộn, tóc còn chưa chải.]\n\n\"Ừ. Uống đi rồi ôn bài.\"\n\n[Thought: Như mọi ngày.]"
+    expect:
+      all_zero: true
+  - name: nho-giang-bai
+    turn:
+      - role: user
+        content: "*Tớ đẩy quyển vở sang.* Bài tích phân này tớ làm mãi không ra. Cậu giảng lại giúp tớ được không?"
+      - role: assistant
+        content: "Lạc Dương kéo quyển vở lại gần, cầm bút chì gạch chân dòng thứ ba.\n\n[Thought: Lại sai đúng chỗ đổi biến như lần trước.]\n\n\"Chỗ này cậu đổi biến nhưng quên đổi cận. Làm lại từ đây.\"\n\n[Thought: Giảng bao nhiêu lần cũng được.]"
+    expect:
+      all_zero: true

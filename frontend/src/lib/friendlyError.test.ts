@@ -15,11 +15,11 @@ test("plain messages stay as they are", () => {
 test("connection and timeout errors are rephrased, the original kept", () => {
   const raw = "Không kết nối được Ollama ở http://localhost:11434. Hãy mở app Ollama (hoặc chạy `ollama serve`) rồi thử lại.";
   const e = friendlyError(raw);
-  assert.equal(e.text, "Lyris chưa kết nối được phần trả lời trên máy. Hãy thử lại sau giây lát.");
+  assert.equal(e.text, "Lyris chưa kết nối được phần trả lời. Hãy thử lại sau giây lát.");
   assert.equal(e.technical, raw);
   assert.doesNotMatch(e.text, /ollama|model/i);
   assert.equal(friendlyError("Ollama phản hồi quá lâu (quá 300 giây). Máy có thể đang thiếu RAM").text, "Lyris phản hồi lâu quá. Hãy thử lại sau giây lát.");
-  assert.equal(friendlyError("Mất kết nối với Ollama ở http://x giữa chừng (ReadError). Hãy thử lại.").text, "Lyris chưa kết nối được phần trả lời trên máy. Hãy thử lại sau giây lát.");
+  assert.equal(friendlyError("Mất kết nối với Ollama ở http://x giữa chừng (ReadError). Hãy thử lại.").text, "Lyris chưa kết nối được phần trả lời. Hãy thử lại sau giây lát.");
 });
 
 test("missing model, empty reply, save failure, unknown", () => {
@@ -50,7 +50,7 @@ test("the server's plain Phase 3b messages pass through unchanged", () => {
   // lyris/chat/service.py (BUSY_DETAIL, SUGGEST_BUSY_DETAIL, NO_REPLY_TO_SUGGEST): the client must not
   // rephrase them again (they would turn into a vaguer sentence).
   const server = [
-    "Chưa kết nối được với phần AI chạy trên máy này. Hãy kiểm tra nó đã được mở rồi thử lại.",
+    "Chưa kết nối được với phần AI của Lyris. Hãy thử lại sau ít phút.",
     "Máy đang bận nên phản hồi quá lâu. Hãy thử lại sau ít phút.",
     "Bộ AI mà story này dùng chưa có trên máy. Hãy chọn bộ khác trong Thiết lập story > Nâng cao.",
     "Bộ AI dùng để viết nháp chưa có trên máy. Xem các bộ đang có trong Tài khoản > Nâng cao.",

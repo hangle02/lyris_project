@@ -35,10 +35,10 @@ Từ 768px: hai cột. Ảnh 340px dính bên trái khi cuộn. Nút "Bước v�
 
 ## Tính năng
 
-- [Hồ sơ nhân vật](../features/ho-so-nhan-vat.md)
-- [Bước vào câu chuyện](../features/buoc-vao-cau-chuyen.md)
-- [Sổ thế giới](../features/so-the-gioi.md) (phần "Thế giới")
-- [Ma trận cảm xúc](../features/ma-tran-cam-xuc.md) (cảm xúc ban đầu)
-- [Nhân vật công khai](../features/nhan-vat-cong-khai.md)
+- [Hồ sơ nhân vật](../features/F23-ho-so-nhan-vat.md)
+- [Bước vào câu chuyện](../features/F24-buoc-vao-cau-chuyen.md)
+- [Sổ thế giới](../features/F17-so-the-gioi.md) (phần "Thế giới")
+- [Ma trận cảm xúc](../features/F09-ma-tran-cam-xuc.md) (cảm xúc ban đầu)
+- [Nhân vật công khai](../features/F31-nhan-vat-cong-khai.md)
 
 Chi tiết: [design-impl.md §16](../../docs/design-impl.md), [phase4.md §10](../../docs/phase4.md) (phần Thế giới), [auth.md §7.3](../../docs/auth.md).

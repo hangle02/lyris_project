@@ -8,7 +8,9 @@ Cách dùng:
 3. Hỏi lại các phần thiếu, gom thành một lượt hỏi ngắn (tối đa 3-4 câu, câu quan trọng trước).
 4. Câu trả lời cũng ghi vào `raw/` (file mới có ngày), rồi mới viết trang wiki và cập nhật `index.md`, `log.md`.
 
-Không đoán thay chủ dự án ở các phần 1, 2, 3 và 7. Phần 5, 6, 8 có thể đề xuất trước rồi xin xác nhận.
+Không đoán thay chủ dự án ở các phần 1, 2, 3 và 7. Phần 5, 6, 8 có thể đề xuất trước rồi xin xác nhận. Chủ dự án không có mặt thì tạm chọn cách hợp lý, ghi vào `decisions/` với chữ "(tạm chọn)" và thêm câu hỏi vào `memory/po-questions.md`; không bỏ trống, không đoán im lặng.
+
+**Kiểm tự động:** `bash verification/plan-check.sh` kiểm phần máy kiểm được của checklist này trên cả wiki (không cần AI): mỗi trang `features/F<NN>-<slug>.md` có dòng đầu `# F<NN> — …`, có Giai đoạn, "Done when" có dòng Unit / Bot / Model thật và không có `[x]`, "Tests" chỉ trỏ tới test có thật; có trang màn hình, có style; không còn chỗ đánh dấu việc chưa viết. Thoát 0 là 🟢 đủ để build; khác 0 thì in ra phần còn thiếu. Phần cần người trả lời (ý tưởng, vòng trải nghiệm, phong cách) vẫn phải hỏi lại theo các câu bên dưới.
 
 ---
 
@@ -36,7 +38,7 @@ Không đoán thay chủ dự án ở các phần 1, 2, 3 và 7. Phần 5, 6, 8 
 
 ## 3. Tính năng và "Done when"
 
-**Phải có:** mỗi tính năng một trang trong `features/`, có trạng thái (Đã xong / Một phần / Chưa làm), cách hoạt động, và danh sách **"Done when"**: những điều kiện kiểm được, mỗi dòng một điều (bấm gì → thấy gì; test nào phải qua).
+**Phải có:** mỗi tính năng một trang `features/F<NN>-<slug>.md` (định dạng ở [README.md](README.md) mục "Trang tính năng"), có Giai đoạn (Đã có / Kế hoạch), cách hoạt động, danh sách **"Done when"** gồm các dòng `Unit:` (test nào phải qua), `Bot:` (bấm gì → thấy gì trên trình duyệt, chạy với LLM giả) và `Model thật:` (chỉ kiểm được với model thật), và mục **"Tests"** trỏ tới test có thật. Trạng thái ⏳ / 🟡 / ✅ / ⛔ không ghi ở đây mà ở `memory/features.json`.
 
 **Hỏi lại khi thiếu:**
 - Làm xong thì bạn thử thế nào để biết nó đúng? Mô tả một lần thử.
@@ -100,6 +102,8 @@ Giới hạn hiện tại: MacBook M2 24GB, một model `gemma4:12b` (khoảng 1
 **Phải có:** lệnh kiểm tra phải qua, điều cần thử tay (trên Mac và iPhone, 390px trước), chỗ phải tắt app của chủ dự án trước khi làm (migration, đổi model), và cách quay lại nếu hỏng (sao lưu `data/lyris.db`).
 
 Lệnh thường dùng:
+- Cổng chấm: `bash verification/verify.sh F<NN>` (chạy Tests của trang, typecheck, build, bot; chỉ nó chuyển 🟡 → ✅). Dòng "Model thật" chỉ chấm khi thêm `--real-model`.
+- Wiki đủ để build chưa: `bash verification/plan-check.sh`.
 - Backend: `backend/.venv/bin/pytest`.
 - Frontend: `npm test`, `npm run typecheck`, `npm run build` (trong `frontend/`).
 - Thiết kế: `lint.mjs --app` và `inspect.mjs --app` của skill `design-taste-frontend` ([design/README.md](design/README.md) §11).

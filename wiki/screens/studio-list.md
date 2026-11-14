@@ -37,10 +37,10 @@ Từ 640px: thẻ nhân vật thành 2 cột. Nếu số thẻ lẻ thì thẻ c
 
 ## Tính năng
 
-- [Xưởng nhân vật](../features/xuong-nhan-vat.md)
-- [AI viết nháp](../features/ai-viet-nhap.md)
-- [Nhập và xuất card](../features/nhap-xuat-card.md)
-- [Nhân vật công khai](../features/nhan-vat-cong-khai.md) (nhãn Riêng tư / Công khai)
-- [Persona](../features/persona.md)
+- [Xưởng nhân vật](../features/F18-xuong-nhan-vat.md)
+- [AI viết nháp](../features/F19-ai-viet-nhap.md)
+- [Nhập và xuất card](../features/F20-nhap-xuat-card.md)
+- [Nhân vật công khai](../features/F31-nhan-vat-cong-khai.md) (nhãn Riêng tư / Công khai)
+- [Persona](../features/F21-persona.md)
 
 Chi tiết: [DESIGN.md](../../DESIGN.md) trang 3, [design-impl.md §6.5](../../docs/design-impl.md), [phase2.md](../../docs/phase2.md).

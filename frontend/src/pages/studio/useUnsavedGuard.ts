@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { isForcedLeave } from "../../lib/leaveGuard";
-import { parseRoute, routeHref } from "../../lib/router";
+import { addNavigationGuard, parseRoute, routeHref } from "../../lib/router";
 
 const LEAVE_MESSAGE = "Bạn có thay đổi chưa lưu. Rời trang và bỏ các thay đổi này?";
 
@@ -16,8 +16,10 @@ function restoreHash(hash: string): void {
 
 /**
  * Warns before losing unsaved changes: the browser's own prompt on reload/close, and a confirm()
- * on in-app navigation (any hash change away from `ownHref`). Cancelling puts the old hash back
- * before the router re-renders (confirm() blocks the task, so React has not rendered yet).
+ * on in-app navigation (any hash change away from `ownHref`: a link, the Back button, navigate()).
+ * The confirm runs as a router navigation guard, i.e. before any useRoute subscriber re-renders (a
+ * plain window listener ran too late on a real link click: the router re-rendered first and the
+ * page was gone). Cancelling puts the old hash back and the router is not notified.
  *
  * Returns `allowLeave()` to call right before a navigation that must not ask (after delete), and
  * `moveTo(href)` when the page itself changes its address (first save of a new card).
@@ -39,24 +41,23 @@ export function useUnsavedGuard(
       // Older browsers need returnValue set.
       e.returnValue = "";
     };
-    const onNavigate = () => {
+    /** Router guard: true lets the navigation through, false cancelled it (old hash put back). */
+    const onNavigate = (): boolean => {
       const s = state.current;
-      if (!s.dirty || s.bypass) return;
-      if (currentHref() === s.ownHref) return;
+      if (!s.dirty || s.bypass) return true;
+      if (currentHref() === s.ownHref) return true;
       if (window.confirm(LEAVE_MESSAGE)) {
         s.bypass = true;
-        return;
+        return true;
       }
       restoreHash(s.ownHref);
+      return false;
     };
     window.addEventListener("beforeunload", onBeforeUnload);
-    // Capture so this runs before the router's own listener when possible.
-    window.addEventListener("hashchange", onNavigate, true);
-    window.addEventListener("popstate", onNavigate, true);
+    const removeGuard = addNavigationGuard(onNavigate);
     return () => {
       window.removeEventListener("beforeunload", onBeforeUnload);
-      window.removeEventListener("hashchange", onNavigate, true);
-      window.removeEventListener("popstate", onNavigate, true);
+      removeGuard();
     };
   }, []);
 

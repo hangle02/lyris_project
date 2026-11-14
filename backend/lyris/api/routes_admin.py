@@ -10,6 +10,7 @@ from urllib.parse import quote
 from fastapi import APIRouter, Depends, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
 
+from lyris.analytics import track
 from lyris.api.deps import OwnerAccount, owner_auth
 from lyris.auth import clock, service, store
 from lyris.db.repo import Repo
@@ -130,6 +131,7 @@ def create_invite(request: Request, actor: OwnerAccount, body: InviteBody | None
     body = body or InviteBody()
     note = " ".join(body.note.split())
     invite, code = service.create_invite(request, actor, note, int(body.expires_in_days))
+    track(request, "invite_created", {"expires_days": int(body.expires_in_days)})
     return InviteCreated(invite=invite_out(invite), code=code)
 
 

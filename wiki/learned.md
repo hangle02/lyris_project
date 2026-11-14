@@ -295,3 +295,38 @@ Harness và các agent ghi thêm bài học mới ở cuối trang; bài mới n
 - **Vì sao:** Route tự sinh không nằm trong router có dependency đăng nhập.
 - **Luật rút ra:** Tạo app với openapi_url, docs_url, redoc_url = None; test quét mọi route qua app.openapi().
 - **Nguồn:** [docs/auth.md](../docs/auth.md) §2.5, §12 mục 9
+
+### 2026-11-14 Dòng "Lời nói đặc trưng" thứ 4 bị bỏ âm thầm
+
+- **Sai:** Gõ 4 dòng vào 'Lời nói đặc trưng (tuỳ chọn)' rồi bấm Lưu thì trình sửa vẫn lưu, chỉ giữ 3 dòng đầu, không báo gì. Unit test của `signatureProblems` vẫn xanh.
+- **Vì sao:** Trình sửa kiểm `validateCard(prepareForSave(card))`. Bước làm sạch chỉ giữ tối đa 3 dòng, nên lúc kiểm thì không bao giờ còn dòng thứ 4. Unit test kiểm card thô, còn màn hình kiểm card đã làm sạch.
+- **Luật rút ra:** Kiểm lỗi trên chữ người dùng ĐANG GÕ, không kiểm bản đã làm sạch (`saveProblems` trong `lib/cardForm.ts`). Unit test xanh chưa đủ: cần một dòng Bot bấm đúng như người dùng.
+- **Nguồn:** bot `bot: lời nói đặc trưng quá 3 dòng bị chặn` ([F18](features/F18-xuong-nhan-vat.md)), `frontend/src/lib/cardForm.test.ts`
+
+### 2026-11-14 Bot headless: rAF đứng yên, đổi #hash không tải lại trang
+
+- **Sai:** Check của bot đỏ lúc có lúc không: chấm đang gõ "xuất hiện" sau 5,7 giây, menu "+" không đóng bằng Esc, cuộn tới lượt không chạy. Bước "tải lại trang" thật ra không tải lại.
+- **Vì sao:** Tab Chrome headless tạo bằng CDP là tab nền nên chỉ vẽ khung hình khi cần. Vì vậy `requestAnimationFrame`, việc focus đặt trong rAF và cuộn mượt đều đứng yên. Ngoài ra `Page.navigate` tới URL chỉ khác `#hash` là điều hướng trong trang, không phải tải lại.
+- **Luật rút ra:** Bot gọi `Page.bringToFront` và bật focus emulation. Bot theo dõi trang bằng MutationObserver cộng setInterval, không dùng rAF. "Tải lại" thì đi qua `about:blank` để tải thật đúng một lần (link `#/signup?code=…` được đọc một lần như người dùng mở).
+- **Nguồn:** `environment/bot.mjs`, `environment/e2e.mjs`
+
+### 2026-11-14 Guard "rời trang" chạy sau router: bấm link thật thì không hỏi
+
+- **Sai:** Ở trình sửa nhân vật, sửa tên mà chưa lưu rồi bấm 'Về Studio' (hay nút Back) thì app rời trang luôn, không hỏi lại. F18 vẫn ✅ vì `leaveGuard.test.ts` chỉ quét mã nguồn, còn bot tự bấm OK mọi hộp thoại mà không ghi lại.
+- **Vì sao:** Guard nghe `popstate`/`hashchange` trên `window` bằng capture, router nghe không capture. Trên `window`, Chrome gọi listener của router trước; khi trình duyệt tự gọi listener (bấm link thật), React render đồng bộ ngay sau listener đó, gỡ trình sửa và gỡ luôn listener của guard. Gán `location.hash` trong script thì không lộ lỗi (React chưa kịp render) nên thử bằng tay dễ tưởng là chạy.
+- **Luật rút ra:** Việc phải chạy TRƯỚC khi đổi màn thì đăng ký với router (`addNavigationGuard` trong `lib/router.ts`), không trông vào thứ tự listener trên `window`. Bot phải GHI mọi hộp thoại (`c.dialogs`) và kiểm chúng có hiện; test quét mã nguồn hay test bị skip không phải bằng chứng.
+- **Nguồn:** bot `bot: rời trình sửa còn thay đổi chưa lưu thì hỏi lại`, `frontend/src/lib/router.test.ts` ([F18](features/F18-xuong-nhan-vat.md)); bản rà soát đối kháng harness 2026-11-14
+
+### 2026-11-14 Kịch bản model thật: lượt chạy lồng không được in dòng mà verify đọc
+
+- **Sai:** Bản nháp đầu của kịch bản `f36-chay-long` chạy lồng `run_eval`, và lượt lồng in "Đã ghi kết quả vào …" trước lượt ngoài. `bakeoff.py` cũng in đúng câu đó. `verify.sh --real-model` lấy dòng ĐẦU TIÊN khớp câu này để đọc `raw.json`, nên sẽ đọc nhầm báo cáo của lượt lồng và chấm đỏ mọi kịch bản khác ("không có trong kết quả"). Ngoài ra một ngoại lệ bất ngờ trong một kịch bản làm cả `run_eval` thoát khác 0, tức đỏ mọi tính năng.
+- **Vì sao:** Giám khảo đọc đầu ra dạng chữ; mọi công cụ con in cùng một câu thì giám khảo không phân biệt được. Lỗi của một kịch bản chưa được cô lập.
+- **Luật rút ra:** Chỉ lượt `run_eval` ngoài cùng in "Đã ghi kết quả vào" (lượt lồng in "(kết quả lượt chạy lồng: …)", `run_bakeoff` không in; test `out.count(...) == 1`). Lỗi trong một loại kịch bản thành `error` của riêng kịch bản đó (`kinds.run_kind`). Mỗi luật máy mới có test hai chiều: kết quả sai phải ra lỗi, kết quả đúng thì không.
+- **Nguồn:** `harness/kinds.py`, `harness/run_eval.py`, `backend/tests/test_run_eval_kinds.py`; [kich-ban-model-that](decisions/kich-ban-model-that.md)
+
+### 2026-11-14 Dòng Done when bị "tách" sang Ngoài Done when cũng là thu hẹp
+
+- **Sai:** Khi viết kịch bản model thật, phần máy không chấm được của 5 dòng (F05 "làm theo, giữ giọng", F10 '<details> Tóm tắt…', F15 "hướng khác", F19 "trình sửa mở…", F36 "chạy hết kịch bản") bị chuyển sang "Ngoài Done when" rồi mới hỏi PO, nên tính năng có thể lên ✅ mà phần đó chưa được chứng minh. F14 ghi "khoảng 4-5 giây" mà kịch bản chấp nhận mọi lượt 5,9 giây. Luật máy còn lỏng: `phrase_in` so chuỗi con ("Chu" khớp "chuyện"), regex F12 sót cách nói khác, F13 chỉ so câu kết nguyên văn.
+- **Vì sao:** Muốn mọi dòng "có kịch bản" cho verify chạy được, nên sửa dòng cho vừa máy thay vì để tính năng chờ.
+- **Luật rút ra:** Dòng gốc giữ nguyên lời; phần máy chấm được thành dòng Model thật RIÊNG. Dòng gốc chưa đủ bằng chứng thì không nhắc id kịch bản (tính năng ở 🟡, `promote --gate` từ chối) và hỏi PO. Ngưỡng phải phủ đúng chữ của dòng ("khoảng 4-5 giây" → trung vị ≤ 5, không chỉ mức trần). So khớp cụm theo nguyên từ; mỗi regex cấm có test với nhiều cách nói thật (cả câu phải bắt lẫn câu không được bắt).
+- **Nguồn:** rà soát đối kháng TASK A 2026-11-14; `harness/kinds.py`, `harness/checks.py`, `backend/tests/test_run_eval_kinds.py`; [kich-ban-model-that](decisions/kich-ban-model-that.md), [nguong-ttft-f14](decisions/nguong-ttft-f14.md)

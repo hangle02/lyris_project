@@ -13,7 +13,16 @@ frontend/dist/
 # Kết quả harness
 harness/results/
 
+# Báo cáo của bot và verify (reports/latest, reports/look, reports/verify.json)
+reports/
+
 # macOS
 .DS_Store
 
 .taste-skill/
+# Video demo (Remotion): thư viện, bản render, clip quay và nhạc có bản quyền không đưa vào git
+demo-video/node_modules/
+demo-video/out/
+demo-video/public/clips/
+demo-video/public/music/
+demo-video/

@@ -37,9 +37,9 @@ Từ 640px: ngăn có độ rộng cố định ở mép phải, bo góc trái. 
 
 ## Tính năng
 
-- [Ma trận cảm xúc](../features/ma-tran-cam-xuc.md)
-- [Trí nhớ](../features/tri-nho.md)
-- [Sổ thế giới](../features/so-the-gioi.md)
-- [Đọc suy nghĩ](../features/doc-suy-nghi.md)
+- [Ma trận cảm xúc](../features/F09-ma-tran-cam-xuc.md)
+- [Trí nhớ](../features/F10-tri-nho.md)
+- [Sổ thế giới](../features/F17-so-the-gioi.md)
+- [Đọc suy nghĩ](../features/F08-doc-suy-nghi.md)
 
 Chi tiết: [design-impl.md §6.3 và §14](../../docs/design-impl.md), [phase3.md §8](../../docs/phase3.md), [phase4.md](../../docs/phase4.md).

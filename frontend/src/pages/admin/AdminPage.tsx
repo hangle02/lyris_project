@@ -4,10 +4,11 @@ import { api, errorMessage, errorTechnical } from "../../api/client";
 import { Avatar } from "../../components/Avatar";
 import { IconMoreHorizontal, IconPlus } from "../../components/icons";
 import { SubpageHeader } from "../../components/shell/SubpageHeader";
-import { Badge, Button, ChoiceGroup, EmptyState, IconButton, InlineAlert, Modal, Skeleton, TextField } from "../../components/ui";
+import { Badge, Button, ChoiceGroup, EmptyState, IconButton, InlineAlert, Modal, SegmentedControl, Skeleton, TextField } from "../../components/ui";
 import { cx } from "../../components/ui/logic";
 import { copyText } from "../../lib/clipboard";
 import { inviteLink, formatInvite } from "../../lib/inviteCode";
+import { initialTab } from "../../lib/overlayParam";
 import { routeHref } from "../../lib/router";
 import type { AdminAccount, InviteCreated, InviteDays, InviteOut } from "../../types";
 import {
@@ -29,6 +30,15 @@ import {
   sortAccounts,
   sortInvites,
 } from "./logic";
+import { MetricsView } from "./MetricsView";
+import { ReportsView } from "./ReportsView";
+
+type AdminTab = "accounts" | "metrics" | "reports";
+const ADMIN_TABS: { value: AdminTab; label: string }[] = [
+  { value: "accounts", label: "Tài khoản" },
+  { value: "metrics", label: "Số liệu" },
+  { value: "reports", label: "Báo cáo" },
+];
 
 type Failure = { text: string; technical: string | null };
 const failure = (e: unknown): Failure => ({ text: errorMessage(e), technical: errorTechnical(e) });
@@ -555,20 +565,32 @@ function MembersSection() {
 }
 
 /**
- * "#/admin" (docs/auth.md §7.3), owner only: invites (create, copy once, revoke) and the accounts
- * (status, last sign-in, devices; reset a password, disable, enable). Nothing here opens anyone's
- * stories or private characters.
+ * "#/admin" (docs/auth.md §7.3), owner only. Three tabs: "Tài khoản" (invites: create, copy once,
+ * revoke; accounts: status, last sign-in, devices; reset a password, disable, enable), "Số liệu"
+ * (usage numbers and the CSV, docs/tracking-plan.md) and "Báo cáo" (reports of AI replies,
+ * docs/compliance.md §2). Nothing here opens anyone's stories or private characters. "?tab=metrics"
+ * / "?tab=reports" opens a tab on load (screenshots).
  */
 export function AdminPage() {
+  const [tab, setTab] = useState<AdminTab>(() => initialTab<AdminTab>(["accounts", "metrics", "reports"], "accounts"));
   useEffect(() => {
     document.title = "Quản lý tài khoản · Lyris";
   }, []);
   return (
     <div className="min-h-dvh bg-bg">
       <SubpageHeader backHref={routeHref({ name: "hub" })} backLabel="Về Tương tác" title="Quản lý tài khoản" />
-      <main className={cx("mx-auto flex w-full max-w-[720px] flex-col gap-8 px-4 pt-5 pb-[max(3rem,env(safe-area-inset-bottom))] sm:px-6")}>
-        <InvitesSection />
-        <MembersSection />
+      <main className={cx("mx-auto flex w-full max-w-[720px] flex-col gap-6 px-4 pt-5 pb-[max(3rem,env(safe-area-inset-bottom))] sm:px-6")}>
+        <SegmentedControl label="Mục quản lý" options={ADMIN_TABS} value={tab} onChange={setTab} />
+        {tab === "accounts" ? (
+          <div className="flex flex-col gap-8">
+            <InvitesSection />
+            <MembersSection />
+          </div>
+        ) : tab === "metrics" ? (
+          <MetricsView />
+        ) : (
+          <ReportsView />
+        )}
       </main>
     </div>
   );

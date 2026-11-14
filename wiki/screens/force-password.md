@@ -27,7 +27,7 @@ Từ 640px: cột rộng tối đa 400px, nằm giữa màn hình.
 
 ## Tính năng
 
-- [Đăng nhập](../features/dang-nhap.md)
-- [Quản lý tài khoản](../features/quan-ly-tai-khoan.md) (chủ máy đặt lại mật khẩu)
+- [Đăng nhập](../features/F29-dang-nhap.md)
+- [Quản lý tài khoản](../features/F30-quan-ly-tai-khoan.md) (chủ máy đặt lại mật khẩu)
 
 Chi tiết: [auth.md](../../docs/auth.md).

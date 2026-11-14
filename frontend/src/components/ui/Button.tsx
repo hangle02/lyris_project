@@ -4,7 +4,8 @@ import { cx } from "./logic";
 import { Spinner } from "./Spinner";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
-/** md = 44px (touch, the default everywhere on phone); sm = 36px (dense rows, desktop toolbars). */
+/** md = 44px (touch, the default everywhere on phone); sm = 36px on tablet/desktop (dense rows,
+ * toolbars) and 44px on phones (< 640px: design/README "vùng chạm tối thiểu 44px"). */
 export type ButtonSize = "md" | "sm";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -34,7 +35,7 @@ const VARIANT: Record<ButtonVariant, string> = {
 
 const SIZE: Record<ButtonSize, string> = {
   md: "h-11 px-5 text-[15px] [&_svg]:text-[18px]",
-  sm: "h-9 px-4 text-[14px] [&_svg]:text-[16px]",
+  sm: "h-9 px-4 text-[14px] [&_svg]:text-[16px] max-sm:h-11",
 };
 
 /**
@@ -69,7 +70,7 @@ export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonEle
   icon: ReactNode;
   /** ghost (default) | secondary (tone step) | primary (accent fill) | orb (brand gradient: send button only). */
   variant?: IconButtonVariant;
-  /** md = 44px (default, touch), sm = 36px. */
+  /** md = 44px (default, touch), sm = 36px (44px on phones). */
   size?: ButtonSize;
   /** Toggle state: sets aria-pressed and the pressed look. */
   pressed?: boolean;
@@ -87,7 +88,7 @@ const ICON_VARIANT: Record<IconButtonVariant, string> = {
 
 const ICON_SIZE: Record<ButtonSize, string> = {
   md: "h-11 w-11 text-[20px]",
-  sm: "h-9 w-9 text-[18px]",
+  sm: "h-9 w-9 text-[18px] max-sm:h-11 max-sm:w-11",
 };
 
 /** Round icon-only button with a required accessible label. */

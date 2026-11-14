@@ -24,6 +24,8 @@ interface Props extends MessageActions {
   streaming: StreamingState | null;
   loading: boolean;
   disabled: boolean;
+  /** Why `disabled` (actionLockReason): the tooltip of every locked action. */
+  lockReason?: string | null;
   characterName: string;
   /** Space above the first message for a header that floats over the list (px). */
   topInset?: number;
@@ -108,6 +110,7 @@ export function MessageList({
   streaming,
   loading,
   disabled,
+  lockReason = null,
   characterName,
   topInset = 0,
   jumpTo = null,
@@ -245,6 +248,7 @@ export function MessageList({
               rows={rows}
               streaming={viewStreaming}
               disabled={disabled}
+              lockReason={lockReason}
               characterName={characterName}
               receipt={receipt}
               {...actions}
@@ -273,6 +277,7 @@ export function MessageList({
                 canRegenerate={row.canRegenerate}
                 hiddenAfter={row.hiddenAfter}
                 disabled={disabled}
+                lockReason={lockReason}
                 {...actions}
               />
             ),

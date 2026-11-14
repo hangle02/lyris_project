@@ -2,19 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { api, errorMessage, errorTechnical } from "../../api/client";
 import { Button, InlineAlert, TextField } from "../../components/ui";
-import { applyAuth, takeNextHash } from "../../hooks/useAuth";
+import { applyAuth, refreshAuth, takeNextHash, useAuth } from "../../hooks/useAuth";
+import { CONSENT_MISSING } from "../../lib/compliance";
+import { track } from "../../lib/track";
 import { formatInvite, normalizeCode } from "../../lib/inviteCode";
 import { confirmError, newPasswordErrors, PASSWORD_HINT, passwordError } from "../../lib/passwordRules";
 import { replaceRoute, routeHref } from "../../lib/router";
 import { cleanDisplayName, displayNameError, HANDLE_MAX, HANDLE_MIN, handleError, normalizeHandle } from "../profile/logic";
 import { AuthLayout, AuthLink, PasswordField } from "./AuthLayout";
+import { ConsentField } from "./ConsentField";
 import { authFieldOf, SIGNUP_PRIVACY } from "./logic";
 import type { AuthField } from "./logic";
 
 const HANDLE_HINT = `${HANDLE_MIN}-${HANDLE_MAX} ký tự: chữ a-z, số, _ và dấu chấm.`;
 const BAD_CODE = "Mã mời gồm 12 ký tự, ví dụ LYR-7KQ2-M9XD-4TPA.";
 
-type Errors = Partial<Record<AuthField | "confirm", string>>;
+type Errors = Partial<Record<AuthField | "confirm" | "consent", string>>;
 
 /**
  * "#/signup?code=LYR-…" (docs/auth.md §7.3). The code from the link fills "Mã mời" and is dropped
@@ -31,16 +34,22 @@ export function SignupPage({ code }: { code: string | null }) {
   const [errors, setErrors] = useState<Errors>({});
   const [general, setGeneral] = useState<{ text: string; technical: string | null } | null>(null);
   const [sending, setSending] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const legalVersion = useAuth().state?.legal_version;
   const refs = {
     code: useRef<HTMLInputElement>(null),
     display_name: useRef<HTMLInputElement>(null),
     handle: useRef<HTMLInputElement>(null),
     password: useRef<HTMLInputElement>(null),
     confirm: useRef<HTMLInputElement>(null),
+    consent: useRef<HTMLInputElement>(null),
   };
 
   useEffect(() => {
     document.title = "Tạo tài khoản · Lyris";
+    // Did the invite link get opened (the code came with it)? Never the code itself.
+    track("signup_viewed", { has_invite_code: code !== null });
+    // Only on mount: the code is dropped from the address right after.
   }, []);
 
   // The link's code: into the field, out of the address bar (replaceState, no history entry).
@@ -74,22 +83,39 @@ export function SignupPage({ code }: { code: string | null }) {
     const pw = newPasswordErrors(password, confirm, { handle: h });
     if (pw.password) found.password = pw.password;
     if (pw.confirm) found.confirm = pw.confirm;
+    if (!agreed) found.consent = CONSENT_MISSING;
     setErrors(found);
     setTouched({ code: true, display_name: true, handle: true, password: true, confirm: true });
-    const first = (["code", "display_name", "handle", "password", "confirm"] as const).find((k) => found[k]);
+    const first = (["code", "display_name", "handle", "password", "confirm", "consent"] as const).find((k) => found[k]);
     if (first) return refs[first].current?.focus();
     setSending(true);
     setGeneral(null);
     try {
-      const state = await api.signup({ invite_code: invite.trim(), handle: h, display_name: cleanDisplayName(name), password });
+      const state = await api.signup({
+        invite_code: invite.trim(),
+        handle: h,
+        display_name: cleanDisplayName(name),
+        password,
+        accept_terms: true,
+        terms_version: legalVersion,
+      });
       // A new member starts on the hub (its empty state points to Khám phá). The remembered page of
       // an earlier visit is dropped, so a later sign-in in this tab does not land there.
       takeNextHash();
       applyAuth(state, { next: null, navigate: true });
     } catch (err) {
       const text = errorMessage(err);
-      const field = authFieldOf(text);
-      if (field && field !== "current") {
+      const errCode = (err as { code?: string | null }).code ?? null;
+      // The Terms changed while the page was open: read the new version; the box must be ticked again.
+      if (errCode === "terms_outdated") {
+        void refreshAuth();
+        setAgreed(false);
+      }
+      const field = errCode === "terms_required" || errCode === "terms_outdated" ? null : authFieldOf(text);
+      if (errCode === "terms_required") {
+        setErrors({ consent: text });
+        refs.consent.current?.focus();
+      } else if (field && field !== "current") {
         setErrors({ [field]: text });
         refs[field === "code" ? "code" : field].current?.focus();
       } else {
@@ -178,6 +204,16 @@ export function SignupPage({ code }: { code: string | null }) {
           onBlur={blur("confirm")}
           autoComplete="new-password"
           error={shown("confirm")}
+          disabled={sending}
+        />
+        <ConsentField
+          ref={refs.consent}
+          checked={agreed}
+          onChange={(v) => {
+            setAgreed(v);
+            clear("consent");
+          }}
+          error={errors.consent}
           disabled={sending}
         />
         <div className="flex flex-col gap-3 pt-1">

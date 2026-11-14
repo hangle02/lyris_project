@@ -3,7 +3,7 @@
 ## 1. Brand Identity & Core Philosophy
 
 * **App Name:** **Lyris**
-* **Tagline:** *"Nơi những tâm hồn trang sách bước ra sưởi ấm thực tại"* (Where souls step off the page to warm reality).
+* **Tagline:** *"Nơi những tâm hồn từ trang sách bước ra sưởi ấm thực tại"* (Where souls step off the page to warm reality).
 * **Design Ethos:** **Romantic, Healing, Intimate & Subtly Mysterious** (*Lãng mạn, Chữa lành, Gần gũi nhưng Bí ẩn*).
 * **Visual Metaphor:** Unlike cold sci-fi or sterile utility AI chatbots, **Lyris** feels like reading a cherished novel by candlelight in a rain-kissed attic bookstore (Dark Mode) or writing a love letter on silk parchment under morning sunlight (Light Mode).
 * **Target Form Factor:** Mobile-first iOS Web App / PWA (optimized for iPhone 15/16 Pro ergonomics, Dynamic Island safe areas, and single-thumb navigation) paired with a responsive desktop companion view, connected to a local MacBook M2 server.

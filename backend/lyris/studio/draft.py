@@ -174,6 +174,7 @@ Quy ước chung:
 - Nhân vật thì viết thẳng tên, không viết {{char}} (trừ trong example_dialogues). Ở mọi trường, khi cần đại từ cho nhân vật thì dùng đúng đại từ dẫn truyện của style profile đã chọn (ví dụ cổ trang: "hắn" cho nam, "nàng" cho nữ), không dùng "anh"/"cô" cho nhân vật cổ trang.
 - Tên người, địa danh, đồ vật, món ăn theo đúng văn hoá của bối cảnh: bối cảnh Trung Quốc dùng tên Hán Việt (ví dụ Tạ Vân Lan, Lục Trần, Thanh Vân Tông), bối cảnh Việt Nam dùng tên người Việt (ví dụ Trần Minh Khang), bối cảnh phương Tây dùng tên phương Tây.
 - Ngắn gọn là bắt buộc. Mỗi trường chỉ viết đúng độ dài ghi dưới đây rồi đóng chuỗi ngay. Các trường ngắn viết liền một đoạn, không xuống dòng, không gạch đầu dòng. Không lặp ý giữa các trường.
+- An toàn: không có nội dung tình dục hay gợi dục lộ liễu, không máu me tàn bạo, không cổ vũ tự làm hại bản thân; tuyệt đối không có gì tình dục liên quan tới người dưới 18 tuổi. Tình cảm, ghen tuông, chiếm hữu được phép nhưng kín đáo. Nếu ý tưởng đòi những điều bị cấm thì viết phiên bản an toàn của ý tưởng.
 
 Các trường:
 - name: họ tên đầy đủ của nhân vật, không kèm chức danh hay chú thích.
@@ -217,6 +218,7 @@ General rules:
 - Write the character's name directly; do not write {{char}} (except in example_dialogues). In every field, refer to the character with the chosen style profile's narration pronoun.
 - Names of people, places, objects and food follow the culture of the setting: for a Chinese setting use Sino-Vietnamese readings with diacritics, exactly as the chosen style profile describes (e.g. Tạ Vân Lan, Lục Trần); for a Vietnamese setting use Vietnamese names; for a Western setting use Western names.
 - Brevity is mandatory. Write each field at exactly the length given below, then close the string. Short fields are a single paragraph: no line breaks, no bullet points. Do not repeat information across fields.
+- Safety: no sexual or explicitly suggestive content, no graphic gore, nothing that encourages self-harm; never anything sexual involving anyone under 18. Romance, jealousy and possessiveness are fine but non-explicit. If the idea asks for something prohibited, write a safe version of it.
 
 Fields:
 - name: the character's full name, without titles or notes.

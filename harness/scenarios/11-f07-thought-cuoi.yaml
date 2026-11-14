@@ -1,0 +1,13 @@
+# F07 — kiểu Thought 'Một đoạn ở cuối' (end).
+id: f07-thought-cuoi
+title: Thought một đoạn ở cuối (end)
+note: >-
+  Story kiểu 'Một đoạn ở cuối': câu trả lời có đúng một dòng [Thought: ...] và nó đứng cuối lượt (sau nó
+  không còn chữ), không có Thought chưa đóng.
+mode: story
+thought_style: end
+input: "*Tớ ngáp một cái, kéo chồng đề cương lại gần.* Còn hai chương nữa thôi. Cậu ôn tới đâu rồi? Giảng tớ phần đạo hàm riêng được không?"
+judge: false
+checks:
+  thought_count: 1
+  thought_at_end: true

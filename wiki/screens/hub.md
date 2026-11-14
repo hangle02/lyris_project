@@ -36,9 +36,9 @@ Danh sách tự tải lại khi quay về app từ tab hay app khác.
 
 ## Tính năng
 
-- [Danh sách story](../features/danh-sach-story.md)
-- [Ma trận cảm xúc](../features/ma-tran-cam-xuc.md) (chip cảm xúc trên mỗi hàng)
-- [Giao diện và theme](../features/giao-dien-theme.md)
-- [Tài khoản và profile](../features/tai-khoan-profile.md)
+- [Danh sách story](../features/F25-danh-sach-story.md)
+- [Ma trận cảm xúc](../features/F09-ma-tran-cam-xuc.md) (chip cảm xúc trên mỗi hàng)
+- [Giao diện và theme](../features/F26-giao-dien-theme.md)
+- [Tài khoản và profile](../features/F28-tai-khoan-profile.md)
 
 Chi tiết thiết kế: [DESIGN.md](../../DESIGN.md) trang 1, [design-impl.md §6.1](../../docs/design-impl.md).

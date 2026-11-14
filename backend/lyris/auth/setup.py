@@ -30,7 +30,8 @@ def banner(code: str) -> str:
         [
             RULE,
             " Lyris: đặt mật khẩu cho tài khoản chủ máy",
-            " Mở http://localhost:5173 trên Mac này và nhập mã thiết lập:",
+            # Không ghi cổng hay máy cụ thể: Lyris có thể chạy ở cổng khác (scripts/serve.sh) hay trên máy chủ.
+            " Mở trang Lyris trong trình duyệt và nhập mã thiết lập:",
             "",
             f"     {code}",
             "",

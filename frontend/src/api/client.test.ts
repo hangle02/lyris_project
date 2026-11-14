@@ -154,3 +154,51 @@ test("429 and bodies without a sentence still read in plain Vietnamese", async (
   assert.equal(codeOf({ detail: "x" }), null);
   assert.equal(codeOf({ code: 3 }), null);
 });
+
+test("createCard says when a picture follows, so character_created.has_avatar is right", async () => {
+  const net = fakeNetwork(() => json(200, { id: 9 }));
+  try {
+    const card = { name: "Lâm" } as unknown as Parameters<typeof api.createCard>[0];
+    await api.createCard(card, null, "form", true);
+    await api.createCard(card, "tok", "import");
+    const [withPicture, imported] = net.sent;
+    assert.ok(withPicture && imported);
+    assert.match(withPicture.url, /\/cards\?via=form&with_avatar=true$/);
+    assert.match(imported.url, /\/cards\?via=import$/);
+    assert.equal(JSON.parse(String(imported.init.body)).avatar_token, "tok");
+  } finally {
+    net.restore();
+  }
+});
+
+test("reportCard and unpublishCard hit the character report routes", async () => {
+  const net = fakeNetwork(() => json(200, { id: 1, reason: "hateful", shared_text: false, status: "open" }));
+  try {
+    await api.reportCard(12, { reason: "hateful", note: "" });
+    await api.unpublishCard(12);
+    const [report, hide] = net.sent;
+    assert.ok(report && hide);
+    assert.match(report.url, /\/api\/cards\/12\/report$/);
+    assert.equal(report.init.method, "POST");
+    assert.deepEqual(JSON.parse(String(report.init.body)), { reason: "hateful", note: "" });
+    assert.match(hide.url, /\/api\/admin\/cards\/12\/unpublish$/);
+  } finally {
+    net.restore();
+  }
+});
+
+test("a network failure does not blame 'this machine' (open web: Lyris runs on a server)", async () => {
+  const g = globalThis as unknown as Record<string, unknown>;
+  const before = g.fetch;
+  g.fetch = async () => {
+    throw new TypeError("Failed to fetch");
+  };
+  try {
+    await assert.rejects(api.listStories(), (e: unknown) => {
+      const text = errorMessage(e);
+      return !/máy này|Mac/.test(text) && /kết nối/.test(text);
+    });
+  } finally {
+    g.fetch = before;
+  }
+});

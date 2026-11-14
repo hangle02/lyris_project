@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request
 
+from lyris.analytics import track
 from lyris.api.deps import CurrentAccount, account_id_of, current_account
 from lyris.db.repo import Repo
 from lyris.lore.service import LoreService
@@ -59,13 +60,15 @@ async def create_lore(request: Request, card_id: int, body: LoreEntryIn, account
 async def import_lore(
     request: Request, card_id: int, body: LoreImportRequest, account: CurrentAccount
 ) -> LoreImportResult:
-    return lore_service(request).import_world_md(
+    result = lore_service(request).import_world_md(
         card_id,
         body.text,
         dry_run=body.dry_run,
         delete_missing=body.delete_missing,
         account_id=account_id_of(account),
     )
+    _track_import(request, result, "world_md")
+    return result
 
 
 @router.post("/cards/{card_id}/lore/import-book", response_model=LoreImportResult)
@@ -73,7 +76,16 @@ async def import_card_book(
     request: Request, card_id: int, account: CurrentAccount, body: LoreBookImportRequest | None = None
 ) -> LoreImportResult:
     dry_run = body.dry_run if body is not None else False
-    return lore_service(request).import_card_book(card_id, dry_run=dry_run, account_id=account_id_of(account))
+    result = lore_service(request).import_card_book(card_id, dry_run=dry_run, account_id=account_id_of(account))
+    _track_import(request, result, "card_book")
+    return result
+
+
+def _track_import(request: Request, result: LoreImportResult, fmt: str) -> None:
+    """`lore_imported` khi nhập thật (không phải xem trước): số mục tạo mới + cập nhật."""
+    if not result.dry_run:
+        entries = min(result.created + result.updated, 10_000)
+        track(request, "lore_imported", {"format": fmt, "entries": entries})
 
 
 @router.get("/cards/{card_id}/lore/summary", response_model=LoreSummary)

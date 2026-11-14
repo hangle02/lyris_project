@@ -8,15 +8,24 @@ from collections.abc import AsyncIterator, Mapping
 from contextlib import asynccontextmanager
 from typing import Any
 
+import httpx
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from lyris.accounts import AccountInputError
+from lyris.analytics import store as analytics_store
+from lyris.analytics.forwarder import PostHogForwarder
+from lyris.analytics.tracker import Tracker
 from lyris.api.routes import router
 from lyris.api.routes_accounts import router as accounts_router
 from lyris.api.routes_admin import router as admin_router
+from lyris.api.routes_analytics import admin_router as analytics_admin_router
+from lyris.api.routes_analytics import router as analytics_router
 from lyris.api.routes_auth import router as auth_router
+from lyris.api.routes_compliance import admin_router as compliance_admin_router
+from lyris.api.routes_compliance import public_router as legal_router
+from lyris.api.routes_compliance import router as compliance_router
 from lyris.api.routes_lore import router as lore_router
 from lyris.api.routes_lyris import router as lyris_router
 from lyris.api.routes_state import router as state_router
@@ -46,6 +55,7 @@ from lyris.system import SystemMonitor
 
 logger = logging.getLogger("lyris.api")
 auth_logger = logging.getLogger("lyris.auth")
+analytics_logger = logging.getLogger("lyris.analytics")
 
 # Dọn phiên hết hạn và lần thử cũ (docs/auth.md §1.4, §3.4): lúc khởi động và mỗi giờ.
 AUTH_CLEANUP_SECONDS = 3600
@@ -70,6 +80,7 @@ def prepare_auth(repo: Repo) -> str | None:
     with repo.transaction():
         conn = repo.conn
         auth_store.purge(conn, now)
+        analytics_store.purge(conn, now)  # sự kiện cũ hơn 180 ngày (docs/tracking-plan.md)
         if auth_store.owner_needs_setup(conn):
             return owner_setup.write_new_code(conn, now)
         auth_store.delete_setup(conn)
@@ -86,6 +97,13 @@ async def _auth_cleanup_loop(repo: Repo) -> None:
                 auth_logger.info("Đã dọn %d phiên hết hạn, %d lần thử cũ", sessions, attempts)
         except Exception:
             auth_logger.exception("Không dọn được phiên hết hạn")
+        try:
+            with repo.transaction():
+                events = analytics_store.purge(repo.conn, clock.now())
+            if events:
+                analytics_logger.info("Đã dọn %d sự kiện cũ hơn 180 ngày", events)
+        except Exception:
+            analytics_logger.exception("Không dọn được sự kiện cũ")
 
 
 def _error(status: int, detail: str) -> JSONResponse:
@@ -203,11 +221,17 @@ def create_app(
     llm: LLMClient | None = None,
     *,
     start_worker: bool | None = None,
+    start_forwarder: bool | None = None,
+    posthog_transport: httpx.AsyncBaseTransport | None = None,
 ) -> FastAPI:
     """Tạo app. `settings` mặc định đọc từ biến môi trường lúc khởi động; `llm` mặc định là OllamaClient.
 
     `start_worker`: chạy worker job nền (Phase 3) trong lifespan. None = chỉ chạy khi dùng Ollama thật
     (`llm` None); test truyền LLM giả thì worker không tự chạy, test gọi `app.state.worker.run_until_idle()`.
+
+    Event tracking: `app.state.analytics` (Tracker) luôn có; `app.state.posthog` (PostHogForwarder) chỉ khi có
+    `LYRIS_POSTHOG_KEY`. `start_forwarder` None = chạy task gửi nền khi có khoá; test truyền False và gọi
+    `app.state.posthog.flush()`, kèm `posthog_transport` giả.
     """
 
     @asynccontextmanager
@@ -290,12 +314,27 @@ def create_app(
                 await worker.start()
             else:
                 worker.recover()
+            # Event tracking (docs/tracking-plan.md): ghi vào DB; có khoá PostHog thì chuyển tiếp nền.
+            posthog: PostHogForwarder | None = None
+            if cfg.posthog_key:
+                posthog = PostHogForwarder(
+                    repo, api_key=cfg.posthog_key, host=cfg.posthog_host, transport=posthog_transport
+                )
+            tracker = Tracker(repo, forward=posthog is not None)
+            if posthog is not None:
+                tracker.on_pending = posthog.notify
+            app.state.analytics = tracker
+            app.state.posthog = posthog
+            if posthog is not None and (start_forwarder if start_forwarder is not None else True):
+                await posthog.start()
             cleanup = asyncio.create_task(_auth_cleanup_loop(repo))
             logger.info("Lyris sẵn sàng: DB %s, model %s, Ollama %s", cfg.db_path, cfg.chat_model, cfg.ollama_url)
             try:
                 yield
             finally:
                 cleanup.cancel()
+                if posthog is not None:
+                    await posthog.stop()
                 await worker.stop()
         finally:
             conn.close()
@@ -310,12 +349,17 @@ def create_app(
     _install_error_handlers(app)
     app.include_router(auth_router)
     app.include_router(admin_router)
+    app.include_router(analytics_admin_router)
+    app.include_router(analytics_router)
+    app.include_router(compliance_admin_router)
+    app.include_router(legal_router)
     app.include_router(router)
     app.include_router(studio_router)
     app.include_router(lyris_router)
     app.include_router(state_router)
     app.include_router(accounts_router)
     app.include_router(lore_router)
+    app.include_router(compliance_router)
     return app
 
 

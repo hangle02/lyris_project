@@ -26,6 +26,7 @@ import {
   normalizeTerm,
   prepareForSave,
   relationshipFor,
+  saveProblems,
   splitList,
   suggestNarration,
   toCard,
@@ -354,4 +355,15 @@ test("prepareForSave cleans signature lines; validateCard blocks too many or too
   assert.ok(validateCard(many).includes("Tối đa 3 lời nói đặc trưng."));
   const blank = prepareForSave({ ...card, extensions: { lyris: { signature_lines: [" "] } } });
   assert.equal("signature_lines" in (blank.extensions.lyris as Record<string, unknown>), false);
+});
+
+test("saveProblems: a 4th signature line typed in the editor blocks saving instead of being dropped", () => {
+  // prepareForSave keeps at most 3 lines; the editor must report the 4th, not save the first 3 silently.
+  const typed = { ...emptyCard(), name: "Hạ Vy", style_profile: "chung", extensions: { lyris: { signature_lines: ["một", "hai", "ba", "bốn"] } } };
+  assert.deepEqual(validateCard(prepareForSave(typed)), []);
+  assert.deepEqual(saveProblems(typed), ["Tối đa 3 lời nói đặc trưng."]);
+  const ok = { ...typed, extensions: { lyris: { signature_lines: ["một", "hai", "ba"] } } };
+  assert.deepEqual(saveProblems(ok), []);
+  // Other problems still come from the prepared card, once each.
+  assert.deepEqual(saveProblems({ ...typed, name: " " }), ["Tên nhân vật không được để trống.", "Tối đa 3 lời nói đặc trưng."]);
 });

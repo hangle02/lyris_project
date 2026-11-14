@@ -225,7 +225,7 @@ function CharactersPanel({ cards, error, onRetry }: { cards: CardSummary[] | nul
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         {/* Each tile already says "Riêng tư"; this line says where the cards live, not that again. */}
-        <p className="text-[14px] leading-snug text-muted">Nhân vật bạn tạo, chỉ nằm trên máy này.</p>
+        <p className="text-[14px] leading-snug text-muted">Nhân vật bạn tạo, lưu trong tài khoản của bạn.</p>
         <Button size="sm" variant="ghost" icon={<IconPlus />} onClick={newCard} className="-mr-3 shrink-0">
           Tạo mới
         </Button>
@@ -480,7 +480,7 @@ function PublicProfileView({ handle }: { handle: string }) {
     return (
       <div className="px-4 pt-6 sm:px-0">
         <EmptyState
-          text={`Không có tài khoản ${atHandle(handle)} trên máy này.`}
+          text={`Không có tài khoản ${atHandle(handle)} trên Lyris.`}
           action={
             <Button size="sm" onClick={() => navigate({ name: "hub" })}>
               Về Tương tác

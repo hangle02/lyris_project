@@ -7,11 +7,13 @@ import { turnDomId } from "../pages/chat/eventsLogic";
 import { PlayerAvatarContext } from "../pages/chat/playerAvatar";
 import { buildStoryBlocks, onlyHiddenThoughts } from "../lib/storyBlocks";
 import { MAX_CONTENT_CHARS, splitSegments } from "../lib/text";
+import { messageLockReason } from "../lib/actionLock";
 import { ShowThoughtsContext } from "./showThoughts";
 import {
   IconChevronLeft,
   IconChevronRight,
   IconEdit,
+  IconFlag,
   IconRefreshCw,
   IconThumbsDown,
   IconThumbsUp,
@@ -42,6 +44,8 @@ export interface MessageActions {
   onEdit: (m: Message, content: string) => Promise<boolean>;
   onDelete: (m: Message) => void;
   onFeedback: (m: Message, rating: Rating | null) => void;
+  /** "Báo cáo" a character's reply (docs/compliance.md §2). Absent: no report action (Studio test chat). */
+  onReport?: (m: Message) => void;
 }
 
 interface Props extends MessageActions {
@@ -53,6 +57,8 @@ interface Props extends MessageActions {
   canRegenerate: boolean;
   /** Disable every action (a reply is streaming or a request is in flight). */
   disabled: boolean;
+  /** Why `disabled` (actionLockReason): the locked buttons' tooltip. */
+  lockReason?: string | null;
   /** Later turns from the other mode (hidden in this view) that "Xoá từ đây" also removes. */
   hiddenAfter: number;
 }
@@ -170,7 +176,8 @@ interface ActionRowProps extends MessageActions {
   message: Message;
   isLastAssistant: boolean;
   canRegenerate: boolean;
-  locked: boolean;
+  /** Why every action is locked right now (shown as the tooltip); null = actions open. */
+  lockReason: string | null;
   onStartEdit: () => void;
   onStartDelete: () => void;
   align?: "start" | "end";
@@ -181,22 +188,31 @@ export function ActionRow({
   message,
   isLastAssistant,
   canRegenerate,
-  locked,
+  lockReason,
   onStartEdit,
   onStartDelete,
   onRegenerate,
   onSelectVariant,
   onFeedback,
+  onReport,
   align = "start",
 }: ActionRowProps) {
   const isUser = message.role === "user";
+  const locked = lockReason !== null;
+  // A locked button says why (F06): its tooltip is the reason, its name stays the action.
+  const tip = (label: string) => lockReason ?? label;
   return (
-    <div className={cx("flex flex-wrap items-center gap-0.5", align === "end" && "justify-end")}>
+    <div
+      className={cx("flex flex-wrap items-center gap-0.5", align === "end" && "justify-end")}
+      // Disabled buttons take no pointer events: hovering one shows the row's tooltip instead.
+      title={lockReason ?? undefined}
+    >
       {!isUser && isLastAssistant && message.variant_count > 1 && (
         <div className="mr-1 inline-flex items-center" role="group" aria-label="Các phiên bản trả lời">
           <IconButton
             size="sm"
             label="Phiên bản trước"
+            title={tip("Phiên bản trước")}
             icon={<IconChevronLeft />}
             disabled={locked || message.variant_index <= 0}
             onClick={() => onSelectVariant(message, message.variant_index - 1)}
@@ -207,6 +223,7 @@ export function ActionRow({
           <IconButton
             size="sm"
             label="Phiên bản sau"
+            title={tip("Phiên bản sau")}
             icon={<IconChevronRight />}
             disabled={locked || message.variant_index >= message.variant_count - 1}
             onClick={() => onSelectVariant(message, message.variant_index + 1)}
@@ -217,6 +234,7 @@ export function ActionRow({
         <IconButton
           size="sm"
           label="Tạo lại câu trả lời"
+          title={tip("Tạo lại câu trả lời")}
           icon={<IconRefreshCw />}
           disabled={locked}
           onClick={() => onRegenerate(message)}
@@ -227,6 +245,7 @@ export function ActionRow({
           <IconButton
             size="sm"
             label="Thích"
+            title={tip("Thích")}
             icon={<IconThumbsUp filled={message.rating === "up"} />}
             pressed={message.rating === "up"}
             className={message.rating === "up" ? "text-accent" : undefined}
@@ -236,6 +255,7 @@ export function ActionRow({
           <IconButton
             size="sm"
             label="Chê"
+            title={tip("Chê")}
             icon={<IconThumbsDown filled={message.rating === "down"} />}
             pressed={message.rating === "down"}
             className={message.rating === "down" ? "text-accent" : undefined}
@@ -244,8 +264,26 @@ export function ActionRow({
           />
         </>
       )}
-      <IconButton size="sm" label="Sửa" icon={<IconEdit />} disabled={locked} onClick={onStartEdit} />
-      <IconButton size="sm" label="Xoá từ đây" icon={<IconTrash />} disabled={locked} onClick={onStartDelete} />
+      <IconButton size="sm" label="Sửa" title={tip("Sửa")} icon={<IconEdit />} disabled={locked} onClick={onStartEdit} />
+      <IconButton
+        size="sm"
+        label="Xoá từ đây"
+        title={tip("Xoá từ đây")}
+        icon={<IconTrash />}
+        disabled={locked}
+        onClick={onStartDelete}
+      />
+      {!isUser && onReport && message.id !== null && (
+        <IconButton
+          size="sm"
+          label="Báo cáo"
+          title={tip("Báo cáo")}
+          icon={<IconFlag />}
+          disabled={locked}
+          onClick={() => onReport(message)}
+          aria-haspopup="dialog"
+        />
+      )}
       <span className={align === "end" ? "order-first mr-1" : "ml-1"}>
         <Tags message={message} />
       </span>
@@ -276,6 +314,7 @@ export function MessageItem({
   isLastAssistant,
   canRegenerate,
   disabled,
+  lockReason = null,
   hiddenAfter,
   ...actions
 }: Props) {
@@ -297,7 +336,7 @@ export function MessageItem({
       message={message}
       isLastAssistant={isLastAssistant}
       canRegenerate={canRegenerate}
-      locked={disabled || pending}
+      lockReason={messageLockReason({ disabled, pending, reason: lockReason })}
       align={isUser ? "end" : "start"}
       onStartEdit={() => {
         setConfirmDelete(false);

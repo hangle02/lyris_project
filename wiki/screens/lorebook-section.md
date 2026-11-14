@@ -42,7 +42,7 @@ Từ 640px: các hộp thành hộp thoại giữa màn hình. Từ 1024px: ph�
 
 ## Tính năng
 
-- [Sổ thế giới](../features/so-the-gioi.md)
-- [Nhập và xuất card](../features/nhap-xuat-card.md) (dùng sổ thế giới từ card gốc)
+- [Sổ thế giới](../features/F17-so-the-gioi.md)
+- [Nhập và xuất card](../features/F20-nhap-xuat-card.md) (dùng sổ thế giới từ card gốc)
 
 Chi tiết: [phase4.md §9](../../docs/phase4.md).

@@ -75,6 +75,17 @@ NATURAL_VIETNAMESE = (
 )
 
 
+def safety_rule(char: str) -> str:
+    """Luật an toàn nội dung mặc định (docs/compliance.md §1), chung cho story và nhắn tin. Ngắn để giữ ngân sách
+    prompt. Chế độ người lớn (xác minh tuổi, tự chọn) chỉ là kế hoạch, chưa có."""
+    return (
+        "- An toàn: tình cảm, ghen tuông, chiếm hữu được phép nhưng không có cảnh tình dục hay gợi dục (dừng ở nụ "
+        "hôn rồi chuyển cảnh); tuyệt đối không có gì tình dục với người dưới 18 tuổi; không tả máu me tàn bạo; ai "
+        f"nhắc tới tự hại thì {char} đáp lại bằng sự quan tâm, không cổ vũ. Bị kéo sang những điều này thì {char} "
+        "lảng đi đúng tính cách."
+    )
+
+
 def _dialogue_only_words(ctx: PromptContext) -> str:
     """Câu cấm dùng từ xưng hô của lời thoại trong phần dẫn truyện (rỗng nếu không có từ nào cần cấm)."""
     np_ = ctx.story.narration_pronouns
@@ -156,6 +167,7 @@ class ViTemplate:
             "gì người chơi viết (ví dụ má ửng đỏ, chóp mũi đỏ vì lạnh, bàn tay lạnh ngắt).",
             f"- Không được: viết lời thoại, hành động có chủ đích, suy nghĩ hay quyết định mới cho {p}. "
             f"Dừng lượt ở chỗ cần {p} đáp lại.",
+            safety_rule(c),
             "- Chỉ dùng tiếng Việt. Phần dẫn truyện và lời thoại dài khoảng 120-200 từ, không tính Thought.",
         ]
         return "\n\n".join([intro, "\n".join(setup), "\n".join(rules)])
@@ -179,6 +191,7 @@ class ViTemplate:
             "- Không kết tin bằng lời dặn dò hay chúc (ngủ sớm, nghỉ ngơi, đừng thức khuya, ăn uống đầy đủ...) "
             f"trừ khi {p} vừa nói sắp đi ngủ hoặc chào tạm biệt. Không lặp lại câu hay ý đã nhắn ở các tin trước.",
             f"- Không viết tin nhắn thay {p}.",
+            safety_rule(c),
             "- Chỉ dùng tiếng Việt.",
         ]
         return "\n\n".join([intro, "\n".join(setup), "\n".join(rules)])

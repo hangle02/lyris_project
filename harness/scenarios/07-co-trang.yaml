@@ -13,7 +13,7 @@ checks:
   min_thoughts: 2
   max_thoughts: 4
   no_adjacent_thoughts: true
-  narration_forbidden: [ngươi, sư đệ, sư tỷ, tớ, cậu, tôi, em]
+  narration_forbidden: [ngươi, sư đệ, sư tỷ, tớ, cậu, tôi, anh, em]
   dialogue_required_any: [ta, đệ, sư đệ, ngươi]
   dialogue_forbidden: [anh, em, tớ, cậu, tôi, tao, mày]
   min_words: 80

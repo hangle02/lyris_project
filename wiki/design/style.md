@@ -68,6 +68,7 @@ Ba font, tự host qua `@fontsource` (chạy offline, có dấu tiếng Việt):
 
 - `rounded-card` 20px, `rounded-control` 14px, còn lại `rounded-full`. Lồng nhau thì bo nhỏ dần.
 - Control cao 44px (`md`, mặc định) hoặc 36px (`sm`).
+- Ở điện thoại (dưới 640px) vùng chạm tối thiểu 44px ([README](README.md)): `Button` và `IconButton` cỡ `sm` tự cao 44px (`max-sm:h-11` trong `components/ui/Button.tsx`), `SegmentedControl` (Story/DM, tab Quản trị) có ô cao 44px. Bot đo ở 390px: nút và link trên header, thanh tab (`#/`, `#/studio`, `#/chat`), hàng thao tác dưới lượt chat, hộp 'Xác nhận xoá'. Chip, ô chọn và nút tự làm (không qua `Button`) chưa được đo hết: làm nút mới thì dùng `Button`/`IconButton`.
 - `shadow-float` cho modal, ngăn kéo, menu, thanh tab. `shadow-orb` (hồng mềm) cho quả cầu và nút gửi.
 
 ## 5. Thương hiệu

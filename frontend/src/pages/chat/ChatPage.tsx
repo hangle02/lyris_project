@@ -8,13 +8,15 @@ import { Composer } from "../../components/Composer";
 import { IconChevronLeft } from "../../components/icons";
 import { MessageList } from "../../components/MessageList";
 import { StorySettingsPanel } from "../../components/StorySettingsPanel";
-import { Button, EmptyState } from "../../components/ui";
+import { Button, EmptyState, Toast } from "../../components/ui";
 import { useChat } from "../../hooks/useChat";
 import { useHealth } from "../../hooks/useHealth";
 import { initialOverlayOpen } from "../../lib/overlayParam";
 import { navigate } from "../../lib/router";
+import { REPORT_DONE } from "../../lib/compliance";
 import { showThoughtsOf } from "../../lib/storyOptions";
-import type { Mode, StoryOut, StoryPatch } from "../../types";
+import { setTrackedStory, trackInStory } from "../../lib/track";
+import type { Message, Mode, StoryOut, StoryPatch } from "../../types";
 import { ChatHeader } from "./ChatHeader";
 import { EMPTY_EXTRAS, lastReplyMode, mergeStory, rollbackPatch } from "./chatLogic";
 import { EventsSheet } from "./EventsSheet";
@@ -22,11 +24,13 @@ import { jumpPlan } from "./eventsLogic";
 import { loreSignature } from "./loreLogic";
 import { useStoryLore } from "./useStoryLore";
 import { HeartDrawer } from "./HeartDrawer";
+import { ReportSheet } from "./ReportSheet";
 import { PlayerAvatarContext, usePersonaFace } from "./playerAvatar";
 import { composerActions, replyAnchor, suggestAvailability, suggestView, suggestionsKey } from "./suggestLogic";
 import type { ComposerActionId } from "./suggestLogic";
 import { useStoryExtras } from "./useStoryExtras";
 import { useSuggestions } from "./useSuggestions";
+import { actionLockReason } from "../../lib/actionLock";
 
 const LAST_STORY_KEY = "lyris.lastStoryId";
 const HUB_HASH = "#/";
@@ -80,6 +84,22 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
   const [notice, setNotice] = useState<string | null>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef<HTMLElement>(null);
+  /** "Báo cáo" on a character's reply: the sheet is open for this message. */
+  const [reporting, setReporting] = useState<Message | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const hideToast = useCallback(() => setToast(null), []);
+
+  // Usage events of this screen carry the story (the server checks it is yours).
+  useEffect(() => {
+    setTrackedStory(storyId);
+    return () => setTrackedStory(null);
+  }, [storyId]);
+  useEffect(() => {
+    if (heartOpen) trackInStory("heart_drawer_opened");
+  }, [heartOpen]);
+  useEffect(() => {
+    if (eventsOpen) trackInStory("events_timeline_opened");
+  }, [eventsOpen]);
 
   const health = useHealth();
   const chat = useChat(storyId, story?.mode ?? "story");
@@ -449,6 +469,7 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
             streaming={chat.streaming}
             loading={chat.loading || !story}
             disabled={busy || suggesting}
+            lockReason={actionLockReason({ streaming, suggesting, saving: chat.mutating })}
             characterName={name}
             topInset={headerHeight}
             jumpTo={jumpTo}
@@ -457,6 +478,7 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
             onEdit={chat.edit}
             onDelete={(m) => void chat.deleteFrom(m)}
             onFeedback={(m, r) => void chat.feedback(m, r)}
+            onReport={setReporting}
           />
           </ShowThoughtsContext.Provider>
         </PlayerAvatarContext.Provider>
@@ -513,6 +535,17 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
           }}
         />
       )}
+
+      <ReportSheet
+        message={reporting}
+        characterName={name}
+        onClose={() => setReporting(null)}
+        onDone={() => {
+          setReporting(null);
+          setToast(REPORT_DONE);
+        }}
+      />
+      <Toast text={toast} onDone={hideToast} />
 
       {settingsOpen && story && (
         <StorySettingsPanel

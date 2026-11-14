@@ -2,7 +2,7 @@
 
 Mọi trang trong `wiki/`, mỗi trang một dòng. Thêm trang mới thì thêm dòng ở đây và một dòng ở [log.md](log.md). Cách wiki vận hành: [README.md](README.md).
 
-Trạng thái: **Đã xong** (có trong code), **Một phần** (có code, còn thiếu phần ghi ở trang), **Chưa làm** (mới là kế hoạch).
+Tính năng có mã `F<NN>` (F01, F02, …). Trạng thái (⏳ pending · 🟡 claimed · ✅ passing · ⛔ blocked) **không** ghi trong wiki: nó nằm ở `memory/features.json`, chỉ `verification/verify.sh` chuyển sang ✅. Wiki chỉ ghi **Giai đoạn**: **Đã có** (có trong code) hoặc **Kế hoạch** (chưa làm; luôn ⏳ cho tới khi làm).
 
 ## Tổng quan
 
@@ -11,51 +11,62 @@ Trạng thái: **Đã xong** (có trong code), **Một phần** (có code, còn 
 - [index.md](index.md): trang này, mọi trang của wiki.
 - [log.md](log.md): mỗi thay đổi một dòng, từ 2026-11-12 tới nay.
 
+## Harness
+
+Wiki là phần ① của harness (theo mẫu mini-harness của Apero); ba phần còn lại ở gốc repo. Cách chạy: [README gốc, mục Harness](../README.md#harness-theo-mẫu-mini-harness-của-apero).
+
+- [../environment/README.md](../environment/README.md): ② luật cho AI, kiểm máy, bot trình duyệt (82 check trong `environment/e2e.mjs`), hướng dẫn `--look` ở [look.md](../environment/look.md).
+- [../verification/README.md](../verification/README.md): ③ `verify.sh` (giám khảo) và `plan-check.sh`.
+- [../memory/README.md](../memory/README.md): ④ `features.json` (trạng thái), [progress.md](../memory/progress.md), [po-questions.md](../memory/po-questions.md).
+- Bảng đếm ngày 2026-11-14: ✅ 24 · 🟡 12 (chờ `--real-model`) · ⏳ 5 (Kế hoạch) · ⛔ 0. Mới nhất: `node memory/features.mjs list`.
+
 ## Tính năng
 
-Mỗi trang có "Done when". Phase theo [docs/plan.md](../docs/plan.md) §10.
+Mỗi trang có "Done when" (dòng Unit / Bot / Model thật) và "Tests" (test thật chứng minh các dòng đó). Xếp theo thứ tự: tính năng đã có, lõi trước; kế hoạch ở cuối. Phase theo [docs/plan.md](../docs/plan.md) §10.
 
-| Trang | Trạng thái | Phase | Mô tả ngắn |
-|---|---|---|---|
-| [ai-viet-nhap](features/ai-viet-nhap.md) | Đã xong | 2 | Gõ một dòng ý tưởng, AI viết nháp một card đầy đủ để sửa rồi lưu |
-| [an-chu-ky-thuat](features/an-chu-ky-thuat.md) | Đã xong | 3b | Không chữ model, Ollama, token trên giao diện; phần máy nằm trong "Nâng cao" |
-| [buoc-vao-cau-chuyen](features/buoc-vao-cau-chuyen.md) | Đã xong | 2b | Nút "Bước vào câu chuyện": chọn persona, "Tuỳ chỉnh story" gập sẵn |
-| [che-do-dm](features/che-do-dm.md) | Đã xong | 2, 2b | Khung nhắn tin: bong bóng, avatar, mốc giờ; đổi Story ⇄ DM trên header |
-| [che-do-story](features/che-do-story.md) | Đã xong | 1, 2, 2b | Trả lời như tiểu thuyết: dẫn truyện, thẻ thoại, thẻ suy nghĩ |
-| [chi-dao-an](features/chi-dao-an.md) | Đã xong | 1 | Người chơi ghi chỉ đạo trong ((...)); AI làm theo, giữ giọng nhân vật |
-| [chong-lap](features/chong-lap.md) | Một phần | 3 | Dặn model tránh câu kết, câu mở đầu đã dùng gần đây; chưa thử trên model thật |
-| [dang-nhap](features/dang-nhap.md) | Đã xong | 4b | Đăng nhập, mã mời, chủ máy; mỗi người chỉ thấy story của mình |
-| [danh-sach-story](features/danh-sach-story.md) | Đã xong | 2b | Tab "Tương tác": mọi story, mới nhất trên cùng |
-| [dinh-dang-luot-nguoi-choi](features/dinh-dang-luot-nguoi-choi.md) | Đã xong | 3b, 4 | Quy ước gõ "…", *"…"*, *hành động* và cách hiện lượt người chơi |
-| [doc-suy-nghi](features/doc-suy-nghi.md) | Đã xong | 4 | Công tắc "Đọc suy nghĩ của nhân vật", lưu theo từng story |
-| [dong-thoi-gian-su-kien](features/dong-thoi-gian-su-kien.md) | Đã xong | 3b | Sheet "Sự kiện": lượt có ký ức, cảm xúc, cảnh; chạm để nhảy tới lượt |
-| [dung-chung-may](features/dung-chung-may.md) | Đã xong | 4b | Một model cho nhiều tài khoản: tối đa 2 lượt cùng lúc, xếp hàng |
-| [giao-dien-theme](features/giao-dien-theme.md) | Đã xong | 2b | Hai theme sáng/tối, font tự host, logo, thanh tab 3 tab |
-| [ho-so-nhan-vat](features/ho-so-nhan-vat.md) | Đã xong | 2b | Hồ sơ nhân vật chỉ xem, không bao giờ hiện bí mật |
-| [kham-pha](features/kham-pha.md) | Đã xong | 2b, 4b | Trang Khám phá: nhân vật nổi bật, lọc theo cảm xúc, lưới ô bằng nhau |
-| [ma-tran-cam-xuc](features/ma-tran-cam-xuc.md) | Đã xong | 3, 3b | Sáu chỉ số cảm xúc, tăng và giảm theo tình huống |
-| [menu-cong](features/menu-cong.md) | Đã xong | 3b | Nút "+" ở ô nhập gom các việc phụ |
-| [nhan-goi-y](features/nhan-goi-y.md) | Đã xong | 3b | Gợi ý trả lời chỉ sinh khi bấm "Nhận gợi ý" |
-| [nhan-vat-cong-khai](features/nhan-vat-cong-khai.md) | Đã xong | 4b | Bật "Công khai" để tài khoản khác bắt đầu story bằng một bản sao |
-| [nhap-xuat-card](features/nhap-xuat-card.md) | Đã xong | 2 | Nhập, xuất Character Card V1/V2 (.json, .png) |
-| [persona](features/persona.md) | Đã xong | 2, 2c | Một tài khoản nhiều persona; persona dùng khi trò chuyện |
-| [quan-ly-tai-khoan](features/quan-ly-tai-khoan.md) | Đã xong | 4b | Trang của chủ máy: mã mời, thành viên, đặt lại mật khẩu, tạm khoá |
-| [so-the-gioi](features/so-the-gioi.md) | Đã xong | 4 | Sổ thế giới theo từng nhân vật, mở khi story nhắc từ khoá gợi nhớ |
-| [tai-khoan-profile](features/tai-khoan-profile.md) | Đã xong | 2c | Tài khoản và trang profile, tách khỏi persona |
-| [tang-toc-prefill](features/tang-toc-prefill.md) | Đã xong | 3b | Cửa sổ lịch sử theo khúc và gửi trước phần đầu prompt khi rảnh |
-| [thao-tac-tin-nhan](features/thao-tac-tin-nhan.md) | Đã xong | 1 | Tạo lại, lật phiên bản, sửa, xoá từ đây, thích/chê |
-| [the-suy-nghi](features/the-suy-nghi.md) | Đã xong | 1, 2b | Thẻ suy nghĩ làm mờ, "Chạm để lắng nghe", rải giữa truyện |
-| [tri-nho](features/tri-nho.md) | Đã xong | 3 | Ký ức, điều đã biết, tóm tắt, cảnh; tìm lại ký ức mỗi lượt |
-| [truy-cap-lan](features/truy-cap-lan.md) | Đã xong | 3, 4b | Mở app trên điện thoại cùng Wi-Fi (cổng 5173), vẫn phải đăng nhập |
-| [van-phong-xung-ho](features/van-phong-xung-ho.md) | Đã xong | 0-2 | Xưng hô và văn phong theo bối cảnh; thiết lập story |
-| [xuong-nhan-vat](features/xuong-nhan-vat.md) | Đã xong | 2, 2b | Studio: tạo, sửa nhân vật, chat thử trước khi lưu |
-| [dm-story-chung-dong-thoi-gian](features/dm-story-chung-dong-thoi-gian.md) | Một phần | 3b | Story nhớ điều đã nói qua DM; chưa thử trên model thật |
-| [harness-kiem-tra](features/harness-kiem-tra.md) | Một phần | 0, 1, 2 | Bake-off model và chấm hành vi; kịch bản sổ thế giới chưa chạy |
-| [iphone-tailscale](features/iphone-tailscale.md) | Một phần | 6 | Có PWA và icon; chưa có Tailscale Serve |
-| [cong-dong](features/cong-dong.md) | Chưa làm | 7 | Bình luận, đăng ảnh, chia sẻ ra ngoài máy Mac |
-| [dao-dien-khoanh-khac](features/dao-dien-khoanh-khac.md) | Chưa làm | 8 | Đạo diễn nhịp truyện, nhiều nhân vật, Khoảnh khắc |
-| [gui-hinh-anh](features/gui-hinh-anh.md) | Chưa làm | chưa xếp | Gửi ảnh trong chat; mục trong menu "+" đang khoá "Sắp có" |
-| [tu-train-model](features/tu-train-model.md) | Chưa làm | 5 | Fine-tune LoRA từ chat đã đánh giá, rồi nạp lại vào app |
+| ID | Trang | Giai đoạn | Phase | Mô tả ngắn |
+|---|---|---|---|---|
+| F01 | [che-do-story](features/F01-che-do-story.md) | Đã có | 1, 2, 2b | Trả lời như tiểu thuyết: dẫn truyện, thẻ thoại, thẻ suy nghĩ |
+| F02 | [che-do-dm](features/F02-che-do-dm.md) | Đã có | 2, 2b | Khung nhắn tin: bong bóng, avatar, mốc giờ; đổi Story ⇄ DM trên header |
+| F03 | [van-phong-xung-ho](features/F03-van-phong-xung-ho.md) | Đã có | 0-2 | Xưng hô và văn phong theo bối cảnh; thiết lập story |
+| F04 | [dinh-dang-luot-nguoi-choi](features/F04-dinh-dang-luot-nguoi-choi.md) | Đã có | 3b, 4 | Quy ước gõ "…", *"…"*, *hành động* và cách hiện lượt người chơi |
+| F05 | [chi-dao-an](features/F05-chi-dao-an.md) | Đã có | 1 | Người chơi ghi chỉ đạo trong ((...)); AI làm theo, giữ giọng nhân vật |
+| F06 | [thao-tac-tin-nhan](features/F06-thao-tac-tin-nhan.md) | Đã có | 1 | Tạo lại, lật phiên bản, sửa, xoá từ đây, thích/chê |
+| F07 | [the-suy-nghi](features/F07-the-suy-nghi.md) | Đã có | 1, 2b | Thẻ suy nghĩ làm mờ, "Chạm để lắng nghe", rải giữa truyện |
+| F08 | [doc-suy-nghi](features/F08-doc-suy-nghi.md) | Đã có | 4 (B) | Công tắc "Đọc suy nghĩ của nhân vật", lưu theo từng story |
+| F09 | [ma-tran-cam-xuc](features/F09-ma-tran-cam-xuc.md) | Đã có | 3, 3b | Sáu chỉ số cảm xúc, tăng và giảm theo tình huống |
+| F10 | [tri-nho](features/F10-tri-nho.md) | Đã có | 3 | Ký ức, điều đã biết, tóm tắt, cảnh; tìm lại ký ức mỗi lượt |
+| F11 | [dong-thoi-gian-su-kien](features/F11-dong-thoi-gian-su-kien.md) | Đã có | 3b | Sheet "Sự kiện": lượt có ký ức, cảm xúc, cảnh; chạm để nhảy tới lượt |
+| F12 | [dm-story-chung-dong-thoi-gian](features/F12-dm-story-chung-dong-thoi-gian.md) | Đã có | 3b (§10.8) | Story nhớ điều đã nói qua DM; chưa thử trên model thật |
+| F13 | [chong-lap](features/F13-chong-lap.md) | Đã có | 3 | Dặn model tránh câu kết, câu mở đầu đã dùng gần đây; chưa thử trên model thật |
+| F14 | [tang-toc-prefill](features/F14-tang-toc-prefill.md) | Đã có | 3b (§10.1, §10.6) | Cửa sổ lịch sử theo khúc và gửi trước phần đầu prompt khi rảnh |
+| F15 | [nhan-goi-y](features/F15-nhan-goi-y.md) | Đã có | 3b | Gợi ý trả lời chỉ sinh khi bấm "Nhận gợi ý" |
+| F16 | [menu-cong](features/F16-menu-cong.md) | Đã có | 3b | Nút "+" ở ô nhập gom các việc phụ |
+| F17 | [so-the-gioi](features/F17-so-the-gioi.md) | Đã có | 4 | Sổ thế giới theo từng nhân vật, mở khi story nhắc từ khoá gợi nhớ |
+| F18 | [xuong-nhan-vat](features/F18-xuong-nhan-vat.md) | Đã có | 2, 2b | Studio: tạo, sửa nhân vật, chat thử trước khi lưu |
+| F19 | [ai-viet-nhap](features/F19-ai-viet-nhap.md) | Đã có | 2 | Gõ một dòng ý tưởng, AI viết nháp một card đầy đủ để sửa rồi lưu |
+| F20 | [nhap-xuat-card](features/F20-nhap-xuat-card.md) | Đã có | 2 | Nhập, xuất Character Card V1/V2 (.json, .png) |
+| F21 | [persona](features/F21-persona.md) | Đã có | 2, 2c | Một tài khoản nhiều persona; persona dùng khi trò chuyện |
+| F22 | [kham-pha](features/F22-kham-pha.md) | Đã có | 2b, 4b | Trang Khám phá: nhân vật nổi bật, lọc theo cảm xúc, lưới ô bằng nhau |
+| F23 | [ho-so-nhan-vat](features/F23-ho-so-nhan-vat.md) | Đã có | 2b (§16) | Hồ sơ nhân vật chỉ xem, không bao giờ hiện bí mật |
+| F24 | [buoc-vao-cau-chuyen](features/F24-buoc-vao-cau-chuyen.md) | Đã có | 2b (§16) | Nút "Bước vào câu chuyện": chọn persona, "Tuỳ chỉnh story" gập sẵn |
+| F25 | [danh-sach-story](features/F25-danh-sach-story.md) | Đã có | 2b | Tab "Tương tác": mọi story, mới nhất trên cùng |
+| F26 | [giao-dien-theme](features/F26-giao-dien-theme.md) | Đã có | 2b | Hai theme sáng/tối, font tự host, logo, thanh tab 3 tab |
+| F27 | [an-chu-ky-thuat](features/F27-an-chu-ky-thuat.md) | Đã có | 3b | Không chữ model, Ollama, token trên giao diện; phần máy nằm trong "Nâng cao" |
+| F28 | [tai-khoan-profile](features/F28-tai-khoan-profile.md) | Đã có | 2c | Tài khoản và trang profile, tách khỏi persona |
+| F29 | [dang-nhap](features/F29-dang-nhap.md) | Đã có | 4b | Đăng nhập, mã mời, chủ máy; mỗi người chỉ thấy story của mình |
+| F30 | [quan-ly-tai-khoan](features/F30-quan-ly-tai-khoan.md) | Đã có | 4b | Trang của chủ máy: mã mời, thành viên, đặt lại mật khẩu, tạm khoá |
+| F31 | [nhan-vat-cong-khai](features/F31-nhan-vat-cong-khai.md) | Đã có | 4b | Bật "Công khai" để tài khoản khác bắt đầu story bằng một bản sao |
+| F32 | [dung-chung-may](features/F32-dung-chung-may.md) | Đã có | 4b | Một model cho nhiều tài khoản: tối đa 2 lượt cùng lúc, xếp hàng |
+| F33 | [truy-cap-lan](features/F33-truy-cap-lan.md) | Đã có | 3, 4b | Mở app trên điện thoại cùng Wi-Fi (cổng 5173), vẫn phải đăng nhập |
+| F34 | [theo-doi-su-kien](features/F34-theo-doi-su-kien.md) | Đã có | Ra mắt | 40 sự kiện không chứa chữ người dùng, tab "Số liệu", xuất CSV/JSONL, PostHog khi có khoá; chưa thử với PostHog thật |
+| F35 | [quyen-rieng-tu-va-bao-cao](features/F35-quyen-rieng-tu-va-bao-cao.md) | Đã có | Ra mắt | Nội dung an toàn, Điều khoản và Chính sách có đồng ý, "Báo cáo", tải dữ liệu, xoá tài khoản, báo cáo nhân vật công khai; email liên hệ đặt bằng `LYRIS_CONTACT` |
+| F36 | [harness-kiem-tra](features/F36-harness-kiem-tra.md) | Đã có | 0, 1, 2 | Bake-off model và chấm hành vi; kịch bản sổ thế giới chưa chạy |
+| F37 | [iphone-tailscale](features/F37-iphone-tailscale.md) | Kế hoạch | 6 | Có PWA và icon; chưa có Tailscale Serve |
+| F38 | [gui-hinh-anh](features/F38-gui-hinh-anh.md) | Kế hoạch | Chưa xếp phase | Gửi ảnh trong chat; mục trong menu "+" đang khoá "Sắp có" |
+| F39 | [cong-dong](features/F39-cong-dong.md) | Kế hoạch | 7 | Bình luận, đăng ảnh, chia sẻ ra ngoài máy Mac |
+| F40 | [dao-dien-khoanh-khac](features/F40-dao-dien-khoanh-khac.md) | Kế hoạch | 8 (tuỳ chọn) | Đạo diễn nhịp truyện, nhiều nhân vật, Khoảnh khắc |
+| F41 | [tu-train-model](features/F41-tu-train-model.md) | Kế hoạch | 5 | Fine-tune LoRA từ chat đã đánh giá, rồi nạp lại vào app |
 
 ## Màn hình
 
@@ -140,6 +151,10 @@ Xếp theo ngày. "Ai quyết": người dùng, thiết kế, hay đo đạc.
 | 2026-11-14 | [cong-sinh-chung](decisions/cong-sinh-chung.md) | Một model chia cho nhiều người: tối đa 2 lượt cùng lúc | thiết kế |
 | 2026-11-14 | [du-lieu-train-co-dong-y](decisions/du-lieu-train-co-dong-y.md) | Dữ liệu train chỉ lấy từ tài khoản đã đồng ý | thiết kế |
 | 2026-11-14 | [luoi-o-bang-nhau](decisions/luoi-o-bang-nhau.md) | Ô nhân vật trong lưới luôn bằng nhau | người dùng |
+| 2026-11-14 | [luu-su-kien-trong-app-va-posthog](decisions/luu-su-kien-trong-app-va-posthog.md) | Sự kiện lưu trong DB của app, gửi thêm PostHog khi có khoá; không bao giờ có chữ người dùng | người dùng |
+| 2026-11-14 | [noi-dung-an-toan-chua-cong-tuoi](decisions/noi-dung-an-toan-chua-cong-tuoi.md) | Nội dung mặc định an toàn, chưa có cổng tuổi; chế độ người lớn chỉ là kế hoạch | người dùng |
+| 2026-11-14 | [kich-ban-model-that](decisions/kich-ban-model-that.md) | Mỗi dòng "Model thật" có kịch bản luật máy; phần chỉ người chấm được tách ra (tạm chọn) | thiết kế |
+| 2026-11-14 | [nguong-ttft-f14](decisions/nguong-ttft-f14.md) | TTFT mỗi lượt sau lượt đầu ≤ 6 giây, đo qua app thật (tạm chọn) | đo đạc |
 
 ## Thiết kế
 
@@ -181,3 +196,4 @@ Lời chủ dự án, chép nguyên văn. Không sửa.
 
 - [plan-checklist.md](plan-checklist.md): 8 phần một ý tưởng phải có; dùng để hỏi lại khi ý tưởng còn thiếu.
 - Kế hoạch đầy đủ và lộ trình các phase nằm ngoài wiki: [docs/plan.md](../docs/plan.md). Thiết kế chi tiết từng phase: [phase1.md](../docs/phase1.md), [phase2.md](../docs/phase2.md), [design-impl.md](../docs/design-impl.md), [accounts.md](../docs/accounts.md), [phase3.md](../docs/phase3.md), [phase4.md](../docs/phase4.md), [auth.md](../docs/auth.md).
+- Ra mắt: [tracking-plan.md](../docs/tracking-plan.md) (sự kiện, KPI), [compliance.md](../docs/compliance.md) (tuân thủ), [deploy.md](../docs/deploy.md) (chạy production), [demo-script.md](../docs/demo-script.md) (kịch bản video demo).

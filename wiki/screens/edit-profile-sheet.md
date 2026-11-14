@@ -30,6 +30,6 @@ Từ 640px: hộp thoại giữa màn hình, cỡ vừa.
 
 ## Tính năng
 
-- [Tài khoản và profile](../features/tai-khoan-profile.md)
+- [Tài khoản và profile](../features/F28-tai-khoan-profile.md)
 
 Chi tiết: [accounts.md §5](../../docs/accounts.md).

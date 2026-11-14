@@ -77,6 +77,16 @@ NATURAL_ENGLISH = (
 )
 
 
+def safety_rule(char: str) -> str:
+    """Default content-safety rule (docs/compliance.md §1), shared by story and texting modes. Kept short for the
+    prompt budget. A mature mode (age verification, opt-in) is planned only, not built."""
+    return (
+        "- Safety: romance, jealousy and possessiveness are fine, but no sexual or suggestive scenes (stop at a kiss "
+        "and cut away); never anything sexual involving anyone under 18; no graphic gore; if self-harm comes up, "
+        f"{char} responds with care, never encouragement. If pushed toward any of this, {char} deflects in character."
+    )
+
+
 class EnTemplate:
     story_start = "(The story begins.)"
     story_continues = "(The story continues.)"
@@ -139,6 +149,7 @@ class EnTemplate:
             "player wrote (a blush, a nose red from the cold, cold hands).",
             f"- Never write new dialogue, deliberate actions, thoughts or decisions for {p}. "
             f"End the turn where {p} needs to respond.",
+            safety_rule(c),
             "- English only. Narration and dialogue about 120-200 words, not counting Thought lines.",
         ]
         return "\n\n".join([intro, "\n".join(setup), "\n".join(rules)])
@@ -162,6 +173,7 @@ class EnTemplate:
             "- Do not end with advice or well-wishes (sleep early, get some rest, eat properly...) unless "
             f"{p} just said goodnight or goodbye. Never repeat a line or idea from earlier texts.",
             f"- Never write messages for {p}.",
+            safety_rule(c),
             "- English only.",
         ]
         return "\n\n".join([intro, "\n".join(setup), "\n".join(rules)])

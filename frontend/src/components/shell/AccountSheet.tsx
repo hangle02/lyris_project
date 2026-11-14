@@ -1,8 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode, RefObject } from "react";
-import { api, errorMessage, errorTechnical } from "../../api/client";
+import { api, downloadAccountData, errorMessage, errorTechnical } from "../../api/client";
 import { useAdvancedTools } from "../../hooks/useAdvancedTools";
-import { signOut, useAuthAccount } from "../../hooks/useAuth";
+import { accountDeleted, signOut, useAuthAccount } from "../../hooks/useAuth";
+import { setAccount } from "../../hooks/useAccount";
+import { PasswordField } from "../../pages/auth/AuthLayout";
+import {
+  ABOUT_TEXT,
+  DELETE_CONFIRM,
+  DELETE_KEPT,
+  DELETE_LABEL,
+  DELETE_OWNER,
+  DELETE_WHAT,
+  EXPORT_HINT,
+  EXPORT_LABEL,
+  PRIVACY_LABEL,
+  SHARING_HINT,
+  SHARING_LABEL,
+  SHARING_OFF_NOTE,
+  TERMS_LABEL,
+} from "../../lib/compliance";
 import { ChangePasswordForm } from "../../pages/auth/ChangePasswordForm";
 import { logoutAllConfirm, PASSWORD_CHANGED } from "../../pages/auth/logic";
 import type { AccountState } from "../../hooks/useAccount";
@@ -15,7 +32,7 @@ import type { ImageCredit } from "../../pages/explore/logic";
 import { GENDER_LABELS } from "../../lib/storyOptions";
 import { Avatar } from "../Avatar";
 import { Wordmark } from "../brand";
-import { IconCheck, IconChevronLeft } from "../icons";
+import { IconCheck, IconChevronLeft, IconDownload } from "../icons";
 import { Badge, Button, Disclosure, EmptyState, ErrorDetails, InlineAlert, Meter, Modal, Select, Skeleton, Spinner, Toggle } from "../ui";
 import type { BadgeTone } from "../ui";
 import { cx } from "../ui/logic";
@@ -614,6 +631,170 @@ function AdvancedSection({ level, state }: { level: HealthLevel; state: PersonaS
   );
 }
 
+/** Saves a downloaded file (an object URL clicked through a hidden link). */
+function saveFile(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.rel = "noopener";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
+
+/**
+ * "Dữ liệu & quyền riêng tư" (docs/compliance.md §4, docs/tracking-plan.md §2): the usage-sharing
+ * switch, "Tải dữ liệu của tôi" and the way to "Xoá tài khoản". Plain words only.
+ */
+function PrivacySection({ state, onDelete }: { state: AccountState; onDelete: () => void }) {
+  const { account } = state;
+  const sharing = account ? account.analytics_opt_out !== true : true;
+  const [saving, setSaving] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const [error, setError] = useState<{ text: string; technical: string | null } | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<{ text: string; technical: string | null } | null>(null);
+
+  const toggle = async (on: boolean) => {
+    setSaving(true);
+    setError(null);
+    setNote(null);
+    try {
+      setAccount(await api.patchAccount({ analytics_opt_out: !on }));
+      if (!on) setNote(SHARING_OFF_NOTE);
+    } catch (e) {
+      setError({ text: errorMessage(e), technical: errorTechnical(e) });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const download = async () => {
+    setExporting(true);
+    setExportError(null);
+    try {
+      const { blob, filename } = await downloadAccountData();
+      saveFile(blob, filename);
+    } catch (e) {
+      setExportError({ text: errorMessage(e), technical: errorTechnical(e) });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  return (
+    <Section title="Dữ liệu & quyền riêng tư">
+      <Toggle
+        label={SHARING_LABEL}
+        description={SHARING_HINT}
+        checked={sharing}
+        onChange={(on) => void toggle(on)}
+        disabled={!account}
+        busy={saving}
+      />
+      {note && (
+        <p role="status" className="-mt-1 text-[13px] leading-snug text-muted">
+          {note}
+        </p>
+      )}
+      {error && <InlineAlert tone="error" text={error.text} technical={error.technical} />}
+      <div className="flex flex-col items-start gap-1.5">
+        <Button size="sm" variant="secondary" icon={<IconDownload />} loading={exporting} onClick={() => void download()} className="max-sm:h-11">
+          {EXPORT_LABEL}
+        </Button>
+        <p className="text-[13px] leading-snug text-muted">{EXPORT_HINT}</p>
+        {exportError && <InlineAlert tone="error" text={exportError.text} technical={exportError.technical} />}
+      </div>
+      <div className="-ml-3">
+        <button
+          type="button"
+          onClick={onDelete}
+          className="inline-flex h-11 items-center rounded-full px-3 text-[14px] font-semibold text-danger transition-colors duration-150 hover:bg-surface-2 sm:h-9"
+        >
+          {DELETE_LABEL}
+        </button>
+      </div>
+    </Section>
+  );
+}
+
+/** "Xoá tài khoản" inside the sheet: what goes, what stays, the owner's case, then the password. */
+function DeleteView({ onBack, backRef }: { onBack: () => void; backRef: RefObject<HTMLButtonElement> }) {
+  const account = useAuthAccount();
+  const isOwner = account?.role === "owner";
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<{ text: string; technical: string | null } | null>(null);
+  const [missing, setMissing] = useState(false);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const run = async () => {
+    if (busy) return;
+    if (!password) {
+      setMissing(true);
+      passwordRef.current?.focus();
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await api.deleteAccount(password);
+      accountDeleted(res.setup_required);
+    } catch (e) {
+      setError({ text: errorMessage(e), technical: errorTechnical(e) });
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="-ml-2 pt-1">
+        <Button ref={backRef} size="sm" variant="ghost" icon={<IconChevronLeft />} onClick={onBack} disabled={busy} className="max-sm:h-11">
+          Tài khoản
+        </Button>
+      </div>
+      <div className="flex flex-col gap-3 text-[14px] leading-relaxed">
+        <p className="text-fg">{DELETE_WHAT}</p>
+        <p className="text-muted">{DELETE_KEPT}</p>
+        {isOwner && <p className="rounded-control bg-surface-2 px-4 py-3 text-fg">{DELETE_OWNER}</p>}
+        <p className="text-muted">Muốn giữ lại một bản? Hãy tải dữ liệu trước khi xoá.</p>
+      </div>
+      <form
+        noValidate
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void run();
+        }}
+      >
+        <PasswordField
+          ref={passwordRef}
+          label="Mật khẩu hiện tại"
+          value={password}
+          onChange={(v) => {
+            setPassword(v);
+            setMissing(false);
+          }}
+          autoComplete="current-password"
+          error={missing ? "Hãy nhập mật khẩu để xác nhận." : undefined}
+          disabled={busy}
+        />
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button variant="ghost" onClick={onBack} disabled={busy} className="max-sm:w-full">
+            Giữ tài khoản
+          </Button>
+          <Button type="submit" variant="danger" loading={busy} className="max-sm:w-full">
+            {DELETE_CONFIRM}
+          </Button>
+        </div>
+        {error && <InlineAlert tone="error" text={error.text} technical={error.technical} />}
+      </form>
+    </div>
+  );
+}
+
 /** "Giới thiệu & bản quyền ảnh": the wordmark, one line about Lyris and the image credits. */
 function AboutView({ onBack, backRef }: { onBack: () => void; backRef: RefObject<HTMLButtonElement> }) {
   return (
@@ -626,7 +807,7 @@ function AboutView({ onBack, backRef }: { onBack: () => void; backRef: RefObject
       <div className="flex flex-col items-start gap-2">
         <Wordmark size={34} />
         <p className="text-[15px] leading-relaxed text-prose">
-          Lyris chạy hoàn toàn trên chiếc Mac này: nhân vật, story và ký ức của bạn không rời khỏi máy.
+          {ABOUT_TEXT}
         </p>
       </div>
       <CreditsList />
@@ -644,7 +825,7 @@ export interface AccountSheetProps {
   /** Personas and app settings, shared with the header. */
   personaState: PersonaSettingsState;
   /** Open straight on the about view ("?open=about", for screenshots). */
-  initialView?: "main" | "about" | "password";
+  initialView?: "main" | "about" | "password" | "delete";
 }
 
 /**
@@ -655,7 +836,7 @@ export interface AccountSheetProps {
  * "?open=system" opens it on load, "?open=about" on the about view.
  */
 export function AccountSheet({ open, onClose, healthLevel, accountState, personaState, initialView = "main" }: AccountSheetProps) {
-  const [view, setView] = useState<"main" | "about" | "password">(initialView);
+  const [view, setView] = useState<"main" | "about" | "password" | "delete">(initialView);
   const [notice, setNotice] = useState<string | null>(null);
   const backRef = useRef<HTMLButtonElement>(null);
   const aboutLinkRef = useRef<HTMLButtonElement>(null);
@@ -676,7 +857,7 @@ export function AccountSheet({ open, onClose, healthLevel, accountState, persona
     (view !== "main" ? backRef.current : aboutLinkRef.current)?.focus();
   }, [view]);
 
-  const go = (next: "main" | "about" | "password") => {
+  const go = (next: "main" | "about" | "password" | "delete") => {
     moved.current = true;
     setView(next);
   };
@@ -687,12 +868,16 @@ export function AccountSheet({ open, onClose, healthLevel, accountState, persona
     <Modal
       open={open}
       onClose={onClose}
-      title={view === "about" ? "Giới thiệu & bản quyền ảnh" : view === "password" ? "Đổi mật khẩu" : "Tài khoản"}
+      title={
+        view === "about" ? "Giới thiệu & bản quyền ảnh" : view === "password" ? "Đổi mật khẩu" : view === "delete" ? "Xoá tài khoản" : "Tài khoản"
+      }
       size="md"
     >
       {open &&
         (view === "about" ? (
           <AboutView onBack={() => go("main")} backRef={backRef} />
+        ) : view === "delete" ? (
+          <DeleteView onBack={() => go("main")} backRef={backRef} />
         ) : view === "password" ? (
           <PasswordView
             onBack={() => go("main")}
@@ -714,6 +899,7 @@ export function AccountSheet({ open, onClose, healthLevel, accountState, persona
               }}
             />
             <PersonaSection state={personaState} onLeave={onClose} />
+            <PrivacySection state={accountState} onDelete={() => go("delete")} />
             {machineLine && (
               <p role="status" className="rounded-control bg-surface-2 px-4 py-3 text-[14px] leading-snug text-fg">
                 {machineLine}
@@ -721,7 +907,7 @@ export function AccountSheet({ open, onClose, healthLevel, accountState, persona
             )}
             <AdvancedSection level={healthLevel} state={personaState} />
             <SignOutSection />
-            <div className="-mt-1 flex justify-center border-t border-line pt-3">
+            <div className="-mt-1 flex flex-wrap items-center justify-center gap-x-1 border-t border-line pt-3">
               <button
                 ref={aboutLinkRef}
                 type="button"
@@ -730,6 +916,20 @@ export function AccountSheet({ open, onClose, healthLevel, accountState, persona
               >
                 Giới thiệu & bản quyền ảnh
               </button>
+              <a
+                href="#/privacy"
+                onClick={onClose}
+                className="inline-flex min-h-11 items-center rounded-full px-3 text-[13px] text-muted underline decoration-line-strong underline-offset-2 transition-colors duration-150 hover:text-fg"
+              >
+                {PRIVACY_LABEL}
+              </a>
+              <a
+                href="#/terms"
+                onClick={onClose}
+                className="inline-flex min-h-11 items-center rounded-full px-3 text-[13px] text-muted underline decoration-line-strong underline-offset-2 transition-colors duration-150 hover:text-fg"
+              >
+                {TERMS_LABEL}
+              </a>
             </div>
           </div>
         ))}

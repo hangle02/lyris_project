@@ -30,7 +30,7 @@ Từ 640px: thành hộp thoại giữa màn hình.
 
 ## Tính năng
 
-- [Dòng thời gian sự kiện](../features/dong-thoi-gian-su-kien.md)
-- [Đạo diễn khoảnh khắc](../features/dao-dien-khoanh-khac.md) (tab Khoảnh khắc, chưa làm)
+- [Dòng thời gian sự kiện](../features/F11-dong-thoi-gian-su-kien.md)
+- [Đạo diễn khoảnh khắc](../features/F40-dao-dien-khoanh-khac.md) (tab Khoảnh khắc, chưa làm)
 
 Chi tiết: [design-impl.md §15](../../docs/design-impl.md), [plan.md](../../docs/plan.md) (Phase 8).

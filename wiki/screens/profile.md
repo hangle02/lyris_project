@@ -34,7 +34,7 @@ Lưới nhân vật: 2 cột ở điện thoại, 3 cột từ 640px. Từ 640px
 
 ## Tính năng
 
-- [Tài khoản và profile](../features/tai-khoan-profile.md)
-- [Nhân vật công khai](../features/nhan-vat-cong-khai.md) (trang người khác)
+- [Tài khoản và profile](../features/F28-tai-khoan-profile.md)
+- [Nhân vật công khai](../features/F31-nhan-vat-cong-khai.md) (trang người khác)
 
 Chi tiết: [accounts.md §5](../../docs/accounts.md).

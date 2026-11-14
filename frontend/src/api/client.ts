@@ -3,8 +3,19 @@ import { friendlyError } from "../lib/friendlyError.ts";
 import type { FriendlyError } from "../lib/friendlyError.ts";
 import { SSEParser } from "../lib/sse.ts";
 import type {
+  AccountDeleted,
   AccountOut,
+  AccountPatch,
   AdminAccount,
+  AdminReport,
+  AnalyticsSummary,
+  LegalDoc,
+  LegalOut,
+  ReportOut,
+  ReportRequest,
+  CardReportRequest,
+  ReportStatus,
+  TermsState,
   AuthState,
   ChangePasswordRequest,
   InviteCreated,
@@ -95,7 +106,7 @@ function notifyAuth(path: string, err: ApiError): void {
   target.dispatchEvent(new CustomEvent(AUTH_EVENT, { detail: { status: err.status, code: err.code } }));
 }
 
-const NETWORK_ERROR = "Không kết nối được Lyris trên máy này. Hãy thử lại sau giây lát.";
+const NETWORK_ERROR = "Không kết nối được Lyris. Hãy kiểm tra mạng rồi thử lại sau giây lát.";
 /** What "Chi tiết" says about NETWORK_ERROR. */
 const NETWORK_TECHNICAL = "Không gọi được máy chủ Lyris (/api). Kiểm tra backend đã chạy chưa: bash scripts/dev.sh.";
 
@@ -297,9 +308,21 @@ export const api = {
   // ---- Phase 2: cards ----
   listCards: () => request<CardSummary[]>("GET", "/cards"),
   getCard: (id: number) => request<CardOut>("GET", `/cards/${id}`),
-  /** `avatarToken` attaches the image held from an import. */
-  createCard: (card: CharacterCard, avatarToken?: string | null) =>
-    request<CardOut>("POST", "/cards", { card, avatar_token: avatarToken ?? null }),
+  /**
+   * `avatarToken` attaches the image held from an import. `via`: how the card was made, and
+   * `withAvatar`: a picture is uploaded right after (uploadAvatar), both for the usage numbers only
+   * (docs/tracking-plan.md `character_created`).
+   */
+  createCard: (
+    card: CharacterCard,
+    avatarToken?: string | null,
+    via: "form" | "ai_draft" | "import" = "form",
+    withAvatar = false,
+  ) =>
+    request<CardOut>("POST", `/cards${query({ via, with_avatar: withAvatar || undefined })}`, {
+      card,
+      avatar_token: avatarToken ?? null,
+    }),
   updateCard: (id: number, card: CharacterCard) => request<CardOut>("PUT", `/cards/${id}`, card),
   /** 409 when stories use the card, unless withStories (deletes those stories and their messages too). */
   deleteCard: (id: number, withStories = false) =>
@@ -416,7 +439,63 @@ export const api = {
       "DELETE",
       `/personas/${id}${query({ with_stories: withStories || undefined })}`,
     ),
+
+  // ---- launch: legal, consent, reports, own data (docs/compliance.md §7) ----
+  /** Terms / Privacy Policy as markdown; works signed out and before the owner setup. */
+  getLegal: (doc: LegalDoc, signal?: AbortSignal) => request<LegalOut>("GET", `/legal/${doc}`, undefined, signal),
+  /** The one-time agreement of an existing account (409 when the version moved on meanwhile). */
+  acceptTerms: (version: string) => request<TermsState>("POST", "/account/terms", { accept_terms: true, version }),
+  /** "Chia sẻ dữ liệu sử dụng ẩn danh": turning it off also deletes the account's stored usage events. */
+  patchAccount: (body: AccountPatch) => request<AccountOut>("PATCH", "/account", body),
+  /** 404 for a message outside your stories; 422 for a player's turn. */
+  reportMessage: (messageId: number, body: ReportRequest) => request<ReportOut>("POST", `/messages/${messageId}/report`, body),
+  /** Someone else's public character (or the original of a story's copy). 404 when not public; 422 for your own. */
+  reportCard: (cardId: number, body: CardReportRequest) => request<ReportOut>("POST", `/cards/${cardId}/report`, body),
+  /** Owner: hide a reported public character (it becomes private; its creator keeps it). */
+  unpublishCard: (cardId: number) => request<{ unpublished: boolean }>("POST", `/admin/cards/${cardId}/unpublish`),
+  /** 400 `bad_password`; 409 while a story is generating, or the owner with other accounts left. */
+  deleteAccount: (password: string) => request<AccountDeleted>("DELETE", "/account", { password }),
+  /** Owner: reports, newest first. */
+  listReports: (status?: ReportStatus) => request<AdminReport[]>("GET", `/admin/reports${query({ status })}`),
+  setReportStatus: (id: number, status: ReportStatus) => request<AdminReport>("PATCH", `/admin/reports/${id}`, { status }),
+  /** Owner: usage numbers of the last `days` days. */
+  analyticsSummary: (days: number, signal?: AbortSignal) =>
+    request<AnalyticsSummary>("GET", `/admin/analytics/summary${query({ days })}`, undefined, signal),
+  /** Owner: CSV of the usage events (a plain link: GET with the sign-in cookie). Dates are Vietnam days. */
+  analyticsCsvUrl: (since: string, until: string) => `${BASE}/admin/analytics/export.csv${query({ since, until })}`,
 };
+
+/**
+ * GET /api/account/export as a file: the JSON body and the server's file name
+ * ("lyris-<handle>-<date>.json"). Errors as ApiError, like every request.
+ */
+export async function downloadAccountData(): Promise<{ blob: Blob; filename: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}/account/export`, { credentials: CREDENTIALS, headers: { ...CSRF_HEADER } });
+  } catch {
+    throw new ApiError(0, NETWORK_ERROR, NETWORK_TECHNICAL);
+  }
+  if (!res.ok) throw await errorFromResponse(res, "/account/export");
+  const blob = await res.blob();
+  return { blob, filename: filenameOf(res.headers.get("Content-Disposition")) ?? "lyris-du-lieu.json" };
+}
+
+/** The file name of a `Content-Disposition: attachment; filename="…"` header, or null. */
+export function filenameOf(disposition: string | null): string | null {
+  if (!disposition) return null;
+  const m = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
+  if (!m || !m[1]) return null;
+  let name: string;
+  try {
+    name = decodeURIComponent(m[1].trim());
+  } catch {
+    name = m[1].trim();
+  }
+  // Only a plain file name (no path).
+  const base = name.split(/[\\/]/).pop() ?? "";
+  return base && base !== "." && base !== ".." ? base : null;
+}
 
 // ---- SSE over fetch POST ----
 

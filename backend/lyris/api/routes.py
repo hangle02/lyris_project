@@ -7,6 +7,10 @@ from typing import Any
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 
+from lyris.analytics import buckets, track, tracker_of
+from lyris.analytics import context as analytics_context
+from lyris.analytics import store as analytics_store
+from lyris.analytics.replies import tracked_reply
 from lyris.api.deps import CurrentAccount, account_id_of, current_account, is_owner
 from lyris.api.routes_lyris import (
     check_model_name,
@@ -20,12 +24,13 @@ from lyris.api.routes_studio import (
     PublicCardView,
     avatar_url_for,
     copy_creator,
+    is_template_card,
     persona_avatar_url,
     public_card_view,
     remove_orphan_avatars,
 )
 from lyris.api.sse import EventStreamResponse, event_stream_response
-from lyris.auth import errors
+from lyris.auth import clock, errors
 from lyris.auth.errors import AuthError
 from lyris.chat.service import Busy, ChatService, message_out
 from lyris.config import Settings
@@ -33,6 +38,7 @@ from lyris.db.repo import NotFound, Repo, StoryRow
 from lyris.llm.base import LLMClient, LLMError
 from lyris.models import (
     CharacterCard,
+    Message,
     DominantEmotion,
     Language,
     Mode,
@@ -46,6 +52,7 @@ from lyris.models import (
     StorySettings,
     ThoughtStyle,
 )
+from lyris.prompt.directives import extract_directives
 from lyris.seed import create_default_story
 from lyris.state.service import StateService
 from lyris.studio.stories import create_story_for, default_settings, default_title
@@ -275,11 +282,6 @@ def _own_story(request: Request, account_id: int, story_id: int) -> Story:
     return _repo(request).get_story(story_id, account_id=account_id)
 
 
-def _own_message(request: Request, account_id: int, message_id: int) -> None:
-    """404 nếu message không có hoặc nằm trong story của account khác."""
-    _repo(request).get_message(message_id, account_id=account_id)
-
-
 @router.get("/stories", response_model=list[StoryOut])
 async def list_stories(request: Request, account: CurrentAccount) -> list[StoryOut]:
     state = _state(request)
@@ -370,6 +372,7 @@ async def create_story(
         if body is not None and body.show_thoughts is False:
             story = repo.update_story(story.id, account_id=account_id, show_thoughts=False)
         _extract_opening(request, story)
+        _track_story_started(request, story, "default")
         return _story_out(repo, story, account_id)
     if body.card_id is None:
         raise HTTPException(status_code=422, detail="Cần chọn nhân vật cho story.")
@@ -411,7 +414,19 @@ async def create_story(
             )
         copy_avatar_for(request, card, copy.id, account_id)
     _extract_opening(request, story)
+    if public:
+        source = "public"
+    else:
+        source = "template" if is_template_card(repo, body.card_id, card.extensions, account_id) else "own"
+    _track_story_started(request, story, source)
     return _story_out(repo, story, account_id)
+
+
+def _track_story_started(request: Request, story: Story, source: str) -> None:
+    track(
+        request, "story_started", {"mode": story.mode, "source": source, "language": story.language},
+        story_id=story.id,
+    )
 
 
 def copy_avatar_for(request: Request, source: CharacterCard, copy_id: int, account_id: int) -> None:
@@ -472,6 +487,10 @@ async def patch_story(request: Request, story_id: int, body: StoryPatch, account
         fields["model_name"] = await check_model_name(request, fields["model_name"])
     before = current.mode
     updated = repo.update_story(story_id, account_id=account_id, **fields)
+    if updated.mode != before:
+        track(request, "mode_switched", {"to": updated.mode}, story_id=story_id)
+    if updated.show_thoughts != current.show_thoughts:
+        track(request, "show_thoughts_toggled", {"enabled": updated.show_thoughts}, story_id=story_id)
     jobs = getattr(request.app.state, "jobs", None)
     if jobs is not None and updated.mode != before:
         try:
@@ -502,50 +521,112 @@ async def list_messages(request: Request, story_id: int, account: CurrentAccount
     return [message_out(m) for m in _repo(request).active_messages(story_id)]
 
 
+def _with_tracking(request: Request, events: Any, story: Story, kind: str) -> Any:
+    """Bọc stream để ghi reply_completed / reply_failed / lore_unlocked (docs/tracking-plan.md)."""
+    assert story.id is not None
+    return tracked_reply(
+        events, tracker=tracker_of(request), ctx=analytics_context(request), story_id=story.id, mode=story.mode,
+        kind=kind,
+    )
+
+
+def _track_message_sent(request: Request, story: Story, text: str, last_activity: str | None) -> None:
+    """Chỉ ghi số liệu về lượt (độ dài theo khoảng, có hành động/chỉ đạo không), không bao giờ ghi chữ."""
+    assert story.id is not None
+    visible, directive = extract_directives(text)
+    with _repo(request).locked() as conn:
+        turns = analytics_store.user_turns(conn, story.id)
+    track(
+        request,
+        "message_sent",
+        {
+            "mode": story.mode,
+            "length_bucket": buckets.length_bucket(len(visible)),
+            "has_action": buckets.has_action(visible),
+            "has_directive": directive is not None,
+            "user_turn": buckets.turn_bucket(turns),
+        },
+        story_id=story.id,
+    )
+    if last_activity is not None:
+        days = (clock.now() - clock.parse(last_activity)).total_seconds() / 86_400
+        if days >= 1:
+            track(
+                request, "story_resumed", {"days_since_last": buckets.days_bucket(days), "mode": story.mode},
+                story_id=story.id,
+            )
+
+
 @router.post("/stories/{story_id}/messages", response_class=EventStreamResponse)
 async def send_message(
     request: Request, story_id: int, body: ContentBody, account: CurrentAccount
 ) -> EventStreamResponse:
-    _own_story(request, account_id_of(account), story_id)
-    return await event_stream_response(_chat(request).send(story_id, body.content))
+    story = _own_story(request, account_id_of(account), story_id)
+    with _repo(request).locked() as conn:
+        last = analytics_store.last_activity(conn, story_id)
+    response = await event_stream_response(
+        _with_tracking(request, _chat(request).send(story_id, body.content), story, "send")
+    )
+    _track_message_sent(request, story, body.content, last)  # lượt người chơi đã lưu (sự kiện đầu đã ra)
+    return response
 
 
 @router.post("/stories/{story_id}/reply", response_class=EventStreamResponse)
 async def reply(request: Request, story_id: int, account: CurrentAccount) -> EventStreamResponse:
-    _own_story(request, account_id_of(account), story_id)
-    return await event_stream_response(_chat(request).respond(story_id))
+    story = _own_story(request, account_id_of(account), story_id)
+    return await event_stream_response(_with_tracking(request, _chat(request).respond(story_id), story, "retry"))
 
 
 # ---------------------------------------------------------------------------- messages
 
 
+def _message_story(request: Request, account_id: int, message_id: int) -> tuple[Message, Story]:
+    """Message và story của nó (404 nếu không thuộc tài khoản)."""
+    repo = _repo(request)
+    msg = repo.get_message(message_id, account_id=account_id)
+    return msg, repo.get_story(msg.story_id, account_id=account_id)
+
+
 @router.post("/messages/{message_id}/regenerate", response_class=EventStreamResponse)
 async def regenerate(request: Request, message_id: int, account: CurrentAccount) -> EventStreamResponse:
-    _own_message(request, account_id_of(account), message_id)
-    return await event_stream_response(_chat(request).regenerate(message_id))
+    _, story = _message_story(request, account_id_of(account), message_id)
+    response = await event_stream_response(
+        _with_tracking(request, _chat(request).regenerate(message_id), story, "regenerate")
+    )
+    track(request, "regenerate_used", {"mode": story.mode}, story_id=story.id)
+    return response
 
 
 @router.post("/messages/{message_id}/variant")
 async def select_variant(
     request: Request, message_id: int, body: VariantBody, account: CurrentAccount
 ) -> dict[str, Any]:
-    _own_message(request, account_id_of(account), message_id)
-    return message_out(_chat(request).select_variant(message_id, body.variant_index))
+    _, story = _message_story(request, account_id_of(account), message_id)
+    selected = message_out(_chat(request).select_variant(message_id, body.variant_index))
+    track(request, "variant_switched", {"mode": story.mode}, story_id=story.id)
+    return selected
 
 
 @router.patch("/messages/{message_id}")
 async def edit_message(
     request: Request, message_id: int, body: ContentBody, account: CurrentAccount
 ) -> dict[str, Any]:
-    _own_message(request, account_id_of(account), message_id)
+    msg, story = _message_story(request, account_id_of(account), message_id)
     # Nội dung rỗng: ChatService raise EmptyContent → 422 (cùng mã với khi gửi tin nhắn rỗng).
-    return message_out(_chat(request).edit_message(message_id, body.content))
+    edited = message_out(_chat(request).edit_message(message_id, body.content))
+    track(request, "message_edited", {"role": msg.role, "mode": story.mode}, story_id=story.id)
+    return edited
 
 
 @router.delete("/messages/{message_id}")
 async def delete_from(request: Request, message_id: int, account: CurrentAccount) -> dict[str, Any]:
-    _own_message(request, account_id_of(account), message_id)
+    _, story = _message_story(request, account_id_of(account), message_id)
     deleted, remaining = _chat(request).delete_from(message_id)
+    if deleted:
+        track(
+            request, "message_deleted", {"count_bucket": buckets.small_count_bucket(deleted), "mode": story.mode},
+            story_id=story.id,
+        )
     return {"deleted": deleted, "messages": [message_out(m) for m in remaining]}
 
 
@@ -553,8 +634,10 @@ async def delete_from(request: Request, message_id: int, account: CurrentAccount
 async def set_feedback(
     request: Request, message_id: int, body: FeedbackBody, account: CurrentAccount
 ) -> dict[str, Any]:
-    _own_message(request, account_id_of(account), message_id)
-    return message_out(_chat(request).set_feedback(message_id, body.rating, body.note))
+    _, story = _message_story(request, account_id_of(account), message_id)
+    rated = message_out(_chat(request).set_feedback(message_id, body.rating, body.note))
+    track(request, "reply_rated", {"rating": body.rating or "cleared", "mode": story.mode}, story_id=story.id)
+    return rated
 
 
 @router.get("/messages/{message_id}/snapshot")

@@ -32,6 +32,6 @@ Từ 640px: phần mô tả của thẻ thẳng hàng với tên, lệch sang ph
 
 ## Tính năng
 
-- [Persona](../features/persona.md)
+- [Persona](../features/F21-persona.md)
 
 Chi tiết: [design-impl.md §13](../../docs/design-impl.md), [accounts.md](../../docs/accounts.md).

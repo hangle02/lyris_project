@@ -231,6 +231,17 @@ def _profile_image(kind: str, status: int) -> Callable[[World], list[Call]]:
     return lambda w: [Call(f"/api/accounts/{w.a_handle}/{kind}", {status})]
 
 
+def _events(w: World) -> list[Call]:
+    """B gắn story của A vào sự kiện: sự kiện vẫn nhận nhưng không mang story_id của A (DB: chỉ dòng của B)."""
+
+    def check(resp: httpx.Response, _: World) -> None:
+        assert resp.json() == {"accepted": 0, "dropped": 1}  # tên sự kiện của server: client không gửi được
+
+    return [
+        Call("/api/events", {202}, {"json": {"events": [{"name": "story_started", "story_id": w.a_story}]}}, check),
+    ]
+
+
 OWN = Skip("chỉ đụng dữ liệu của chính người gọi, không nhận id của người khác")
 OPEN = Skip("route mở của /api/auth (test_auth_api.py)")
 
@@ -249,6 +260,22 @@ SWEEP: dict[tuple[str, str], Case] = {
     ("POST", "/api/admin/accounts/{account_id}/disable"): _owner_only("/api/admin/accounts/{w.a_id}/disable"),
     ("POST", "/api/admin/accounts/{account_id}/enable"): _owner_only("/api/admin/accounts/{w.a_id}/enable"),
     ("GET", "/api/admin/invites"): _owner_only("/api/admin/invites"),
+    ("GET", "/api/admin/analytics/summary"): _owner_only("/api/admin/analytics/summary"),
+    ("GET", "/api/admin/analytics/export.csv"): _owner_only("/api/admin/analytics/export.csv"),
+    ("GET", "/api/admin/analytics/export.jsonl"): _owner_only("/api/admin/analytics/export.jsonl"),
+    ("POST", "/api/events"): _events,
+    # ---- tuân thủ (docs/compliance.md; test riêng: test_compliance.py)
+    ("GET", "/api/legal/{doc}"): Skip("văn bản pháp lý chung, không có dữ liệu tài khoản"),
+    ("POST", "/api/messages/{message_id}/report"): _not_found(
+        "/api/messages/{w.a_message}/report", json={"reason": "other", "share_text": True}
+    ),
+    ("POST", "/api/cards/{card_id}/report"): _not_found("/api/cards/{w.a_private}/report", json={"reason": "other"}),
+    ("GET", "/api/admin/reports"): _owner_only("/api/admin/reports"),
+    ("PATCH", "/api/admin/reports/{report_id}"): _owner_only("/api/admin/reports/1", json={"status": "reviewed"}),
+    ("POST", "/api/admin/cards/{card_id}/unpublish"): _owner_only("/api/admin/cards/{w.a_public}/unpublish"),
+    ("DELETE", "/api/account"): Skip("chỉ xoá tài khoản của chính người gọi; ghi lần thử mật khẩu (test_compliance.py)"),
+    ("GET", "/api/account/export"): Skip("chỉ xuất dữ liệu của chính người gọi; ghi sự kiện (test_compliance.py)"),
+    ("POST", "/api/account/terms"): OWN,
     ("POST", "/api/admin/invites"): _owner_only("/api/admin/invites", json={"note": "x"}),
     ("DELETE", "/api/admin/invites/{invite_id}"): _owner_only("/api/admin/invites/1"),
     # ---- máy
@@ -334,6 +361,7 @@ SWEEP: dict[tuple[str, str], Case] = {
     # ---- tài khoản
     ("GET", "/api/account"): _list("/api/account", _check_account),
     ("PUT", "/api/account"): OWN,
+    ("PATCH", "/api/account"): OWN,
     ("PUT", "/api/account/avatar"): OWN,
     ("DELETE", "/api/account/avatar"): OWN,
     ("GET", "/api/account/avatar"): OWN,
@@ -354,7 +382,7 @@ async def world(tmp_path_factory: pytest.TempPathFactory) -> AsyncIterator[World
 
 async def test_sweep_covers_every_route() -> None:
     assert SWEEP.keys() == ROUTE_RULES.keys()
-    assert len(SWEEP) == 86
+    assert len(SWEEP) == 100
     # Mọi route "Chủ" đều được quét bằng thành viên.
     for route, rule in ROUTE_RULES.items():
         if rule == "owner":
@@ -394,6 +422,8 @@ def _kwargs_for(method: str, path: str) -> dict[str, Any]:
         "/api/messages/{message_id}": {"content": "Của A"},
         "/api/messages/{message_id}/variant": {"variant_index": 0},
         "/api/messages/{message_id}/feedback": {"rating": "up"},
+        "/api/messages/{message_id}/report": {"reason": "other", "share_text": True},
+        "/api/cards/{card_id}/report": {"reason": "other"},
         "/api/personas/{persona_id}": PERSONA_IN,
         "/api/cards/{card_id}": card_body("Của A"),
         "/api/cards/{card_id}/lore": LORE_IN,

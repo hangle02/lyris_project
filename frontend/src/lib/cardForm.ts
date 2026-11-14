@@ -235,6 +235,17 @@ export function validateCard(card: CharacterCard, styleNames?: readonly string[]
   return errors;
 }
 
+/**
+ * What blocks "Lưu" in the editor: the card as it will be saved (prepareForSave), plus the signature
+ * lines AS TYPED. prepareForSave keeps at most 3 signature lines, so validating only the prepared card
+ * let a 4th typed line be dropped silently instead of being reported.
+ */
+export function saveProblems(card: CharacterCard, styleNames?: readonly string[]): string[] {
+  const errors = validateCard(prepareForSave(card), styleNames);
+  for (const p of signatureProblems(card)) if (!errors.includes(p)) errors.push(p);
+  return errors;
+}
+
 // ---- soft hints (do not block saving) ----
 
 export type HintField = "address" | "greeting";

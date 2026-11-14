@@ -17,6 +17,6 @@ Che khoảng chờ ngắn lúc mở app, trước khi biết nên hiện [Đăng
 
 ## Tính năng
 
-- [Đăng nhập](../features/dang-nhap.md)
+- [Đăng nhập](../features/F29-dang-nhap.md)
 
 Chi tiết: [auth.md §7.3](../../docs/auth.md).

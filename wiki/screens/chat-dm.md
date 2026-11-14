@@ -35,9 +35,9 @@ Từ 640px: header một hàng. Cột tin rộng tối đa 720px.
 
 ## Tính năng
 
-- [Chế độ DM](../features/che-do-dm.md)
-- [DM và Story chung dòng thời gian](../features/dm-story-chung-dong-thoi-gian.md)
-- [Thao tác tin nhắn](../features/thao-tac-tin-nhan.md)
-- [Thẻ suy nghĩ](../features/the-suy-nghi.md), [Đọc suy nghĩ](../features/doc-suy-nghi.md)
+- [Chế độ DM](../features/F02-che-do-dm.md)
+- [DM và Story chung dòng thời gian](../features/F12-dm-story-chung-dong-thoi-gian.md)
+- [Thao tác tin nhắn](../features/F06-thao-tac-tin-nhan.md)
+- [Thẻ suy nghĩ](../features/F07-the-suy-nghi.md), [Đọc suy nghĩ](../features/F08-doc-suy-nghi.md)
 
 Chi tiết: [phase3.md](../../docs/phase3.md), [design-impl.md §15](../../docs/design-impl.md).

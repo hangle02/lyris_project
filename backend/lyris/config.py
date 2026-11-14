@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, field
 from pathlib import Path
 
 # backend/lyris/config.py -> thư mục gốc dự án là cha của backend/
@@ -15,6 +16,7 @@ DEFAULT_CHAT_MODEL = "gemma4:12b"
 DEFAULT_NUM_CTX = 8192
 DEFAULT_EMBED_MODEL = "bge-m3"
 DEFAULT_CHAT_SLOTS = 2
+DEFAULT_POSTHOG_HOST = "https://us.i.posthog.com"
 
 
 @dataclass(frozen=True)
@@ -38,6 +40,13 @@ class Settings:
     # Phase 4b (docs/auth.md §5.1): LYRIS_CHAT_SLOTS = số lượt sinh cùng lúc trên cả máy (mặc định 2, bằng
     # OLLAMA_NUM_PARALLEL). 1 = lần lượt từng người.
     chat_slots: int = 2
+    # Event tracking (docs/tracking-plan.md): LYRIS_POSTHOG_KEY bật chuyển tiếp sự kiện sang PostHog (không có thì
+    # sự kiện chỉ nằm trong DB của app). Không bao giờ in ra (repr=False). LYRIS_POSTHOG_HOST mặc định PostHog Mỹ.
+    posthog_key: str | None = field(default=None, repr=False)
+    posthog_host: str = DEFAULT_POSTHOG_HOST
+    # LYRIS_CONTACT: email (hoặc địa chỉ https://) của người vận hành. Trang đăng nhập dùng cho "Xin mã mời" và
+    # "Quên mật khẩu"; văn bản pháp lý điền vào chỗ [ĐIỀN EMAIL LIÊN HỆ]. Không đặt thì trang nói chung chung.
+    contact: str | None = None
 
 
 def _env(name: str) -> str | None:
@@ -123,6 +132,29 @@ def _chat_slots() -> int:
     return value
 
 
+def _posthog_host() -> str:
+    raw = _env("LYRIS_POSTHOG_HOST")
+    if raw is None:
+        return DEFAULT_POSTHOG_HOST
+    # Chỉ https: sự kiện không bao giờ đi qua mạng mà không mã hoá (gõ nhầm http:// thì báo lỗi, không gửi).
+    if not raw.startswith("https://"):
+        raise ValueError(f"LYRIS_POSTHOG_HOST phải bắt đầu bằng https://, đang là {raw!r}")
+    return raw.rstrip("/")
+
+
+_EMAIL = re.compile(r"[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+")
+_HTTPS = re.compile(r"https://[^\s<>\"]+")
+
+
+def _contact() -> str | None:
+    raw = _env("LYRIS_CONTACT")
+    if raw is None:
+        return None
+    if not (_EMAIL.fullmatch(raw) or _HTTPS.fullmatch(raw)) or len(raw) > 200:
+        raise ValueError(f"LYRIS_CONTACT phải là một email hoặc địa chỉ https://, đang là {raw!r}")
+    return raw
+
+
 def get_settings() -> Settings:
     """Đọc cấu hình từ biến môi trường (mỗi lần gọi đọc lại, tiện cho test)."""
     db_path = _db_path()
@@ -138,4 +170,7 @@ def get_settings() -> Settings:
         embed_model=_env("LYRIS_EMBED_MODEL") or DEFAULT_EMBED_MODEL,
         cookie_secure=(_env("LYRIS_COOKIE_SECURE") or "0").lower() in ("1", "true", "yes"),
         chat_slots=_chat_slots(),
+        posthog_key=_env("LYRIS_POSTHOG_KEY"),
+        posthog_host=_posthog_host(),
+        contact=_contact(),
     )

@@ -1,0 +1,31 @@
+# F10 — trí nhớ: ký ức và điều đã biết do trích xuất thật ghi ra phải đúng chi tiết của lượt.
+id: f10-ky-uc
+title: Ký ức và điều đã biết được trích đúng ý lượt chơi
+kind: extract
+note: >-
+  Hai lượt có chi tiết cụ thể, bền vững (quê, giỗ, dị ứng; nhân vật học đàn từ nhỏ, mẹ dạy đàn). Chạy đúng lời
+  gọi trích xuất của việc nền; ký ức phải nhắc ít nhất một chi tiết của lượt, và có ít nhất một điều đã biết
+  (fact) bền vững chứa chi tiết đó, nói về ĐÚNG người (facts_owner: người chơi dị ứng tôm, không phải Lạc Dương).
+  So khớp nguyên từ ("đàn" không khớp "đàng"); chuyến về quê ăn giỗ là sự việc, không tính là điều đã biết.
+mode: story
+cases:
+  - name: nguoi-choi-ke
+    turn:
+      - role: user
+        content: "*Tớ đặt hộp bánh đậu xanh lên bàn.* Cuối tuần này tớ về Tô Châu ăn giỗ ông nội, tớ mua bánh này làm quà cho mẹ. À, tớ dị ứng tôm từ bé, nên giỗ nào cũng phải ngồi ăn riêng một mâm đó."
+      - role: assistant
+        content: "Lạc Dương liếc hộp bánh, rồi lấy trong cặp ra một túi thuốc dị ứng nhỏ đặt cạnh nó.\n\n[Thought: Cô ấy vẫn nhớ mua quà cho mẹ, mà lúc nào cũng quên mang thuốc.]\n\n\"Mang theo cái này. Về Tô Châu ăn giỗ đông người, đừng gắp nhầm món có tôm.\"\n\n[Thought: Cuối tuần không gặp được rồi.]"
+    expect:
+      memory_any: ["Tô Châu", "giỗ", "bánh đậu xanh"]
+      facts_any: ["dị ứng tôm", "dị ứng với tôm", "ăn tôm", "tôm"]
+      facts_owner: persona
+  - name: nhan-vat-ke
+    turn:
+      - role: user
+        content: "*Tớ chống cằm nhìn cậu gõ nhịp lên mặt bàn.* Cậu học piano từ hồi nào thế? Tớ chưa bao giờ hỏi."
+      - role: assistant
+        content: "Ngón tay Lạc Dương dừng lại giữa chừng.\n\n[Thought: Cô ấy chưa từng hỏi thật.]\n\n\"Từ năm sáu tuổi. Mẹ tớ dạy đàn ở Cung thiếu nhi, tối nào cũng bắt tập một tiếng.\" Anh rụt tay về. \"Giờ thì ít chơi rồi.\"\n\n[Thought: Lần cuối mình chơi đàn là hôm sinh nhật mười tám tuổi của cô ấy.]"
+    expect:
+      memory_any: ["piano", "học đàn", "dạy đàn", "tập đàn", "chơi đàn"]
+      facts_any: ["piano", "học đàn", "dạy đàn", "tập đàn", "chơi đàn", "sáu tuổi", "Cung thiếu nhi"]
+      facts_owner: character

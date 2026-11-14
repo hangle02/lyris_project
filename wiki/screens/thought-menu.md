@@ -30,7 +30,7 @@ Bấm ra ngoài hoặc Esc để đóng.
 
 ## Tính năng
 
-- [Thẻ suy nghĩ](../features/the-suy-nghi.md)
-- [Đọc suy nghĩ](../features/doc-suy-nghi.md)
+- [Thẻ suy nghĩ](../features/F07-the-suy-nghi.md)
+- [Đọc suy nghĩ](../features/F08-doc-suy-nghi.md)
 
 Chi tiết: [phase4.md](../../docs/phase4.md) (phần B), [design-impl.md §17](../../docs/design-impl.md).

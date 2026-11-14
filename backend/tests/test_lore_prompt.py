@@ -196,7 +196,9 @@ def test_real_cards_with_longest_summary_keep_a_full_pair_after_shift(name: str)
             min_window = min(min_window, built.token_estimate["E"])
         hist.append(assistant(t + 1, long_reply(t)))
     # Số đo ghi lại để thấy khi ai đó tăng LORE_TOKEN_LIMIT (lịch sử nhỏ nhất ngay sau lần dịch).
-    assert min_window >= 700, (name, min_window)
+    # 2026-11-15: 700 -> 600. Khối A có thêm luật an toàn nội dung (~115 token, docs/compliance.md §1), phần cố định
+    # lớn hơn nên cửa sổ nhỏ nhất của yen-hoanh-sinh còn 618 token (vẫn giữ trọn một cặp lượt, kiểm ở trên).
+    assert min_window >= 600, (name, min_window)
 
 
 def test_lore_reserve_never_leaves_only_the_new_turn_on_yen_hoanh_sinh() -> None:

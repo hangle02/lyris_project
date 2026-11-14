@@ -1,0 +1,8 @@
+# F36 — harness: bakeoff.py chạy trên model thật và in bảng so sánh model.
+id: f36-bakeoff
+title: bakeoff.py in bảng so sánh model
+kind: bakeoff
+note: >-
+  Gọi run_bakeoff của harness/bakeoff.py (đúng phần main() chạy) với model của run_eval và 2 câu đầu của
+  prompts.json. Phải thoát 0, ghi speed.md có bảng "| Model |" với dòng của model kèm số TTFT và tok/s.
+limit: 2

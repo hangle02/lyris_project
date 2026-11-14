@@ -18,9 +18,11 @@ import anyio
 from fastapi import APIRouter, Depends, Request, Response
 from pydantic import BaseModel
 
+from lyris.analytics import track
 from lyris.api.deps import CurrentAccount, account_id_of, current_account, job_queue, state_service
 from lyris.chat.service import Busy, ChatService
 from lyris.db.repo import Repo
+from lyris.llm.errors import UserFacingError
 from lyris.models import StoryExtras, SuggestionsOut, TimelineEntry
 
 SUGGEST_DISCONNECT_POLL_S = 0.25
@@ -49,6 +51,7 @@ async def story_extras(request: Request, story_id: int, account: CurrentAccount)
 async def forget_memory(request: Request, story_id: int, memory_id: int, account: CurrentAccount) -> dict[str, int]:
     """Quên một ký ức/fact (xoá dòng). 404 nếu không thuộc story hoặc story không thuộc account."""
     _repo(request).delete_memory(story_id, memory_id, account_id=account_id_of(account))
+    track(request, "memory_forgotten", story_id=story_id)
     return {"deleted": 1}
 
 
@@ -71,7 +74,7 @@ async def suggestions(request: Request, story_id: int, account: CurrentAccount) 
     502: lỗi model, dạng `{"detail": câu dễ hiểu, "technical": chi tiết}`.
     Người dùng bỏ đi (client ngắt kết nối) thì huỷ lời gọi model và nhả khoá story.
     """
-    _repo(request).get_story(story_id, account_id=account_id_of(account))  # 404 nếu không có
+    story = _repo(request).get_story(story_id, account_id=account_id_of(account))  # 404 nếu không có
     chat: ChatService = request.app.state.chat
     chat.ensure_idle(story_id)  # 409 ngay, trước khi tạo task
     task = asyncio.create_task(chat.suggest(story_id))
@@ -83,7 +86,16 @@ async def suggestions(request: Request, story_id: int, account: CurrentAccount) 
                 with contextlib.suppress(asyncio.CancelledError, Exception):
                     await task
                 return Response(status_code=499)
-        return SuggestionsOut(items=task.result())
+        try:
+            items = task.result()
+        except UserFacingError:
+            track(request, "suggestions_requested", {"ok": False, "items": 0, "mode": story.mode}, story_id=story_id)
+            raise
+        track(
+            request, "suggestions_requested", {"ok": True, "items": min(len(items), 3), "mode": story.mode},
+            story_id=story_id,
+        )
+        return SuggestionsOut(items=items)
     finally:
         if not task.done():
             task.cancel()

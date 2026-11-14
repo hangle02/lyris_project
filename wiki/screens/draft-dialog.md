@@ -28,6 +28,6 @@ Từ 640px: hộp thoại giữa màn hình, cỡ vừa.
 
 ## Tính năng
 
-- [AI viết nháp](../features/ai-viet-nhap.md)
+- [AI viết nháp](../features/F19-ai-viet-nhap.md)
 
 Chi tiết: [phase2.md](../../docs/phase2.md).

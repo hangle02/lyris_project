@@ -18,7 +18,7 @@ const RULES: { test: RegExp; text: string }[] = [
   {
     // The Lyris server itself cannot be reached (client.ts NETWORK_ERROR and friends).
     test: /máy chủ lyris|backend lyris|scripts\/dev\.sh/i,
-    text: "Không kết nối được Lyris trên máy này. Hãy thử lại sau giây lát.",
+    text: "Không kết nối được Lyris. Hãy kiểm tra mạng rồi thử lại sau giây lát.",
   },
   {
     test: /quá lâu|timed? ?out|timeout|hết thời gian/i,
@@ -30,7 +30,7 @@ const RULES: { test: RegExp; text: string }[] = [
   },
   {
     test: /không kết nối được ollama|ollama không chạy|mất kết nối|connection|connect|đóng kết nối/i,
-    text: "Lyris chưa kết nối được phần trả lời trên máy. Hãy thử lại sau giây lát.",
+    text: "Lyris chưa kết nối được phần trả lời. Hãy thử lại sau giây lát.",
   },
   {
     test: /không trả về nội dung|trả về rỗng|empty/i,

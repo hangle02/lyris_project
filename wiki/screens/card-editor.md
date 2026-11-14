@@ -43,12 +43,12 @@ Công tắc "Công khai": bật rồi phải bấm Lưu mới chia sẻ ("Bấm 
 
 ## Tính năng
 
-- [Xưởng nhân vật](../features/xuong-nhan-vat.md)
-- [Nhập và xuất card](../features/nhap-xuat-card.md)
-- [Ma trận cảm xúc](../features/ma-tran-cam-xuc.md) (cảm xúc ban đầu)
-- [Sổ thế giới](../features/so-the-gioi.md)
-- [Nhân vật công khai](../features/nhan-vat-cong-khai.md)
-- [Văn phong và xưng hô](../features/van-phong-xung-ho.md)
-- [Ẩn chữ kỹ thuật](../features/an-chu-ky-thuat.md) (xem trước prompt chỉ trong Công cụ nâng cao)
+- [Xưởng nhân vật](../features/F18-xuong-nhan-vat.md)
+- [Nhập và xuất card](../features/F20-nhap-xuat-card.md)
+- [Ma trận cảm xúc](../features/F09-ma-tran-cam-xuc.md) (cảm xúc ban đầu)
+- [Sổ thế giới](../features/F17-so-the-gioi.md)
+- [Nhân vật công khai](../features/F31-nhan-vat-cong-khai.md)
+- [Văn phong và xưng hô](../features/F03-van-phong-xung-ho.md)
+- [Ẩn chữ kỹ thuật](../features/F27-an-chu-ky-thuat.md) (xem trước prompt chỉ trong Công cụ nâng cao)
 
 Chi tiết: [phase2.md](../../docs/phase2.md), [design-impl.md §6.5](../../docs/design-impl.md), [auth.md §7.3](../../docs/auth.md).

@@ -70,7 +70,7 @@ async def test_setup_code_takes_effect_while_app_runs(app: FastAPI, settings: Se
     assert codes.normalize_code(printed) is not None
     assert printed not in caplog.text
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t", headers={"X-Lyris": "1"}) as c:
-        resp = await c.post("/api/auth/setup-owner", json={"setup_code": printed, "password": "đèn lồng đỏ rực"})
+        resp = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": printed, "password": "đèn lồng đỏ rực"})
         assert resp.status_code == 200, resp.text
     code, _ = run(settings.db_path, "setup-code")
     assert code == 1  # đã có mật khẩu

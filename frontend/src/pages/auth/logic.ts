@@ -1,12 +1,32 @@
 // Words and small rules of the sign-in screens (docs/auth.md §7.3, §7.4). Pure, tested in logic.test.ts.
 
 /** DESIGN.md tagline, under the wordmark of the sign-in screens. */
-export const TAGLINE = "Nơi những tâm hồn trang sách bước ra sưởi ấm thực tại";
+export const TAGLINE = "Nơi những tâm hồn từ trang sách bước ra sưởi ấm thực tại";
 
 export const LOGGED_OUT_TEXT = "Bạn đã bị đăng xuất. Hãy đăng nhập lại.";
-export const FORGOT_TEXT = "Quên mật khẩu? Hãy nhờ chủ máy đặt lại.";
+export const FORGOT_TEXT = "Quên mật khẩu? Hãy nhờ người quản lý Lyris đặt lại.";
 export const SIGNUP_PRIVACY =
-  "Lyris chạy trên máy của chủ máy. Story của bạn là riêng tư: tài khoản khác, kể cả chủ máy, không xem được trong app. Nhưng dữ liệu nằm trên máy đó.";
+  "Story của bạn là riêng tư: tài khoản khác, kể cả người quản lý, không xem được trong app. Dữ liệu được lưu trên máy chủ chạy Lyris.";
+
+// ---- a way in for open-web visitors (no invite code yet, forgotten password) ----
+
+/** Without a contact set by the operator (LYRIS_CONTACT): who gives codes, in plain words. */
+export const NO_INVITE_TEXT = "Chưa có mã mời? Lyris đang mở theo đợt, hãy xin mã từ người giới thiệu Lyris cho bạn.";
+export const NO_INVITE_LEAD = "Chưa có mã mời?";
+export const NO_INVITE_LINK = "Xin mã mời";
+export const FORGOT_LEAD = "Quên mật khẩu?";
+export const FORGOT_LINK = "Nhờ người quản lý đặt lại";
+
+/**
+ * Link for the operator's contact (GET /api/auth/me `contact`): an email becomes a mailto with a
+ * subject, an https address stays as it is; anything else (or nothing) gives null.
+ */
+export function contactHref(contact: string | null | undefined, subject: string): string | null {
+  const c = (contact ?? "").trim();
+  if (/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(c)) return `mailto:${c}?subject=${encodeURIComponent(subject)}`;
+  if (/^https:\/\/[^\s<>"]+$/.test(c)) return c;
+  return null;
+}
 export const SETUP_INTRO =
   "Lyris giờ có đăng nhập. Nhập mã thiết lập in trong cửa sổ Terminal đang chạy Lyris trên Mac, rồi chọn mật khẩu cho tài khoản của bạn.";
 export const FORCE_INTRO = "Mật khẩu của bạn vừa được đặt lại. Hãy chọn mật khẩu mới để tiếp tục.";

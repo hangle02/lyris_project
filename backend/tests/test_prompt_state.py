@@ -15,7 +15,24 @@ from tests.test_prompt import GREETING, assistant, make_card, make_persona, make
 
 # sha256 của BuiltPrompt.model_dump_json() đo bằng builder trước Phase 3 (2026-11-13). Nếu cố ý đổi
 # template/style thì tính lại; nếu không, hash lệch nghĩa là prompt cũ (Studio, harness) đã bị đổi.
+#
+# Đổi có chủ ý 2026-11-15 (docs/compliance.md §1): khối A của story và nhắn tin (vi + en) có thêm đúng một dòng
+# luật an toàn nội dung (`safety_rule`, ngay trước dòng "Chỉ dùng tiếng Việt" / "English only"). Đã kiểm: bỏ dòng
+# đó khỏi template thì cả 7 kịch bản cho lại đúng hash cũ (vi_story c696e4d7…, vi_story_summary 54f83049…,
+# vi_dm 2ec6392f…, en_first_end 1d9a5f8b…, en_dm 5b2600ea…, vi_long_cut d37f0d4f…, vi_long_full d5ac01a9…),
+# nên ngoài dòng mới không có gì khác đổi. `test_safety_rule_is_the_only_change` bên dưới kiểm lại điều này.
 GOLDEN = {
+    "vi_story": "2c9ca73223add1cf39ccc4869a92185f2e0468273882fe050f988b6fc5c5b929",
+    "vi_story_summary": "3d391be248da8715e6c8baaef30b59a43b78b0719610454e30868d57600a350f",
+    "vi_dm": "2431303e7962b6d99e54d8b2c760b748f93b7b7d1c3c426deb7ebcc8b1957908",
+    "en_first_end": "f449bffbba0d7848170ae490b47155d84cc5886a7e3109357e03e036408f8f76",
+    "en_dm": "7b4c2f3a828c6562fd34a0a1e77c2841fc1665eab73b31cd87d54232ed9011eb",
+    "vi_long_cut": "ec3dbed9495a64caccac82be10183eb5e151b9a4e73befedafad056fe5e7fc23",
+    "vi_long_full": "14eb23267881f31418b1c7e4b6aa55412a3f5d49010894a2e1e8c3ee8bf387ff",
+}
+
+# Hash trước khi có luật an toàn (2026-11-13): bỏ dòng `safety_rule` thì phải cho lại đúng các hash này.
+GOLDEN_BEFORE_SAFETY = {
     "vi_story": "c696e4d7c52a310201dc5bc4bd75b5b9fdb4f60dca502c56fc954bdaedfa4df2",
     "vi_story_summary": "54f83049986dde4e57df98c8d3010b1de532648930fe9afe4099d21189bbc80d",
     "vi_dm": "2ec6392fba702e46c452369e6fd5cfb662b40698173354979c7e7cfbbdad2bb0",
@@ -92,6 +109,23 @@ def test_empty_state_changes_nothing(name: str) -> None:
     card, persona, story, history, budget = scenarios()[name]
     built = build_prompt(card, persona, story, history, budget=budget, state=PromptState())
     assert digest(built) == GOLDEN[name]
+
+
+def test_safety_rule_is_the_only_change(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Template không có dòng luật an toàn (docs/compliance.md §1) cho lại đúng prompt cũ: lần đổi hash 2026-11-15
+    chỉ do dòng đó. Dựng lại lớp template từ mã nguồn đã bỏ `safety_rule(c),` (không sửa file)."""
+    import types
+
+    from lyris.prompt.templates import en, vi
+
+    for mod in (vi, en):
+        src = open(mod.__file__, encoding="utf-8").read()
+        assert src.count("            safety_rule(c),\n") == 2  # story + nhắn tin
+        clone = types.ModuleType(mod.__name__ + "_no_safety")
+        exec(compile(src.replace("            safety_rule(c),\n", ""), mod.__file__, "exec"), clone.__dict__)
+        monkeypatch.setattr(mod, "TEMPLATE", clone.TEMPLATE)
+    for name, (card, persona, story, history, budget) in scenarios().items():
+        assert digest(build_prompt(card, persona, story, history, budget=budget)) == GOLDEN_BEFORE_SAFETY[name], name
 
 
 def test_empty_state_trims_with_fixed_reserve() -> None:
@@ -257,7 +291,9 @@ def test_state_lines_capped_near_350_tokens() -> None:
 
 def test_budget_accounts_for_larger_f() -> None:
     history = long_history()
-    budget = PromptBudget(num_ctx=3500)
+    # 2026-11-15: 3500 -> 3600. Khối A có thêm luật an toàn nội dung (~115 token, docs/compliance.md §1): với 3500,
+    # A + B + F dài đã chiếm gần hết chỗ, không còn cửa sổ lịch sử hợp lệ nào vừa giới hạn.
+    budget = PromptBudget(num_ctx=3600)
     plain = build_prompt(make_card(), make_persona(), make_story(), history, budget=budget)
     long = "Một chuyện rất dài " * 10
     hits = [hit(i, i, f"{long} {i}") for i in range(1, 4)] + [hit(10 + i, 1, f"{long} f{i}", kind="fact") for i in range(1, 4)]

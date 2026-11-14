@@ -255,7 +255,7 @@ async def test_phase2b_database_migrates_to_owner(tmp_path: Path, avatars_dir: P
 
     conn = connect(db)
     try:
-        assert migrate(conn) == 8
+        assert migrate(conn) == 11
         accounts = conn.execute("SELECT * FROM accounts").fetchall()
         assert len(accounts) == 1
         owner = accounts[0]

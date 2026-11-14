@@ -47,7 +47,7 @@ export function HubHeader() {
   return (
     <header className="glass sticky top-0 z-30 pt-safe">
       <div className={cx(SHELL_CONTAINER, "flex h-14 items-center gap-2")}>
-        <a href={routeHref({ name: "hub" })} className="-ml-1 flex shrink-0 items-center rounded-control px-1 pb-0.5">
+        <a href={routeHref({ name: "hub" })} className="-ml-1 flex min-h-11 min-w-11 shrink-0 items-center rounded-control px-1 pb-0.5">
           <Wordmark size={27} />
         </a>
         <div className="ml-auto flex shrink-0 items-center gap-0.5">

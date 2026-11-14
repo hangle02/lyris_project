@@ -730,3 +730,43 @@ api.listPublicCards / getPublicCard;  ApiError.code;  CSRF_HEADER
 - Mọi ô nhân vật cùng một kích thước ở mọi độ rộng và mọi mục (`GRID = grid-cols-2 / sm:grid-cols-3 / lg:grid-cols-5`, cố định). Hàng cuối thiếu ô thì để trống, không kéo giãn ô cuối sang hai cột, không đổi số cột theo số nhân vật (đã bỏ `desktopColumns` và kiểu ô "wide").
 - Các ô trong cùng một hàng cao bằng nhau (`li` là flex, thẻ `a` lấp đầy).
 - Nhân vật ở khung nổi bật không lặp lại trong lưới (trừ khi đang lọc theo cảm xúc); khung nổi bật dùng ảnh của nhân vật đã thêm (`heroImageUrl`, `withoutHero`).
+
+## 19. Ra mắt: tracking, quyền riêng tư, báo cáo (fe, 2026-11-14)
+
+Hợp đồng: `docs/compliance.md` §7 và `docs/tracking-plan.md` §7 (backend làm ở hai bước trước). Trên màn hình thường không có chữ "event", "analytics", "tracking", "PostHog": nói "dữ liệu sử dụng", "thao tác". Câu chữ nằm ở `lib/compliance.ts` (thuần, có test).
+
+**Thành phần và hàm mới (dùng lại, đừng viết lại):**
+
+```ts
+// lib (thuần, có test)
+track(name, props?) / trackInStory(name, props?) / setTrackedStory(id) / setTrackingConsent({signedIn, optOut}) / noteRoute(name)   // lib/track
+createTracker(deps), buildEvent, decide, vibeCode, chipPosition, profileFrom, displayMode, CLIENT_EVENTS            // lib/track (lõi thuần)
+parseMarkdown(md) -> Block[], parseInline, safeHref, slugify                                                        // lib/markdown
+REPORT_REASONS, reasonLabel, cleanNote, AI_DISCLAIMER, CONSENT_*, SHARING_*, DELETE_*, eventLabel, funnelRates, csvRange…   // lib/compliance
+// UI
+<Checkbox label checked onChange hint? error? disabled? />      // components/ui: ô 22px, hàng 44px, input thật bên dưới
+<Toast text onDone duration? />                                 // components/ui: viên thông báo ngắn trên đáy, role=status
+<LegalContent doc /> <LegalBody blocks /> <LegalDialog doc onClose />   // components/LegalDocument
+<ConsentField checked onChange error? /> <LegalLinks />         // pages/auth/ConsentField
+<TermsPage /> <LegalPage doc /> <ReportSheet message characterName onClose onDone /> <MetricsView /> <ReportsView />
+api.getLegal / acceptTerms / patchAccount / reportMessage / deleteAccount / listReports / setReportStatus / analyticsSummary / analyticsCsvUrl, downloadAccountData(), filenameOf()
+accountDeleted(setupRequired)   // hooks/useAuth: quên tài khoản trên trình duyệt, về đăng nhập hoặc màn thiết lập
+```
+
+**Màn hình (390px trước):**
+- **Trang pháp lý** `#/privacy`, `#/terms` (route `legal`): mở cho mọi người, cả khi chưa đăng nhập và trước khi thiết lập chủ máy (`gateOf` trả `"public"`; App vẽ trang trước khi chờ `/auth/me`). Header mảnh: "‹ Quay lại" (có trang trước trong app thì `history.back()`, không thì `#/`) và nút theme; wordmark 28, h1 24/28px, cột chữ 680px, thân 16px/1.65 `prose`, h2 20px, danh sách có chấm `muted`, bảng cookie trong khung `surface` bo 20 tự cuộn ngang. Văn bản lấy từ `GET /api/legal/{doc}` (một nguồn: `docs/legal/*.md`), đọc bằng `lib/markdown` rồi vẽ bằng React (không chèn HTML). Liên kết `privacy.md`/`terms.md` trong văn bản thành `#/privacy`/`#/terms`; liên kết lạ (javascript:, data:) thành chữ thường. Cuối trang: liên kết sang văn bản kia.
+- **Đồng ý khi tạo tài khoản / thiết lập chủ máy:** `ConsentField` ngay trên nút chính: "Tôi đồng ý với **Điều khoản** và **Chính sách quyền riêng tư**". Chạm hai tên mở văn bản trong `Modal lg` ngay trên form (không mất chữ đã gõ; Cmd/Ctrl-click mở tab mới). Chưa đánh dấu mà bấm nút: lỗi "Hãy đánh dấu đồng ý để tiếp tục." dưới ô, focus vào ô (nút không bị tắt). Gửi `accept_terms: true` + `terms_version` (từ `/auth/me`). Lỗi `terms_required` hiện dưới ô; `terms_outdated` đọc lại `/auth/me` và bỏ dấu.
+- **Đồng ý một lần** (`TermsPage`, cổng `"terms"` khi `account.terms_required`, sau màn đổi mật khẩu bắt buộc): khung `AuthLayout`, h1 "Trước khi tiếp tục", ba ý ngắn trong khung `surface`, "Đọc đầy đủ: Điều khoản sử dụng và Chính sách quyền riêng tư" (mở dialog), primary "Đồng ý và tiếp tục", ghost "Đăng xuất".
+- **Đăng nhập, thiết lập:** dòng 13px "Quyền riêng tư · Điều khoản" cuối trang (chạm 44px).
+- **Sheet Tài khoản:** mục mới "Dữ liệu & quyền riêng tư" sau Persona: `Toggle` "Chia sẻ dữ liệu sử dụng ẩn danh" + "Giúp cải thiện Lyris. Chỉ ghi thao tác, không bao giờ ghi chữ bạn viết." (tắt: dòng "Đã tắt. Dữ liệu sử dụng đã lưu của bạn cũng đã được xoá."); secondary "Tải dữ liệu của tôi" (tải `lyris-<handle>-<ngày>.json`) + một dòng mô tả; nút chữ đỏ "Xoá tài khoản" mở màn trong sheet (như "Đổi mật khẩu"): xoá gì, còn gì, câu riêng cho chủ máy (chỉ xoá được khi không còn ai; xoá xong về màn thiết lập), "Mật khẩu hiện tại", danger "Xoá vĩnh viễn" + ghost "Giữ tài khoản"; lỗi của server (sai mật khẩu, chủ máy còn thành viên, story đang sinh) là `InlineAlert`. Xoá xong: trình duyệt quên tài khoản, về `#/login` (hoặc màn thiết lập). Cuối sheet thêm hai liên kết "Quyền riêng tư", "Điều khoản" cạnh "Giới thiệu & bản quyền ảnh".
+- **Báo cáo câu trả lời:** icon cờ `IconFlag` ("Báo cáo") cuối hàng thao tác của câu trả lời nhân vật đã lưu (Story và DM; không có ở chat thử Studio). `ReportSheet` (`Modal sm`): "Lý do" là các pill radio (Nội dung tình dục, Liên quan trẻ vị thành niên, Bạo lực, Thù ghét, Tự làm hại bản thân, Quấy rối, Khác; chạm 44px trên điện thoại), "Ghi chú (không bắt buộc)" placeholder "Điều gì chưa ổn?" bộ đếm "n/300", `Checkbox` tắt sẵn "Gửi kèm câu trả lời này để người quản lý xem xét" + "Không bật thì chỉ gửi lý do và ghi chú. Người quản lý không biết ai báo cáo.". Gửi xong: `Toast` "Đã gửi báo cáo. Cảm ơn bạn.". Client không gửi thêm `content_reported` (server tự ghi).
+- **Câu nhắc AI:** dòng 12px `muted` dưới nút "Bước vào câu chuyện" của sheet bắt đầu story: "Nhân vật do AI đóng vai, có thể sai. Đừng xem là lời khuyên chuyên môn."
+- **Quản lý tài khoản** giờ có `SegmentedControl` ba mục (`?tab=metrics|reports` mở sẵn, để chụp ảnh): "Tài khoản" (như cũ), "Số liệu", "Báo cáo".
+  - **Số liệu:** `ChoiceGroup` 7/30/90 ngày; câu "Chỉ ghi thao tác…, không bao giờ ghi chữ ai viết."; "Người dùng": bốn ô bằng nhau (lưới 2 cột, 4 cột từ `sm`): Hôm nay / 7 ngày qua / 30 ngày qua / Ngày đông nhất (số 24px `tabular-nums`); "Hành trình người mới": các bước của phễu bằng `Meter` (số người + % so với bước đầu); "Quay lại": hai ô D1/D7 (% và "x / y người"); "Thao tác nhiều nhất" (tên thường của sự kiện, `eventLabel`); "Xuất dữ liệu": "Tải tệp CSV" (liên kết `export.csv?since&until` theo ngày Việt Nam của khoảng đang chọn). Đang tải: khung xương; lỗi: `InlineAlert` + Thử lại; chưa có gì: `EmptyState`.
+  - **Báo cáo:** `SegmentedControl` Cần xem / Đã xem / Bỏ qua; mỗi báo cáo một thẻ: `Badge` lý do (trẻ vị thành niên `danger`, đứng đầu), thời gian tương đối · Story/Nhắn tin · ngôn ngữ, ghi chú, câu trả lời được gửi kèm (khung `surface-2`, cuộn trong khung, không có ngoặc kép) hoặc "Người báo cáo không gửi kèm câu trả lời.", nhân vật công khai liên quan; ghost "Đánh dấu đã xem" / "Bỏ qua" / "Mở lại".
+
+**Tracking phía client:** xem `docs/tracking-plan.md` §7.1 (danh sách chỗ gửi từng sự kiện, đồng ý, gom lô, `keepalive`). `App` báo cho tracker ai đang đăng nhập; `TrackingConsent` (chỉ trong cổng "app") đưa lựa chọn chia sẻ của tài khoản vào. Chưa biết lựa chọn thì sự kiện chờ (tối đa 60), không gửi.
+
+**Kiểm tra:**
+- `npm test` 392 (trước 359): `lib/track` (14: không lọt chữ, đồng ý, opt-out, GPC, gom lô, giới hạn hàng chờ, trùng lặp, khớp bảng sự kiện của backend), `lib/markdown` (5, cả hai văn bản thật), `lib/compliance` (7, lý do báo cáo khớp backend, mọi sự kiện có tên thường), `launchWiring.test.ts` (5: mọi sự kiện client được gửi từ một màn, thuộc tính chỉ là mã cố định, liên kết và ô đồng ý đúng chỗ, `filenameOf`), `lib/router` và `lib/auth` (route `legal`, cổng `public`/`terms`). `typecheck`, `build` qua.
+- Chạy thật: backend 8063 với DB tạm trong scratchpad (Ollama cổng chết), Vite 8068 proxy tới đó; Chrome headless 390x844 (và 1280x860 cho Số liệu, trang pháp lý): thiết lập chủ máy thiếu/có đồng ý, dialog Điều khoản, trang Chính sách (bảng cookie), sheet Tài khoản (mục mới, màn xoá), chat có nút Báo cáo, sheet báo cáo trống/đã điền, toast, Số liệu (tối/sáng, desktop), Báo cáo, tạo tài khoản bằng mã mời có ô đồng ý, sheet bắt đầu story có câu nhắc AI, màn đồng ý một lần (sau khi xoá dấu đồng ý trong DB tạm), tắt chia sẻ (sự kiện đã lưu của tài khoản bị xoá, không gửi thêm), tải dữ liệu, xoá tài khoản thành viên (sai rồi đúng mật khẩu, về đăng nhập). Trong DB tạm: sự kiện client có đủ thuộc tính mã cố định, sự kiện story mang `story_id` và `mode` do server điền; không cuộn ngang ở 390px.

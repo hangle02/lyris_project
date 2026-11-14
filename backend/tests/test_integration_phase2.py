@@ -610,7 +610,7 @@ async def test_phase1_database_migrates_and_works(tmp_path: Path, avatars_dir: P
     app = create_app(settings, fake)
     async with app.router.lifespan_context(app):
         conn: sqlite3.Connection = app.state.repo.conn
-        assert conn.execute("PRAGMA user_version").fetchone()[0] == 8
+        assert conn.execute("PRAGMA user_version").fetchone()[0] == 11
         async with owner_client(app, base_url="http://test") as client:
             stories = (await client.get("/api/stories")).json()
             # Không tạo thêm story seed; story có message mới nhất lên đầu.
@@ -642,7 +642,7 @@ async def test_phase1_database_migrates_and_works(tmp_path: Path, avatars_dir: P
     # Mở lại: không migrate lại, không lỗi.
     conn2 = connect(db)
     try:
-        assert migrate(conn2) == 8
+        assert migrate(conn2) == 11
         assert conn2.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
     finally:
         conn2.close()

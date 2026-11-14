@@ -7,8 +7,11 @@ Chỉ dùng thư viện chuẩn. Kết quả ghi vào harness/results/<thời gi
   key.json    ánh xạ Model A/B/... -> tên model thật (mở sau khi chấm xong)
   raw.json    toàn bộ dữ liệu thô
 
-Ví dụ:
-  python3 harness/bakeoff.py --models qwen3.5:9b gemma4:12b sailor2:8b
+Ví dụ (từ thư mục gốc dự án, Python của backend):
+  backend/.venv/bin/python harness/bakeoff.py --models qwen3.5:9b gemma4:12b sailor2:8b
+  backend/.venv/bin/python harness/bakeoff.py --models gemma4:12b --limit 2 --host http://127.0.0.1:11434
+
+run_eval.py (kịch bản `kind: bakeoff`) gọi thẳng `run_bakeoff`.
 """
 from __future__ import annotations
 
@@ -112,34 +115,47 @@ def fmt(x: float | None, nd: int = 1) -> str:
     return "-" if x is None else f"{x:.{nd}f}"
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--models", nargs="+", required=True, help="tag Ollama, ví dụ qwen3.5:9b")
-    ap.add_argument("--prompts", default=str(HERE / "prompts.json"))
-    ap.add_argument("--num-ctx", type=int, default=8192)
-    ap.add_argument("--max-tokens", type=int, default=450)
-    ap.add_argument("--temperature", type=float, default=0.8)
-    ap.add_argument("--seed", type=int, default=7)
-    args = ap.parse_args()
-
-    spec = json.loads(Path(args.prompts).read_text(encoding="utf-8"))
-    cases = spec["cases"]
+def run_bakeoff(
+    models: list[str],
+    *,
+    prompts: Path = HERE / "prompts.json",
+    num_ctx: int = 8192,
+    max_tokens: int = 450,
+    temperature: float = 0.8,
+    seed: int = 7,
+    host: str | None = None,
+    out_root: Path = HERE / "results",
+    limit: int | None = None,
+) -> tuple[int, Path | None, list[str]]:
+    """Chạy bake-off; trả (mã thoát, thư mục kết quả, các dòng bảng so sánh). `limit`: chỉ chạy N câu đầu
+    (run_eval dùng để kiểm nhanh trên model thật). Không in dòng "Đã ghi kết quả vào" (main() in)."""
+    global HOST
+    if host:
+        HOST = host.rstrip("/")
+    spec = json.loads(Path(prompts).read_text(encoding="utf-8"))
+    cases = spec["cases"][:limit] if limit else spec["cases"]
     options = {
-        "num_ctx": args.num_ctx,
-        "num_predict": args.max_tokens,
-        "temperature": args.temperature,
-        "seed": args.seed,
+        "num_ctx": num_ctx,
+        "num_predict": max_tokens,
+        "temperature": temperature,
+        "seed": seed,
     }
 
     try:
         urllib.request.urlopen(HOST + "/api/version", timeout=5)
     except Exception:
         print("Không kết nối được Ollama ở", HOST, "- hãy mở app Ollama trước.", file=sys.stderr)
-        return 1
+        return 1, None, []
 
-    out = HERE / "results" / datetime.now().strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    out = Path(out_root) / stamp
+    n = 2
+    while out.exists():  # hai lần chạy trong cùng một giây
+        out = Path(out_root) / f"{stamp}-{n}"
+        n += 1
     out.mkdir(parents=True)
     raw: dict = {"options": options, "models": {}}
+    args = argparse.Namespace(models=models, seed=seed)
 
     for model in args.models:
         print(f"\n=== {model} ===", flush=True)
@@ -216,8 +232,35 @@ def main() -> int:
     (out / "raw.json").write_text(json.dumps(raw, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print("\n" + "\n".join(lines))
-    print(f"\nĐã ghi kết quả vào {out}")
-    return 0
+    return 0, out, lines
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--models", nargs="+", required=True, help="tag Ollama, ví dụ qwen3.5:9b")
+    ap.add_argument("--prompts", default=str(HERE / "prompts.json"))
+    ap.add_argument("--num-ctx", type=int, default=8192)
+    ap.add_argument("--max-tokens", type=int, default=450)
+    ap.add_argument("--temperature", type=float, default=0.8)
+    ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--host", default=HOST, help=f"địa chỉ Ollama (mặc định {HOST})")
+    ap.add_argument("--limit", type=int, default=None, help="chỉ chạy N câu đầu của prompts.json")
+    ap.add_argument("--out-root", default=str(HERE / "results"), help="thư mục chứa kết quả (mặc định harness/results/)")
+    args = ap.parse_args(argv)
+    code, out, _ = run_bakeoff(
+        args.models,
+        prompts=Path(args.prompts),
+        num_ctx=args.num_ctx,
+        max_tokens=args.max_tokens,
+        temperature=args.temperature,
+        seed=args.seed,
+        host=args.host,
+        out_root=Path(args.out_root),
+        limit=args.limit,
+    )
+    if out is not None:
+        print(f"\nĐã ghi kết quả vào {out}")
+    return code
 
 
 if __name__ == "__main__":

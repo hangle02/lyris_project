@@ -12,7 +12,8 @@ tài khoản đọc từ cookie phiên (`lyris.auth.service.require_account`):
 `OwnerAccount`: thêm 403 `owner_only` nếu không phải chủ máy. `PendingAccount`: cho phép tài khoản đang
 chờ đổi mật khẩu (chỉ dùng ở `auth/me`, `auth/change-password`, `auth/logout`).
 
-Mọi router gắn `Depends(current_account)` ở cấp router (mặc định là cấm); chỉ router `/api/auth` có route mở.
+Mọi router gắn `Depends(current_account)` ở cấp router (mặc định là cấm); chỉ router `/api/auth` có route mở,
+và `POST /api/events` (docs/tracking-plan.md) đọc phiên nếu có: chưa đăng nhập chỉ nhận vài sự kiện ẩn danh.
 """
 from __future__ import annotations
 

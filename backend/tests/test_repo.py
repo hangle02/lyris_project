@@ -145,7 +145,7 @@ def test_settings_from_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
 
 # ---------------------------------------------------------------- connection / migrations
 
-LATEST = 8  # số migration mới nhất trong lyris/db/migrations
+LATEST = 11  # số migration mới nhất trong lyris/db/migrations
 
 
 def test_v1_database_upgrades_with_default_thought_style(tmp_path: Path) -> None:

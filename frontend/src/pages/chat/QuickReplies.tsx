@@ -1,4 +1,5 @@
 import { InlineText } from "../../components/Prose";
+import { trackInStory } from "../../lib/track";
 import { cx } from "../../components/ui";
 
 interface Props {
@@ -31,7 +32,7 @@ export function QuickReplies({ suggestions, disabled, onPick }: Props) {
       )}
     >
       <ul className="flex w-max gap-2 sm:w-auto sm:flex-wrap">
-        {suggestions.map((s) => (
+        {suggestions.map((s, i) => (
           <li
             key={s}
             // 100vw minus the 16px margin, the 8px gap and a 14px peek of the next card; a lone card
@@ -43,7 +44,11 @@ export function QuickReplies({ suggestions, disabled, onPick }: Props) {
               disabled={disabled}
               title={s}
               aria-label={`Gửi: ${s}`}
-              onClick={() => onPick(s)}
+              onClick={() => {
+                // Usage: which of the suggestions was taken (its place, never its text).
+                trackInStory("suggestion_used", { position: Math.min(3, i + 1) });
+                onPick(s);
+              }}
               className={cx(
                 // 44px+ on phones (touch), 36px from 640px; the pressed-input tone of DESIGN.md.
                 "flex min-h-11 w-full items-center rounded-control bg-surface-2 px-4 py-2 text-left text-[14px] leading-snug font-medium text-fg",

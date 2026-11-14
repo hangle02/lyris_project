@@ -1,0 +1,37 @@
+# F13 — chống lặp câu: 10 lượt DM liên tiếp trên model thật, câu kết không lặp.
+id: f13-dm-10-luot
+title: 10 lượt DM không kết bằng cùng một lời dặn
+kind: dm_session
+note: >-
+  Nhắn tin buổi tối, 10 lượt người chơi liên tiếp; mỗi lượt dựng prompt bằng đúng build_prompt (có câu cần tránh
+  của các lượt trước ở khối F) và lấy câu trả lời thật làm lịch sử cho lượt sau. Luật máy: không câu kết nào
+  (câu cuối, bỏ dấu câu và emoji) lặp ở quá 2 lượt; 3 chữ cuối không trùng nhau ở quá 3 lượt; câu kết không chứa
+  cùng một lời dặn (một nhóm trong `reminders`, viết lại kiểu khác vẫn tính) ở quá 2 lượt. Mỗi lượt chỉ kiểm
+  "câu trả lời rỗng" (luật khác thuộc tính năng khác).
+mode: dm
+history:
+  - role: assistant
+    content: "Về tới ký túc xá chưa?"
+  - role: user
+    content: "về rồi nè, vừa tắm xong 🥰"
+turns:
+  - "cậu ăn tối chưa? tớ vừa ăn mì tôm 😋"
+  - "mai thi giữa kỳ môn vi tích phân rồi, tớ run quá"
+  - "cậu ôn tới chương mấy rồi?"
+  - "hôm nay học trưởng Chu hỏi tớ có muốn vào câu lạc bộ nhiếp ảnh không đó"
+  - "cậu thấy tớ có nên vào không?"
+  - "à mà cuối tuần này cậu rảnh không, đi hiệu sách với tớ đi"
+  - "tớ muốn mua cuốn tiểu thuyết trinh thám mới ra"
+  - "phòng tớ vừa mất điện nè, tối thui luôn 😭"
+  - "cậu đang làm gì đó?"
+  - "kể tớ nghe chuyện gì vui đi"
+max_same_ending: 2
+ending_words: 3
+max_same_tail: 3
+max_same_reminder: 2
+reminders:
+  - ["ngủ sớm", "ngủ đi", "đi ngủ", "ngủ ngon", "thức khuya", "đừng thức", "nghỉ ngơi", "nghỉ sớm"]
+  - ["giữ ấm", "mặc ấm", "đắp chăn", "kẻo lạnh", "kẻo ốm"]
+  - ["ăn uống", "ăn đủ", "ăn tối đi", "ăn gì đi", "đừng bỏ bữa", "uống nước"]
+  - ["ôn bài", "ôn tiếp", "học bài", "học tiếp", "làm bài đi"]
+  - ["cẩn thận", "coi chừng", "đi đứng"]

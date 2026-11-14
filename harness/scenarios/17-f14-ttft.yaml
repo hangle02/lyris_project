@@ -1,0 +1,45 @@
+# F14 — tăng tốc: đo TTFT qua app thật (worker, trích xuất, tóm tắt, prefill raw), kể cả lượt cửa sổ dịch.
+id: f14-ttft
+title: TTFT các lượt sau lượt đầu, kể cả lượt cửa sổ dịch
+kind: app_ttft
+note: >-
+  Bật app Lyris thật trong tiến trình (create_app, DB tạm, Ollama thật, worker + prefill như khi chạy app),
+  nạp sẵn lịch sử story seed tới gần mốc cửa sổ dịch, rồi gửi lượt qua HTTP như giao diện; sau mỗi lượt chờ
+  việc nền (trích xuất, tóm tắt) và prefill xong mới gửi lượt sau (như docs/phase3.md §10.6). Lượt đầu đọc cả
+  prompt nên không tính. TTFT đo phía người chơi qua HTTP thật (uvicorn cổng 8068/8069): từ lúc gửi POST tới sự
+  kiện `delta` đầu tiên. Các lượt sau lượt đầu: trung vị <= 5 giây ("khoảng 4-5 giây") và không lượt nào > 6 giây
+  (tạm chọn, wiki/decisions/nguong-ttft-f14.md); phải gặp ít nhất một lượt cửa sổ dịch và đo thêm ít nhất 1 lượt
+  sau đó. Mỗi lần chờ việc nền tối đa 180 giây, cả kịch bản tối đa 900 giây (quá là lỗi của riêng kịch bản này).
+mode: story
+max_ttft_s: 6.0
+max_median_ttft_s: 5.0
+after_shift: 1
+max_turns: 7
+probe_chars: 2500
+settle_timeout_s: 180
+max_total_s: 900
+preload:
+  - role: user
+    content: "*Tớ kéo ghế ngồi xuống cạnh cậu, đặt cốc trà sữa lên bàn.* Hôm nay thư viện đông ghê. Cậu giữ chỗ cho tớ từ sáng à?"
+  - role: assistant
+    content: "Lạc Dương không ngẩng lên, chỉ đẩy chồng sách của mình sang một bên để chừa chỗ cho cô.\n\n[Thought: Từ bảy giờ. Nhưng nói ra thì cô ấy lại áy náy.]\n\n\"Tiện thôi.\" Anh lật sang trang mới, ngón tay gõ nhẹ lên mép bàn. \"Ống hút của cậu rơi dưới chân kìa.\"\n\nCô cúi xuống nhặt, tóc mái xoà xuống che nửa gương mặt. Anh liếc sang một thoáng rồi lại nhìn vào trang giáo trình, nhưng dòng chữ trước mắt đã không vào đầu được nữa.\n\n[Thought: Lại không buộc tóc. Lát nữa gió ngoài hành lang thổi vào thì thể nào cũng kêu lạnh.]\n\nAnh lặng lẽ cởi chiếc khăn quàng xám vắt trên thành ghế, gấp gọn rồi đặt cạnh khuỷu tay cô, như thể chỉ tiện tay để đó."
+  - role: user
+    content: "*Tớ chọc chọc vào tay cậu.* Câu này trong đề cương tớ đọc ba lần vẫn không hiểu. Cậu giảng tớ với."
+  - role: assistant
+    content: "Lạc Dương kéo tờ đề cương về phía mình, cầm bút chì gạch chân hai dòng.\n\n[Thought: Lại là phần này. Năm ngoái mình cũng mất cả buổi mới hiểu.]\n\n\"Cậu đọc ngược thứ tự rồi. Phải xét điều kiện trước, rồi mới thay số.\" Anh vẽ một mũi tên nhỏ bên lề, nét chữ ngay ngắn. \"Làm lại từ dòng này. Sai chỗ nào tớ chỉ.\"\n\nCô cắn đầu bút, nghiêng người lại gần để nhìn cho rõ. Mùi dầu gội hương bưởi thoảng qua, anh khẽ lùi ra một chút.\n\n[Thought: Gần quá. Tập trung vào bài đi.]\n\nAnh gõ đầu bút chì lên tờ giấy hai cái, ra hiệu cho cô viết tiếp, giọng vẫn điềm đạm như không có gì xảy ra."
+  - role: user
+    content: "*Tớ vươn vai, nhìn ra cửa sổ.* Trời tối mất rồi. Căn tin giờ này còn mì bò không nhỉ?"
+  - role: assistant
+    content: "Lạc Dương gấp sách lại, nhìn đồng hồ treo tường phía cuối phòng đọc.\n\n[Thought: Bảy giờ kém mười. Cả buổi chiều cô ấy chỉ uống mỗi cốc trà sữa.]\n\n\"Còn. Quầy số ba đóng lúc tám giờ.\" Anh đứng dậy trước, cầm luôn túi sách của cô khoác lên vai mình. \"Đi thôi. Hôm nay tớ mời.\"\n\nHành lang thư viện đã lên đèn, ánh vàng hắt xuống nền gạch bóng loáng. Gió cuối thu lùa qua khe cửa sổ, cô rụt cổ lại theo phản xạ.\n\n[Thought: Biết ngay mà.]\n\nAnh dừng bước, kéo chiếc khăn quàng xám trên tay cô quấn hai vòng quanh cổ cô, động tác thuần thục như đã làm cả trăm lần."
+  - role: user
+    content: "*Tớ vừa ăn vừa kể.* Chiều nay bạn cùng phòng tớ cãi nhau với bạn trai, khóc cả buổi. Tớ chẳng biết dỗ thế nào."
+  - role: assistant
+    content: "Lạc Dương gắp mấy lát thịt bò trong bát mình sang bát cô, nghe cô kể mà không chen vào câu nào.\n\n[Thought: Chuyện của người khác mà cô ấy cũng lo tới mức quên ăn.]\n\n\"Không cần dỗ.\" Anh đặt đũa xuống. \"Ngồi cạnh, đưa khăn giấy, đợi bạn ấy tự nói. Vậy là đủ.\"\n\nCô chớp mắt nhìn anh, như ngạc nhiên vì anh lại hiểu mấy chuyện này. Anh quay đi, rót thêm nước nóng vào cốc của cô.\n\n[Thought: Vì hồi nhỏ mỗi lần cô ấy khóc, mình cũng chỉ biết ngồi cạnh như vậy.]\n\n\"Ăn đi, nguội rồi.\" Anh đẩy bát mì lại gần cô thêm một chút."
+turns:
+  - "*Tớ duỗi chân dưới gầm bàn, ngáp một cái.* Ăn no rồi buồn ngủ ghê. Mai cậu có tiết sáng không?"
+  - "*Tớ lấy điện thoại ra xem.* Nhóm lớp vừa báo dời lịch thi sang thứ sáu đó. Vậy là còn thêm hai ngày ôn."
+  - "*Tớ chống cằm nhìn cậu.* Cậu ôn kỹ thế, có môn nào cậu thấy khó không? Tớ chưa thấy cậu kêu bao giờ."
+  - "*Tớ đẩy cuốn sổ sang.* Cậu xem giúp tớ kế hoạch ôn tập tuần này có ổn không."
+  - "*Tớ cười, khều nhẹ tay áo cậu.* Thi xong mình đi ăn lẩu nhé, tớ khao. Lần này tớ giữ lời thật."
+  - "*Tớ nhìn ra sân trường lấp lánh đèn.* Cuối năm nay cậu có về nhà ăn Tết sớm không?"
+  - "*Tớ quàng lại chiếc khăn của cậu cho chặt.* Khăn này ấm thật. Cậu cho tớ mượn tới mai nhé."

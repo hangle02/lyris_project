@@ -36,8 +36,8 @@ Từ 640px: thành hộp thoại giữa màn hình, cỡ vừa.
 
 ## Tính năng
 
-- [Văn phong và xưng hô](../features/van-phong-xung-ho.md)
-- [Đọc suy nghĩ](../features/doc-suy-nghi.md)
-- [Ẩn chữ kỹ thuật](../features/an-chu-ky-thuat.md) (model nằm trong "Nâng cao", chỉ chủ máy)
+- [Văn phong và xưng hô](../features/F03-van-phong-xung-ho.md)
+- [Đọc suy nghĩ](../features/F08-doc-suy-nghi.md)
+- [Ẩn chữ kỹ thuật](../features/F27-an-chu-ky-thuat.md) (model nằm trong "Nâng cao", chỉ chủ máy)
 
 Chi tiết: [auth.md §1.1](../../docs/auth.md) (ai được đổi model), [design-impl.md §15](../../docs/design-impl.md).

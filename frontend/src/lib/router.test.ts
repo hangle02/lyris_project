@@ -211,3 +211,54 @@ test("routeHref: Phase 4b routes round-trip, and have no tab bar", () => {
   assert.equal(routeHref({ name: "signup", code: "7KQ2M9XD4TPA" }), "#/signup?code=LYR-7KQ2-M9XD-4TPA");
   assert.equal(routeHref({ name: "admin" }), "#/admin");
 });
+
+test("legal pages: #/privacy and #/terms round-trip, no tab bar, nothing deeper", () => {
+  assert.deepEqual(parseRoute("#/privacy"), { name: "legal", doc: "privacy" });
+  assert.deepEqual(parseRoute("#/terms"), { name: "legal", doc: "terms" });
+  assert.deepEqual(parseRoute("#/terms/"), { name: "legal", doc: "terms" });
+  for (const h of ["#/privacy/x", "#/terms/1"]) assert.deepEqual(parseRoute(h), HUB, h);
+  const routes: Route[] = [
+    { name: "legal", doc: "privacy" },
+    { name: "legal", doc: "terms" },
+  ];
+  for (const r of routes) {
+    assert.deepEqual(parseRoute(routeHref(r)), r);
+    assert.equal(tabOf(r), null);
+  }
+});
+
+test("navigation guards run before route subscribers; a cancelling guard stops the re-render", async () => {
+  const { addNavigationGuard, subscribeRoute } = await import("./router.ts");
+  const g = globalThis as { window?: unknown };
+  const had = "window" in g;
+  const old = g.window;
+  const win = new EventTarget();
+  g.window = win;
+  try {
+    const calls: string[] = [];
+    let allow = true;
+    const unsub = subscribeRoute(() => calls.push("route"));
+    const unguard = addNavigationGuard(() => {
+      calls.push("guard");
+      return allow;
+    });
+    // A real link click / Back button: the browser fires popstate, then hashchange.
+    win.dispatchEvent(new Event("popstate"));
+    assert.deepEqual(calls, ["guard", "route"]);
+    calls.length = 0;
+    allow = false;
+    win.dispatchEvent(new Event("hashchange"));
+    assert.deepEqual(calls, ["guard"], "cancelled: the page is not re-rendered away");
+    unguard();
+    calls.length = 0;
+    win.dispatchEvent(new Event("hashchange"));
+    assert.deepEqual(calls, ["route"]);
+    unsub();
+    calls.length = 0;
+    win.dispatchEvent(new Event("hashchange"));
+    assert.deepEqual(calls, [], "last subscriber gone: the window listeners are removed");
+  } finally {
+    if (had) g.window = old;
+    else delete g.window;
+  }
+});

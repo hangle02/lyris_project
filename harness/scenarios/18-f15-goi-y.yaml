@@ -1,0 +1,11 @@
+# F15 — nhận gợi ý: lời gọi gợi ý thật (suggest_replies), rồi "Gợi ý khác" (avoid = lần trước).
+id: f15-goi-y
+title: Nhận gợi ý và Gợi ý khác
+kind: suggest
+note: >-
+  Story seed ngay sau lời mở đầu. "Nhận gợi ý" phải cho đúng 3 gợi ý tiếng Việt; mỗi gợi ý gửi đi làm lượt người
+  chơi thì giữ nguyên văn (không bị tách thành chỉ đạo, nằm nguyên văn trong lượt gửi model). "Gợi ý khác"
+  (truyền gợi ý lần trước để tránh) cũng cho 3 gợi ý, không gợi ý nào trùng hay trùng từ >= 60% với lần trước.
+mode: story
+language: vi
+max_overlap: 0.6

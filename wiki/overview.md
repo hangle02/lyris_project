@@ -36,18 +36,18 @@ Mọi story và chat chỉ nằm trên máy Mac. Không gửi gì ra ngoài.
 2. **[Hồ sơ nhân vật](screens/character-profile.md)**: ảnh lớn, tên, vai trò, tag, "Lời nói đặc trưng", tab "Giới thiệu" và "Thiết lập" (chỉ xem, không sửa). Không bao giờ hiện bí mật của nhân vật.
 3. **[Bước vào câu chuyện](screens/start-story-sheet.md)**: sheet chọn persona. Mở "Tuỳ chỉnh story" để đổi bối cảnh, lời mở đầu, ngôn ngữ, Story/DM, kiểu quan hệ, ngôi kể, đại từ dẫn truyện, kiểu suy nghĩ, có đọc suy nghĩ hay không.
 4. **[Chat](screens/chat-story.md)**, hai chế độ chung một dòng thời gian:
-   - **[Story](features/che-do-story.md)**: văn tiểu thuyết. Dẫn truyện nghiêng không khung, lời thoại trong thẻ, suy nghĩ của nhân vật trong thẻ làm mờ "Chạm để lắng nghe".
-   - **[DM](features/che-do-dm.md)**: giao diện nhắn tin, bong bóng, avatar, mốc giờ.
-   - [Nút "+"](features/menu-cong.md) ở ô chat: "Nhận gợi ý" (chỉ khi bấm), "Xem sự kiện", "Gửi hình ảnh" (Sắp có).
-5. **Ngăn trái tim** trong chat ([cảm xúc](features/ma-tran-cam-xuc.md), [trí nhớ](features/tri-nho.md), [sổ thế giới](features/so-the-gioi.md)): chỉ dẫn diễn xuất, 6 thanh cảm xúc, nơi chốn và thời gian, ký ức (quên được), "Thế giới đã mở khoá".
-6. **[Tương tác](screens/hub.md)** (tab giữa): danh sách story đang chơi. **[Studio](features/xuong-nhan-vat.md)** (tab phải): tạo và sửa nhân vật, sổ thế giới, bật "Công khai".
+   - **[Story](features/F01-che-do-story.md)**: văn tiểu thuyết. Dẫn truyện nghiêng không khung, lời thoại trong thẻ, suy nghĩ của nhân vật trong thẻ làm mờ "Chạm để lắng nghe".
+   - **[DM](features/F02-che-do-dm.md)**: giao diện nhắn tin, bong bóng, avatar, mốc giờ.
+   - [Nút "+"](features/F16-menu-cong.md) ở ô chat: "Nhận gợi ý" (chỉ khi bấm), "Xem sự kiện", "Gửi hình ảnh" (Sắp có).
+5. **Ngăn trái tim** trong chat ([cảm xúc](features/F09-ma-tran-cam-xuc.md), [trí nhớ](features/F10-tri-nho.md), [sổ thế giới](features/F17-so-the-gioi.md)): chỉ dẫn diễn xuất, 6 thanh cảm xúc, nơi chốn và thời gian, ký ức (quên được), "Thế giới đã mở khoá".
+6. **[Tương tác](screens/hub.md)** (tab giữa): danh sách story đang chơi. **[Studio](features/F18-xuong-nhan-vat.md)** (tab phải): tạo và sửa nhân vật, sổ thế giới, bật "Công khai".
 
 ## Khác WHIF ở đâu
 
 Lấy từ góp ý của chủ dự án trong `raw/`:
 
 - **AI không viết thay người chơi.** Nhân vật phản ứng với hành động bạn viết (ví dụ "run rẩy"), được tả thêm trạng thái nhỏ nó nhìn thấy, nhưng không viết lời, hành động hay quyết định mới cho persona. ([raw](raw/2026-11-12-quyen-cua-nguoi-choi.md), [quyết định](decisions/nguoi-choi-la-tac-gia.md))
-- **Bám sát lượt của bạn.** WHIF hay trả lời lệch, bỏ qua điều người dùng viết. Ghi chú cuối prompt (khối F), ngay trước câu trả lời, dặn nhân vật tiếp nối trực tiếp từ đúng lời nói, hành động bạn vừa viết, không đổi cảnh. Bạn còn chỉ đạo được nhân vật bằng `((...))` ([tính năng](features/chi-dao-an.md)).
+- **Bám sát lượt của bạn.** WHIF hay trả lời lệch, bỏ qua điều người dùng viết. Ghi chú cuối prompt (khối F), ngay trước câu trả lời, dặn nhân vật tiếp nối trực tiếp từ đúng lời nói, hành động bạn vừa viết, không đổi cảnh. Bạn còn chỉ đạo được nhân vật bằng `((...))` ([tính năng](features/F05-chi-dao-an.md)).
 - **Xưng hô theo bối cảnh.** Nhân vật tên kiểu Trung thì nói kiểu Trung (ta/ngươi, gia/em...), kiểu Việt thì anh/em, tớ/cậu. Xưng hô chỉ dùng trong lời thoại và suy nghĩ; dẫn truyện dùng đại từ riêng. ([raw](raw/2026-11-12-nhan-vat-va-xung-ho.md), [quyết định](decisions/van-phong-theo-boi-canh.md))
 - **Story và DM tách khung nhưng chung trí nhớ.** Nói tên trong DM thì sang Story nhân vật vẫn biết. ([raw](raw/2026-11-13-loi-thoai-va-dm-story.md), [quyết định](decisions/story-dm-chung-dong-thoi-gian.md))
 - **Suy nghĩ rải trong truyện**, không chỉ ở cuối lượt; tắt được hẳn. ([raw](raw/2026-11-13-khong-doc-suy-nghi.md), [quyết định](decisions/thought-rai-giua-truyen.md), [quyết định](decisions/tuy-chon-doc-suy-nghi.md))
@@ -80,9 +80,13 @@ Theo [docs/plan.md](../docs/plan.md) §10 và code hiện có (DB thật đang �
 - Nhân vật mẫu: Hạ Vy (nổi bật), Trần Minh Khang, Tạ Vân Lan, Lạc Dương, Morwenna Penrose (tiếng Anh). File: `backend/lyris/seed/templates/`.
 - Nhân vật chủ dự án gửi, có thế giới riêng trong `worlds/`: Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương. ([raw](raw/2026-11-12-bon-nhan-vat-va-the-gioi.md))
 
+## Kiểm tra và tiêu chí xong
+
+Mỗi tính năng (F01–F41) có "Done when" gồm dòng Unit, Bot và Model thật, và mục "Tests" trỏ tới test có thật. Một tính năng chỉ là ✅ khi `verification/verify.sh` chạy xanh: test trong "Tests" (`backend/.venv/bin/pytest`, `npm test`), typecheck, build, và bot trình duyệt trên server LLM giả. Dòng Model thật chỉ chấm khi chạy thêm `--real-model` (cần Ollama). Trạng thái nằm ở `memory/features.json`, không ghi trong wiki. Luật đầy đủ: [README.md](README.md) mục "Trang tính năng".
+
 ## Đọc tiếp
 
-- [features/](features/): từng tính năng, có danh sách "Done when".
+- [features/](features/): từng tính năng `F<NN>-<slug>.md`, có "Done when" và "Tests".
 - [screens/](screens/): từng màn hình.
 - [decisions/](decisions/): lựa chọn quan trọng và lý do.
 - [design/README.md](design/README.md): nguyên tắc thiết kế. [design/style.md](design/style.md): màu, chữ, thành phần.

@@ -5,7 +5,18 @@ import { Button, InlineAlert, TextField } from "../../components/ui";
 import { applyAuth, takeNextHash, useAuth } from "../../hooks/useAuth";
 import { routeHref } from "../../lib/router";
 import { AuthLayout, AuthLink, PasswordField } from "./AuthLayout";
-import { FORGOT_TEXT, LOGGED_OUT_TEXT, loginHandle } from "./logic";
+import { LegalLinks } from "./ConsentField";
+import {
+  contactHref,
+  FORGOT_LEAD,
+  FORGOT_LINK,
+  FORGOT_TEXT,
+  LOGGED_OUT_TEXT,
+  loginHandle,
+  NO_INVITE_LEAD,
+  NO_INVITE_LINK,
+  NO_INVITE_TEXT,
+} from "./logic";
 
 /**
  * "#/login" (docs/auth.md §7.3). Signed out on any other hash, the gate shows this page and keeps that
@@ -13,7 +24,10 @@ import { FORGOT_TEXT, LOGGED_OUT_TEXT, loginHandle } from "./logic";
  * too many tries), under the button.
  */
 export function LoginPage() {
-  const { loggedOut } = useAuth();
+  const { loggedOut, state: authState } = useAuth();
+  // The operator's contact (LYRIS_CONTACT): how a visitor without a code, or who forgot a password, reaches someone.
+  const inviteHref = contactHref(authState?.contact, "Xin mã mời Lyris");
+  const forgotHref = contactHref(authState?.contact, "Quên mật khẩu Lyris");
   const [handle, setHandle] = useState("");
   const [password, setPassword] = useState("");
   const [sending, setSending] = useState(false);
@@ -91,8 +105,22 @@ export function LoginPage() {
         <AuthLink lead="Có mã mời?" href={routeHref({ name: "signup", code: null })}>
           Tạo tài khoản
         </AuthLink>
-        <p className="text-[14px] leading-snug text-muted">{FORGOT_TEXT}</p>
+        {inviteHref ? (
+          <AuthLink lead={NO_INVITE_LEAD} href={inviteHref}>
+            {NO_INVITE_LINK}
+          </AuthLink>
+        ) : (
+          <p className="text-[14px] leading-snug text-muted">{NO_INVITE_TEXT}</p>
+        )}
+        {forgotHref ? (
+          <AuthLink lead={FORGOT_LEAD} href={forgotHref}>
+            {FORGOT_LINK}
+          </AuthLink>
+        ) : (
+          <p className="text-[14px] leading-snug text-muted">{FORGOT_TEXT}</p>
+        )}
       </div>
+      <LegalLinks />
     </AuthLayout>
   );
 }

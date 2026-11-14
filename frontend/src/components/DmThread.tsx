@@ -17,11 +17,14 @@ import { PlayerAvatarContext } from "../pages/chat/playerAvatar";
 import { ShowThoughtsContext } from "./showThoughts";
 import { ThoughtCard } from "../pages/chat/ThoughtCard";
 import { Chip, cx } from "./ui";
+import { messageLockReason } from "../lib/actionLock";
 
 interface Props extends MessageActions {
   rows: ThreadRow[];
   streaming: StreamingState | null;
   disabled: boolean;
+  /** Why `disabled` (actionLockReason): the locked buttons' tooltip. */
+  lockReason?: string | null;
   characterName: string;
   /** Character image; defaults to CharacterAvatarContext (set by the chat page). */
   avatarUrl?: string | null;
@@ -114,6 +117,7 @@ function DmMessage({
   selected,
   onToggle,
   disabled,
+  lockReason,
   footer,
   actions,
 }: {
@@ -123,6 +127,7 @@ function DmMessage({
   selected: boolean;
   onToggle: () => void;
   disabled: boolean;
+  lockReason: string | null;
   footer: string | null;
   actions: MessageActions;
 }) {
@@ -155,7 +160,7 @@ function DmMessage({
         message={m}
         isLastAssistant={row.isLastAssistant}
         canRegenerate={row.canRegenerate}
-        locked={disabled || pending}
+        lockReason={messageLockReason({ disabled, pending, reason: lockReason })}
         align={mine ? "end" : "start"}
         onStartEdit={() => {
           setConfirmDelete(false);
@@ -276,6 +281,7 @@ export function DmThread({
   rows,
   streaming,
   disabled,
+  lockReason = null,
   characterName,
   avatarUrl: avatarProp,
   receipt = null,
@@ -336,6 +342,7 @@ export function DmThread({
                     selected={id !== null && selectedId === id}
                     onToggle={() => setSelectedId((cur) => (id === null || cur === id ? null : id))}
                     disabled={disabled}
+                    lockReason={lockReason}
                     footer={footer}
                     actions={actions}
                   />

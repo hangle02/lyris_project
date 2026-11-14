@@ -6,6 +6,9 @@ thiết lập story: mặc định là seed Lạc Dương, hoặc bộ card tron
 stream câu trả lời qua `lyris.llm.ollama.OllamaClient`, chạy kiểm tra máy (checks.py), rồi nhờ một model chấm (judge, mặc định gemma4:e4b) xét godmodding và việc bám
 sát lượt người chơi.
 
+Kịch bản có khoá `kind` khác `reply` (trích xuất, tóm tắt, gợi ý, viết nháp, nhiều lượt DM, TTFT qua app thật, bake-off,
+chạy lồng) được chạy bằng harness/kinds.py: chỉ luật máy, không judge. Cách viết kịch bản: harness/README.md.
+
 Kết quả ghi vào harness/results/eval-<thời gian>/:
   report.md  bảng tóm tắt + toàn bộ câu trả lời
   raw.json   dữ liệu thô (prompt, câu trả lời, số liệu, phán quyết)
@@ -37,15 +40,18 @@ for _p in (HERE, BACKEND_DIR):
 import httpx  # noqa: E402
 import yaml  # noqa: E402
 from checks import run_checks, strip_thoughts, word_count  # noqa: E402
+from kinds import KIND_KEYS, KINDS, META_KINDS, Env, Outcome, SpecError, fresh_prompt_state, parse_spec, run_kind  # noqa: E402
 
 from lyris.config import get_settings  # noqa: E402
 from lyris.llm.base import Done, LLMError, TextDelta  # noqa: E402
 from lyris.llm.ollama import OllamaClient  # noqa: E402
 from lyris.llm.thought import split_thought  # noqa: E402
+from lyris.lore.select import lore_for_history  # noqa: E402
 from lyris.models import (  # noqa: E402
     BuiltPrompt,
     CharacterCard,
     ChatTurn,
+    LoreEntry,
     Message,
     Mode,
     Persona,
@@ -54,7 +60,7 @@ from lyris.models import (  # noqa: E402
 )
 from lyris.prompt.builder import PromptBudget, build_prompt  # noqa: E402
 from lyris.prompt.directives import extract_directives  # noqa: E402
-from lyris.prompt.templates import PromptContext  # noqa: E402
+from lyris.prompt.templates import PromptContext, get_template  # noqa: E402
 from lyris.seed import load_default_story_settings, load_seed_card, load_seed_persona  # noqa: E402
 
 DEFAULT_SCENARIOS = HERE / "scenarios"
@@ -62,7 +68,10 @@ DEFAULT_CARDS = HERE / "cards"
 RESULTS_DIR = HERE / "results"
 DEFAULT_JUDGE_MODEL = "gemma4:e4b"
 _MODES: tuple[str, ...] = get_args(Mode)
-_SCENARIO_KEYS = {"id", "title", "note", "mode", "card", "history", "input", "checks", "judge"}
+_SCENARIO_KEYS = {"id", "title", "note", "mode", "card", "history", "input", "checks", "judge", "kind", "thought_style", "lore"}
+# Khoá chung của mọi loại kịch bản khác `reply` (phần riêng: kinds.KIND_KEYS).
+_COMMON_KEYS = {"id", "title", "note", "mode", "card", "kind"}
+_LORE_KEYS = {"title", "keys", "known_by", "content", "category"}
 _CHECK_KEYS = {
     "thought_count",
     "min_thoughts",
@@ -78,7 +87,24 @@ _CHECK_KEYS = {
     "language",
     "dialogue_forbidden",
     "dialogue_required_any",
+    "directive_echo",
+    "say_forbidden",
+    "forbidden_patterns",
+    "required_any",
+    "prompt_includes",
+    "prompt_excludes",
 }
+_LIST_CHECKS = (
+    "narration_forbidden",
+    "forbidden_phrases",
+    "dialogue_forbidden",
+    "dialogue_required_any",
+    "say_forbidden",
+    "forbidden_patterns",
+    "required_any",
+    "prompt_includes",
+    "prompt_excludes",
+)
 _LANGUAGES = ("vi", "en")
 _CARD_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 
@@ -92,6 +118,8 @@ JUDGE_SCHEMA: dict[str, Any] = {
     },
     "required": ["godmodding", "follows_player", "reason"],
 }
+APP_NUM_CTX = 8192  # environment/rules.md: num_ctx luôn 8192 cho mọi lời gọi
+DEFAULT_DEADLINE_MIN = 50.0
 JUDGE_OPTIONS: dict[str, Any] = {"temperature": 0, "num_ctx": 8192, "num_predict": 512}
 _PREV_TURN_CHARS = 2000
 
@@ -107,6 +135,7 @@ class ScenarioError(ValueError):
 class HistoryItem:
     role: str
     content: str
+    mode: str | None = None  # None = mode của story; "dm" trong story Story Mode = lượt nhắn tin (F12)
 
 
 @dataclass(frozen=True)
@@ -121,6 +150,10 @@ class Scenario:
     note: str = ""
     judge: bool = True
     card: str | None = None  # tên file trong harness/cards/ (có .json); None = seed Lạc Dương
+    kind: str = "reply"  # xem kinds.KINDS
+    spec: dict[str, Any] = field(default_factory=dict)  # phần riêng của loại khác `reply` (kinds.parse_spec)
+    thought_style: str | None = None  # ghi đè thought_style của story (CLI --thought-style vẫn thắng)
+    lore: tuple[dict[str, Any], ...] = ()  # mục thế giới của card cho lượt này (F17)
 
 
 def _require_str(data: dict[str, Any], key: str, where: str, *, allow_empty: bool = False) -> str:
@@ -130,20 +163,34 @@ def _require_str(data: dict[str, Any], key: str, where: str, *, allow_empty: boo
     return value
 
 
-def parse_scenario(data: Any, path: Path) -> Scenario:
-    where = path.name
-    if not isinstance(data, dict):
-        raise ScenarioError(f"{where}: nội dung phải là một mapping YAML")
-    unknown = set(data) - _SCENARIO_KEYS
-    if unknown:
-        raise ScenarioError(f"{where}: trường lạ {sorted(unknown)}")
+def _parse_card(data: dict[str, Any], where: str) -> str | None:
+    if data.get("card") is None:
+        return None
+    raw_card = data["card"]
+    if not isinstance(raw_card, str) or not _CARD_NAME.fullmatch(raw_card.strip()):
+        raise ScenarioError(f"{where}: `card` phải là tên file trong harness/cards/, ví dụ viet_hien_dai.json")
+    card = raw_card.strip()
+    return card if card.endswith(".json") else card + ".json"
+
+
+def _parse_head(data: dict[str, Any], where: str) -> tuple[str, str, str, str]:
+    """(id, mode, title, note) chung của mọi loại kịch bản."""
     sid = _require_str(data, "id", where).strip()
     mode = data.get("mode", "story")
     if mode not in _MODES:
         raise ScenarioError(f"{where}: `mode` phải là một trong {list(_MODES)}, đang là {mode!r}")
-    text = _require_str(data, "input", where)
+    note = data.get("note") or ""
+    if not isinstance(note, str):
+        raise ScenarioError(f"{where}: `note` phải là chuỗi")
+    title = data.get("title") or sid
+    if not isinstance(title, str):
+        raise ScenarioError(f"{where}: `title` phải là chuỗi")
+    return sid, mode, title.strip(), note.strip()
 
-    checks = data.get("checks") or {}
+
+def parse_checks(checks: Any, where: str) -> dict[str, Any]:
+    """`checks` của lượt trả lời (dùng cho `reply` và `dm_session`)."""
+    checks = checks or {}
     if not isinstance(checks, dict):
         raise ScenarioError(f"{where}: `checks` phải là mapping")
     bad_checks = set(checks) - _CHECK_KEYS
@@ -152,22 +199,71 @@ def parse_scenario(data: Any, path: Path) -> Scenario:
     for key in ("thought_count", "min_thoughts", "max_thoughts", "max_words", "min_words"):
         if key in checks and (not isinstance(checks[key], int) or isinstance(checks[key], bool) or checks[key] < 0):
             raise ScenarioError(f"{where}: `checks.{key}` phải là số nguyên không âm")
-    for key in ("narration_forbidden", "forbidden_phrases", "dialogue_forbidden", "dialogue_required_any"):
+    for key in _LIST_CHECKS:
         if key in checks and (
             not isinstance(checks[key], list) or not all(isinstance(w, str) and w.strip() for w in checks[key])
         ):
             raise ScenarioError(f"{where}: `checks.{key}` phải là list chuỗi không rỗng")
+    for pattern in checks.get("forbidden_patterns") or []:
+        try:
+            re.compile(pattern)
+        except re.error as exc:
+            raise ScenarioError(f"{where}: `checks.forbidden_patterns` có regex hỏng {pattern!r}: {exc}") from exc
     if "language" in checks and checks["language"] not in _LANGUAGES:
         raise ScenarioError(f"{where}: `checks.language` phải là một trong {list(_LANGUAGES)}")
+    return dict(checks)
 
-    card: str | None = None
-    if data.get("card") is not None:
-        raw_card = data["card"]
-        if not isinstance(raw_card, str) or not _CARD_NAME.fullmatch(raw_card.strip()):
-            raise ScenarioError(f"{where}: `card` phải là tên file trong harness/cards/, ví dụ viet_hien_dai.json")
-        card = raw_card.strip()
-        if not card.endswith(".json"):
-            card += ".json"
+
+def _parse_lore(value: Any, where: str) -> tuple[dict[str, Any], ...]:
+    if value is None:
+        return ()
+    if not isinstance(value, list) or not value:
+        raise ScenarioError(f"{where}: `lore` phải là list mục {{title, keys, known_by, content}}")
+    out: list[dict[str, Any]] = []
+    for i, item in enumerate(value):
+        if not isinstance(item, dict) or set(item) - _LORE_KEYS or not {"title", "keys", "content"} <= set(item):
+            raise ScenarioError(f"{where}: lore[{i}] cần title, keys, content (known_by, category tuỳ chọn)")
+        for key in ("title", "content"):
+            if not isinstance(item[key], str) or not item[key].strip():
+                raise ScenarioError(f"{where}: lore[{i}].{key} phải là chuỗi không rỗng")
+        for key in ("keys", "known_by"):
+            if key in item and (
+                not isinstance(item[key], list) or not all(isinstance(k, str) and k.strip() for k in item[key])
+            ):
+                raise ScenarioError(f"{where}: lore[{i}].{key} phải là list chuỗi không rỗng")
+        out.append(dict(item))
+    return tuple(out)
+
+
+def parse_scenario(data: Any, path: Path) -> Scenario:
+    where = path.name
+    if not isinstance(data, dict):
+        raise ScenarioError(f"{where}: nội dung phải là một mapping YAML")
+    kind = data.get("kind", "reply")
+    if kind not in KINDS:
+        raise ScenarioError(f"{where}: `kind` phải là một trong {list(KINDS)}, đang là {kind!r}")
+    allowed = _SCENARIO_KEYS if kind == "reply" else _COMMON_KEYS | KIND_KEYS[kind]
+    unknown = set(data) - allowed
+    if unknown:
+        raise ScenarioError(f"{where}: trường lạ {sorted(unknown)}")
+    if kind != "reply":
+        sid, mode, title, note = _parse_head(data, where)
+        try:
+            spec = parse_spec(kind, data, where)
+        except SpecError as exc:
+            raise ScenarioError(str(exc)) from exc
+        return Scenario(
+            id=sid, title=title, mode=mode, input="", checks={}, path=path, note=note, judge=False,
+            card=_parse_card(data, where), kind=kind, spec=spec,
+        )
+
+    sid = _require_str(data, "id", where).strip()
+    mode = data.get("mode", "story")
+    if mode not in _MODES:
+        raise ScenarioError(f"{where}: `mode` phải là một trong {list(_MODES)}, đang là {mode!r}")
+    text = _require_str(data, "input", where)
+    checks = parse_checks(data.get("checks"), where)
+    card = _parse_card(data, where)
 
     history: tuple[HistoryItem, ...] | None = None
     if "history" in data and data["history"] is not None:
@@ -176,37 +272,40 @@ def parse_scenario(data: Any, path: Path) -> Scenario:
             raise ScenarioError(f"{where}: `history` phải là list {{role, content}}")
         items: list[HistoryItem] = []
         for i, item in enumerate(raw_history):
-            if not isinstance(item, dict) or set(item) - {"role", "content"}:
-                raise ScenarioError(f"{where}: history[{i}] phải có đúng hai trường role, content")
+            if not isinstance(item, dict) or set(item) - {"role", "content", "mode"}:
+                raise ScenarioError(f"{where}: history[{i}] phải có đúng hai trường role, content (mode tuỳ chọn)")
             role = item.get("role")
             if role not in ("user", "assistant"):
                 raise ScenarioError(f"{where}: history[{i}].role phải là user hoặc assistant")
             content = item.get("content")
             if not isinstance(content, str) or not content.strip():
                 raise ScenarioError(f"{where}: history[{i}].content phải là chuỗi không rỗng")
-            items.append(HistoryItem(role=role, content=content))
+            item_mode = item.get("mode")
+            if item_mode is not None and item_mode not in _MODES:
+                raise ScenarioError(f"{where}: history[{i}].mode phải là một trong {list(_MODES)}")
+            items.append(HistoryItem(role=role, content=content, mode=item_mode))
         history = tuple(items)
 
     judge = data.get("judge", True)
     if not isinstance(judge, bool):
         raise ScenarioError(f"{where}: `judge` phải là true/false")
-    note = data.get("note") or ""
-    if not isinstance(note, str):
-        raise ScenarioError(f"{where}: `note` phải là chuỗi")
-    title = data.get("title") or sid
-    if not isinstance(title, str):
-        raise ScenarioError(f"{where}: `title` phải là chuỗi")
+    thought_style = data.get("thought_style")
+    if thought_style is not None and thought_style not in ("inline", "end"):
+        raise ScenarioError(f"{where}: `thought_style` phải là inline hoặc end")
+    _, _, title, note = _parse_head(data, where)
     return Scenario(
         id=sid,
-        title=title.strip(),
+        title=title,
         mode=mode,
         input=text,
-        checks=dict(checks),
+        checks=checks,
         path=path,
         history=history,
-        note=note.strip(),
+        note=note,
         judge=judge,
         card=card,
+        thought_style=thought_style,
+        lore=_parse_lore(data.get("lore"), where),
     )
 
 
@@ -336,15 +435,16 @@ def make_story(seed: SeedSetup, mode: str, model_name: str, thought_style: str |
     return Story.model_validate(data)
 
 
-def make_message(story: Story, turn_index: int, role: str, content: str) -> Message:
-    """Message như app lưu: user tách `((...))`, assistant tách `[Thought: ...]`."""
+def make_message(story: Story, turn_index: int, role: str, content: str, mode: str | None = None) -> Message:
+    """Message như app lưu: user tách `((...))`, assistant tách `[Thought: ...]`. `mode` None = mode của story."""
+    mode = mode or story.mode
     if role == "user":
         visible, directive = extract_directives(content)
         return Message(
             story_id=story.id or 1,
             turn_index=turn_index,
             role="user",
-            mode=story.mode,
+            mode=mode,
             raw_content=content,
             visible_content=visible,
             directive=directive,
@@ -354,7 +454,7 @@ def make_message(story: Story, turn_index: int, role: str, content: str) -> Mess
         story_id=story.id or 1,
         turn_index=turn_index,
         role="assistant",
-        mode=story.mode,
+        mode=mode,
         raw_content=content,
         visible_content=visible,
         thought=thought,
@@ -371,9 +471,9 @@ def scenario_history(scenario: Scenario, seed: SeedSetup, story: Story) -> list[
     if scenario.history is None:
         items = [HistoryItem("assistant", ctx.fill(seed.card.greeting))] if seed.card.greeting.strip() else []
     else:
-        items = [HistoryItem(item.role, ctx.fill(item.content)) for item in scenario.history]
+        items = [HistoryItem(item.role, ctx.fill(item.content), item.mode) for item in scenario.history]
     items.append(HistoryItem("user", scenario.input))
-    return [make_message(story, i, item.role, item.content) for i, item in enumerate(items)]
+    return [make_message(story, i, item.role, item.content, item.mode) for i, item in enumerate(items)]
 
 
 def checks_for_style(scenario: Scenario, thought_style: str | None) -> dict[str, Any]:
@@ -388,13 +488,47 @@ def checks_for_style(scenario: Scenario, thought_style: str | None) -> dict[str,
     return checks
 
 
+def lore_entries(scenario: Scenario) -> list[LoreEntry]:
+    """Mục thế giới của kịch bản như app lưu trong DB (id 1.., card 1, bật)."""
+    return [
+        LoreEntry(
+            id=i,
+            card_id=1,
+            slug=f"muc-{i}",
+            title=item["title"],
+            category=item.get("category", "lore"),
+            keys=list(item["keys"]),
+            known_by=list(item.get("known_by", ["*"])),
+            content=item["content"],
+            position=i,
+        )
+        for i, item in enumerate(scenario.lore, 1)
+    ]
+
+
 def build_scenario_prompt(
     scenario: Scenario, seed: SeedSetup, model_name: str, budget: PromptBudget, thought_style: str | None = None
 ) -> tuple[Story, list[Message], BuiltPrompt]:
-    story = make_story(seed, scenario.mode, model_name, thought_style)
+    """Prompt như ChatService dựng: `thought_style` (CLI) thắng `scenario.thought_style`; có `lore` thì chọn mục
+    bằng đúng `lore_for_history` như `LoreService.prompt_lore`; khối F có chỉ dẫn diễn xuất từ 6 chỉ số ban đầu
+    (`fresh_prompt_state`, như story mới trong app: chưa có tóm tắt, cảnh, ký ức)."""
+    story = make_story(seed, scenario.mode, model_name, thought_style or scenario.thought_style)
     history = scenario_history(scenario, seed, story)
-    built = build_prompt(seed.card, seed.persona, story, history, budget=budget)
+    lore = None
+    if scenario.lore:
+        ctx = PromptContext(card=seed.card, persona=seed.persona, story=story, style="")
+        lore = lore_for_history(lore_entries(scenario), tpl=get_template(story.language), ctx=ctx, history=history)
+    state = fresh_prompt_state(seed.card, seed.persona, story)  # như ChatService.prompt_state với story mới
+    built = build_prompt(seed.card, seed.persona, story, history, budget=budget, lore=lore, state=state)
     return story, history, built
+
+
+def prompt_problems(built: BuiltPrompt, checks: dict[str, Any]) -> list[str]:
+    """Kiểm tra trên prompt đã dựng (tất định, trước khi gọi model): cụm phải có / không được có."""
+    text = "\n".join(m.content for m in built.messages).casefold()
+    problems = [f'prompt thiếu "{p}"' for p in checks.get("prompt_includes") or [] if p.casefold() not in text]
+    problems += [f'prompt có "{p}" (không được gửi cho model)' for p in checks.get("prompt_excludes") or [] if p.casefold() in text]
+    return problems
 
 
 # ---- judge -------------------------------------------------------------------------------------
@@ -522,7 +656,7 @@ async def call_judge(
 @dataclass
 class ScenarioResult:
     scenario: Scenario
-    built: BuiltPrompt
+    built: BuiltPrompt | None  # None với loại khác `reply`
     history: list[Message]
     setup: SeedSetup
     text: str = ""
@@ -531,6 +665,7 @@ class ScenarioResult:
     problems: list[str] = field(default_factory=list)
     words: int = 0
     judge: dict[str, Any] | None = None
+    details: dict[str, Any] = field(default_factory=dict)  # kết quả riêng của loại khác `reply`
 
 
 async def generate(client: OllamaClient, model: str, built: BuiltPrompt) -> tuple[str, dict[str, Any], str | None]:
@@ -637,11 +772,27 @@ def write_report(
     ]
     for r in results:
         s = r.scenario
-        last_user = r.history[-1]
         md += [f"## {s.id}: {s.title}", ""]
         if s.note:
             md += [f"_{s.note}_", ""]
         st = r.setup.story_settings
+        if r.built is None:
+            md += [
+                f"Loại `{s.kind}`. Card: {r.setup.card.name} ({r.setup.source}), persona {r.setup.persona.name}, "
+                f"ngôn ngữ {st.get('language', 'vi')}.",
+                "",
+                "**Kết quả:**",
+                "",
+                "```text",
+                r.text.strip() or "(trống)",
+                "```",
+                "",
+            ]
+            if r.error:
+                md += [f"**Lỗi khi sinh:** {r.error}", ""]
+            md += [f"- Lỗi máy: {', '.join(r.problems) if r.problems else 'không'}", ""]
+            continue
+        last_user = r.history[-1]
         md += [
             f"Card: {r.setup.card.name} ({r.setup.source}), persona {r.setup.persona.name}, "
             f"ngôn ngữ {st.get('language', 'vi')}, style `{r.setup.card.style_profile}`.",
@@ -685,6 +836,7 @@ def write_report(
         "results": [
             {
                 "id": r.scenario.id,
+                "kind": r.scenario.kind,
                 "title": r.scenario.title,
                 "mode": r.scenario.mode,
                 "file": r.scenario.path.name,
@@ -692,7 +844,7 @@ def write_report(
                 "language": r.setup.story_settings.get("language", "vi"),
                 "input": r.scenario.input,
                 "checks": checks_for_style(r.scenario, args.thought_style),
-                "prompt": r.built.model_dump(),
+                "prompt": r.built.model_dump() if r.built is not None else None,
                 "reply": r.text,
                 "visible": split_thought(r.text)[0] if r.text else "",
                 "thought": split_thought(r.text)[1] if r.text else None,
@@ -701,6 +853,7 @@ def write_report(
                 "problems": r.problems,
                 "words": r.words,
                 "judge": r.judge,
+                "details": r.details,
             }
             for r in results
         ],
@@ -713,12 +866,20 @@ async def run(
     *,
     transport: httpx.AsyncBaseTransport | None = None,
     results_dir: Path = RESULTS_DIR,
+    report: dict[str, Any] | None = None,
+    depth: int = 0,
 ) -> int:
-    """Chạy toàn bộ. `transport`, `results_dir` chỉ dùng cho test (Ollama giả, thư mục tạm)."""
+    """Chạy toàn bộ. `transport`, `results_dir` chỉ dùng cho test (Ollama giả, thư mục tạm).
+
+    `report` (nếu có) nhận `{"out": thư mục kết quả}`. `depth` > 0: lượt chạy lồng của kịch bản `nested_eval`;
+    lượt đó không in dòng "Đã ghi kết quả vào" (verify.sh đọc đúng dòng đó của lượt ngoài cùng)."""
     try:
         scenarios = load_scenarios(Path(args.scenarios), args.only)
     except ScenarioError as exc:
         print(f"Lỗi kịch bản: {exc}", file=sys.stderr)
+        return 2
+    if depth > 0 and any(s.kind in META_KINDS for s in scenarios):
+        print(f"Lỗi kịch bản: không chạy lồng được loại {sorted(META_KINDS)}", file=sys.stderr)
         return 2
     budget = PromptBudget(num_ctx=args.num_ctx)
     # Dựng prompt trước hết: lỗi bộ card / prompt builder lộ ra ngay, chưa tốn lời gọi model nào.
@@ -730,6 +891,9 @@ async def run(
         return 2
     for s in scenarios:
         setup = setups[s.id]
+        if s.kind != "reply":
+            results.append(ScenarioResult(scenario=s, built=None, history=[], setup=setup))
+            continue
         try:
             _, history, built = build_scenario_prompt(s, setup, args.model, budget, args.thought_style)
         except ValueError as exc:  # style profile không có, lịch sử sai...
@@ -761,8 +925,59 @@ async def run(
         print(f"Không nạp được {args.model}: {exc}", file=sys.stderr)
         return 1
 
+    deadline = time.monotonic() + max(0.0, args.deadline_min) * 60
+
+    def remaining() -> float:
+        return deadline - time.monotonic()
+
+    async def run_nested(ids: list[str]) -> tuple[int, Path | None]:
+        sub = argparse.Namespace(
+            **{**vars(args), "only": list(ids), "no_judge": True, "keep_loaded": True,
+               "deadline_min": max(0.0, remaining()) / 60}
+        )
+        info: dict[str, Any] = {}
+        code = await run(sub, transport=transport, results_dir=results_dir, report=info, depth=depth + 1)
+        return code, info.get("out")
+
+    env = Env(
+        client=client,
+        model=args.model,
+        num_ctx=args.num_ctx,
+        ollama_url=args.ollama_url,
+        make_story=make_story,
+        make_message=make_message,
+        generate=generate,
+        budget=budget,
+        transport=transport,
+        results_dir=results_dir,
+        run_nested=run_nested,
+        depth=depth,
+    )
+
+    over = f"hết giờ chung của run_eval ({args.deadline_min:g} phút, --deadline-min)"
     for i, r in enumerate(results, 1):
-        r.text, r.stats, r.error = await generate(client, args.model, r.built)
+        if remaining() <= 0:
+            r.error = f"{over}: chưa chạy"
+            print(f"  [{i}/{len(results)}] {r.scenario.id}: LỖI: {r.error}", flush=True)
+            continue
+        if r.built is None:
+            try:
+                outcome = await asyncio.wait_for(
+                    run_kind(r.scenario.kind, r.scenario.spec, r.setup, env, r.scenario.mode), timeout=remaining()
+                )
+            except TimeoutError:
+                outcome = Outcome(error=f"{over}: dừng giữa chừng")
+            r.text, r.problems, r.error = outcome.text, outcome.problems, outcome.error
+            r.stats, r.details = outcome.stats, outcome.details
+            note = f"LỖI: {r.error}" if r.error else (", ".join(r.problems) or "ok")
+            print(f"  [{i}/{len(results)}] {r.scenario.id} ({r.scenario.kind}): {note}", flush=True)
+            continue
+        try:
+            r.text, r.stats, r.error = await asyncio.wait_for(generate(client, args.model, r.built), timeout=remaining())
+        except TimeoutError:
+            r.error = f"{over}: dừng giữa chừng"
+            print(f"  [{i}/{len(results)}] {r.scenario.id}: LỖI: {r.error}", flush=True)
+            continue
         checks = checks_for_style(r.scenario, args.thought_style)
         r.problems = (
             run_checks(
@@ -771,12 +986,14 @@ async def run(
                 persona_name=r.setup.persona.name,
                 names=r.setup.names(),
                 dm=r.scenario.mode == "dm",
+                directive=r.history[-1].directive,
             )
             if r.text
             else []
         )
         if not r.text and not r.error:
             r.problems = ["câu trả lời rỗng"]
+        r.problems += prompt_problems(r.built, checks)
         r.words = word_count(strip_thoughts(r.text))
         note = ", ".join(r.problems) or "ok"
         if r.error:
@@ -795,7 +1012,7 @@ async def run(
         if use_judge:
             print(f"Chấm bằng {args.judge_model}...", flush=True)
             for r in results:
-                if not r.scenario.judge or not r.text.strip():
+                if not r.scenario.judge or not r.text.strip() or r.built is None:
                     continue
                 r.judge = await call_judge(
                     http, args.judge_model, judge_messages(r.setup, r.scenario.mode, r.history, r.text)
@@ -813,6 +1030,8 @@ async def run(
         "started_at": started.isoformat(timespec="seconds"),
         "finished_at": datetime.now().isoformat(timespec="seconds"),
         "model": args.model,
+        "num_ctx": args.num_ctx,
+        "deadline_min": args.deadline_min,
         "judge_model": args.judge_model if use_judge else None,
         "load_s": load_s,
         "aggregate": aggregate(results),
@@ -825,6 +1044,8 @@ async def run(
         n += 1
     out.mkdir(parents=True)
     write_report(out, args, results, meta)
+    if report is not None:
+        report["out"] = out
 
     agg = meta["aggregate"]
     print()
@@ -834,7 +1055,10 @@ async def run(
         f"lỗi máy {agg['with_machine_problems']}/{agg['scenarios']}; "
         f"godmodding {agg['godmodding']}/{agg['judged']}; không bám sát {agg['not_following']}/{agg['judged']}"
     )
-    print(f"Đã ghi kết quả vào {out}")
+    if depth == 0:
+        print(f"Đã ghi kết quả vào {out}")
+    else:
+        print(f"(kết quả lượt chạy lồng: {out})")
     return 0
 
 
@@ -847,9 +1071,21 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--scenarios", default=str(DEFAULT_SCENARIOS), help="thư mục chứa *.yaml")
     ap.add_argument("--cards", default=str(DEFAULT_CARDS), help="thư mục chứa bộ card *.json cho khoá `card:`")
     ap.add_argument("--only", action="append", metavar="ID", help="chỉ chạy kịch bản có id này (lặp lại được)")
-    ap.add_argument("--num-ctx", type=int, default=settings.num_ctx, help=f"num_ctx (mặc định {settings.num_ctx})")
+    ap.add_argument(
+        "--num-ctx",
+        type=int,
+        default=APP_NUM_CTX,
+        help=f"num_ctx (mặc định {APP_NUM_CTX} như app; không lấy LYRIS_NUM_CTX: đổi là phá cache prompt)",
+    )
     ap.add_argument("--ollama-url", default=settings.ollama_url)
     ap.add_argument("--keep-loaded", action="store_true", help="không nhả model khỏi RAM sau khi chạy xong")
+    ap.add_argument(
+        "--deadline-min",
+        type=float,
+        default=DEFAULT_DEADLINE_MIN,
+        help=f"hạn chung (phút, mặc định {DEFAULT_DEADLINE_MIN:g}): quá hạn thì kịch bản còn lại thành lỗi của riêng nó, "
+        "run_eval vẫn ghi báo cáo và thoát 0 (verify.sh cắt run_eval ở 60 phút)",
+    )
     ap.add_argument(
         "--thought-style",
         choices=["inline", "end"],

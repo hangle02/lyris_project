@@ -173,6 +173,15 @@ export async function signOut(everywhere = false): Promise<void> {
   resetBrowser("#/login", true);
 }
 
+/**
+ * The account was deleted (DELETE /api/account): this browser forgets it and reloads, on the login
+ * page, or on the first-run setup when the owner deleted the last account (the gate shows it on "#/").
+ */
+export function accountDeleted(setupRequired: boolean): void {
+  set({ status: "loading" });
+  resetBrowser(setupRequired ? "#/" : "#/login", true);
+}
+
 /** After a successful password change (new sign-in for this device). */
 export function passwordChanged(state: AuthState): void {
   applyAuth(state);

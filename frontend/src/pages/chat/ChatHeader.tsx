@@ -84,7 +84,7 @@ export const ChatHeader = forwardRef<HTMLElement, Props>(function ChatHeader(
         </div>
 
         {story && (
-          <div className="order-last flex h-12 basis-full items-center justify-between gap-2 px-2 sm:order-none sm:h-14 sm:basis-auto sm:justify-end sm:px-0">
+          <div className="order-last flex h-14 basis-full items-center justify-between gap-2 px-2 sm:order-none sm:basis-auto sm:justify-end sm:px-0">
             <SegmentedControl
               label="Chế độ hiển thị"
               size="sm"

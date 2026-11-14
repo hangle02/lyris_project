@@ -22,7 +22,7 @@ function hasModel(models: string[], wanted: string): boolean {
 }
 
 export function describeHealth(h: HealthResponse | null, err: string | null): HealthStatus {
-  if (err) return { level: "down", label: "Không kết nối được Lyris trên máy này. Hãy thử lại sau giây lát.", technical: err };
+  if (err) return { level: "down", label: "Không kết nối được Lyris. Hãy kiểm tra mạng rồi thử lại sau giây lát.", technical: err };
   if (!h) return { level: "checking", label: "Đang kiểm tra…", technical: null };
   if (!h.ollama.reachable) {
     return {

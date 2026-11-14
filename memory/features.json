@@ -1,0 +1,1164 @@
+[
+  {
+    "id": "F01",
+    "title": "Chế độ Story (văn tiểu thuyết)",
+    "page": "wiki/features/F01-che-do-story.md",
+    "phase": "Phase 1, 2, 2b",
+    "stage": "built",
+    "done": [
+      "Unit: `POST /api/stories/{id}/messages` stream câu trả lời qua SSE rồi lưu lượt khi xong; ngắt giữa chừng thì lưu phần đã có, ngắt trước chữ đầu tiên thì không lưu gì.",
+      "Unit: `llm/thought.py` tách `[Thought: ...]` khỏi chữ ở mọi cách chia chunk, kể cả khối chưa đóng lúc đang stream; thẻ suy nghĩ nằm đúng chỗ của nó trong lượt.",
+      "Unit: `lib/storyBlocks.ts`: lời trong ngoặc kép từ 3 chữ trở lên thành thẻ thoại, bỏ cặp ngoặc ngoài cùng; câu ngắn hơn ở lại trong dòng; `*hành động*` thành dẫn truyện không còn dấu sao.",
+      "Bot: gửi một lượt ở Story thì ba chấm đang gõ hiện trước chữ đầu tiên, chữ hiện dần trong vùng đang stream, rồi lượt mới của nhân vật xuất hiện.",
+      "Bot: trong lúc sinh có nút aria-label 'Dừng' (thay nút 'Gửi (Enter)'); sinh xong thì 'Dừng' biến mất.",
+      "Bot: lượt nhân vật vừa sinh (`aria-label=\"Lượt của {tên}\"`) có thẻ thoại không bắt đầu bằng dấu ngoặc kép, có thẻ suy nghĩ, không chứa chữ `[Thought`; phần dẫn truyện có `font-style: italic` và không có viền.",
+      "Bot: trong lúc chờ chữ đầu tiên không có chữ 'đang suy nghĩ' hay số giây đếm."
+    ],
+    "tests": [
+      "backend/tests/test_thought.py",
+      "backend/tests/test_api.py::test_full_send_flow",
+      "backend/tests/test_api.py::test_abort_before_any_text_saves_nothing",
+      "backend/tests/test_api.py::test_aclose_mid_stream_persists_partial",
+      "backend/tests/test_api.py::test_client_disconnect_over_asgi_persists_partial",
+      "frontend/src/lib/storyBlocks.test.ts",
+      "frontend/src/lib/sse.test.ts",
+      "frontend/src/lib/text.test.ts",
+      "bot: lời trả lời stream, chấm đang gõ rồi tới chữ",
+      "bot: đang sinh có nút Dừng",
+      "bot: lượt nhân vật có thẻ thoại, thẻ suy nghĩ, dẫn truyện nghiêng",
+      "bot: lúc chờ chỉ có ba chấm, không có chữ"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:06.885Z"
+  },
+  {
+    "id": "F02",
+    "title": "Chế độ DM (nhắn tin)",
+    "page": "wiki/features/F02-che-do-dm.md",
+    "phase": "Phase 2, 2b",
+    "stage": "built",
+    "done": [
+      "Unit: lượt gửi ở DM lưu `mode = dm` và dùng template prompt DM (vi và en).",
+      "Unit: `lib/threadRows.ts`: mỗi khung gộp các lượt của mode kia thành một dòng nhãn và đếm số lượt bị ẩn; tin người chơi mới nhất có '• Đã gửi', thành '• Đã xem' khi đã có trả lời.",
+      "Unit: `*hành động*` trong tin nhắn được nhận là hành động (hiện nghiêng, bỏ dấu sao).",
+      "Bot: bấm 'DM' trong nhóm 'Chế độ hiển thị' thì ô nhập thành 'Tin nhắn cho {tên}'; gửi một tin thì có tin của bạn (`aria-label=\"Tin nhắn của bạn\"`) và tin trả lời của nhân vật; bấm 'Story' thì về ô nhập Story và các lượt Story vẫn còn.",
+      "Bot: ở DM, tin người chơi có chân giờ kèm 'Đã gửi' hoặc 'Đã xem'; tin nhân vật có avatar; lúc chờ trả lời có bong bóng ba chấm cạnh avatar nhân vật.",
+      "Bot: lượt đã chơi ở Story hiện trong DM thành một dòng nhãn gộp, không hiện chữ của lượt đó."
+    ],
+    "tests": [
+      "backend/tests/test_api.py::test_dm_mode_reply",
+      "backend/tests/test_prompt.py::test_vi_dm_rules",
+      "backend/tests/test_prompt.py::test_en_dm",
+      "frontend/src/lib/threadRows.test.ts",
+      "frontend/src/lib/text.test.ts",
+      "bot: chuyển sang DM rồi quay lại Story",
+      "bot: DM có avatar, chân Đã gửi/Đã xem, bong bóng ba chấm",
+      "bot: lượt mode kia thành một dòng nhãn"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:06.942Z"
+  },
+  {
+    "id": "F03",
+    "title": "Văn phong, xưng hô và thiết lập story",
+    "page": "wiki/features/F03-van-phong-xung-ho.md",
+    "phase": "Phase 0-2",
+    "stage": "built",
+    "done": [
+      "Unit: có đủ 5 style profile trong `backend/lyris/prompt/styles/`, mỗi file có phần vi và en; frontmatter không lọt vào prompt.",
+      "Unit: `PATCH /api/stories/{id}` sửa được tiêu đề, bối cảnh, ngôn ngữ, kiểu quan hệ, ngôi kể, kiểu suy nghĩ, `show_thoughts`; giao diện chỉ gửi trường đã đổi.",
+      "Unit: tạo story lấy đại từ dẫn truyện từ card, rồi từ style profile; xưng hô trùng đại từ dẫn truyện bị bắt.",
+      "Unit: story tiếng Anh dùng prompt tiếng Anh đã kiểm; story tiếng Việt dùng prompt tiếng Việt đã kiểm.",
+      "Unit: thành viên không đổi được model của story và không thấy danh sách model; chỉ chủ máy đổi được.",
+      "Bot: ở `#/chat/<id>`, bấm 'Thiết lập story' mở panel có ô tiêu đề, bối cảnh, ngôn ngữ, kiểu quan hệ, ngôi kể, kiểu suy nghĩ và công tắc 'Đọc suy nghĩ của nhân vật'; bấm 'Xoá story…' thì hiện hộp 'Xác nhận xoá story' có nút 'Xoá vĩnh viễn' trước khi xoá (bấm 'Huỷ' thì story vẫn còn).",
+      "Model thật: card `trung_co_dai` không dùng 'anh/em' hay 'tớ/cậu' (harness `run_eval.py`, kịch bản `07-co-trang`).",
+      "Model thật: dẫn truyện ngôi thứ ba không có 'tôi' và không dùng đại từ xưng hô của lời thoại (harness `run_eval.py`, kịch bản `01-mo-dau`, `06-viet-hien-dai`, `07-co-trang`: `narration_forbidden`).",
+      "Model thật: story tiếng Anh trả lời bằng tiếng Anh (harness kịch bản `08-tieng-anh`)."
+    ],
+    "tests": [
+      "backend/tests/test_styles.py",
+      "backend/tests/test_studio_stories.py",
+      "backend/tests/test_api_studio.py::test_patch_story_phase2_fields",
+      "backend/tests/test_prompt.py::test_en_story_rules_match_verified_prompt",
+      "backend/tests/test_prompt.py::test_vi_story_rules_match_verified_prompt",
+      "backend/tests/test_prompt.py::test_address_terms_overlapping_narration_pronoun",
+      "backend/tests/test_auth_routes.py::test_member_cannot_change_story_model_and_health_hides_models",
+      "frontend/src/lib/storyOptions.test.ts",
+      "bot: Thiết lập story có đủ ô, Xoá story hỏi lại",
+      "model: 01-mo-dau",
+      "model: 06-viet-hien-dai",
+      "model: 07-co-trang",
+      "model: 08-tieng-anh"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:38:15.162Z"
+  },
+  {
+    "id": "F04",
+    "title": "Trình bày lượt của người chơi",
+    "page": "wiki/features/F04-dinh-dang-luot-nguoi-choi.md",
+    "phase": "Phase 3b, 4",
+    "stage": "built",
+    "done": [
+      "Unit: `lib/playerBlocks.ts`: mỗi câu trong \"…\" thành một ô thoại, bỏ dấu ngoặc; hai câu thoại trong một lượt thành hai ô.",
+      "Unit: `*\"…\"*` ở lại trong dòng, chữ đứng, giữ ngoặc; `*hành động*` thành dòng nghiêng không dấu sao; lượt chỉ có '...' hay emoji vẫn hiện chữ.",
+      "Unit: ngoặc mở kiểu ” của bàn phím điện thoại được nhận như ngoặc mở.",
+      "Unit: chữ đã lưu không đổi: lượt người chơi (kể cả emoticon) được lưu nguyên văn.",
+      "Bot: gửi lượt `\"Chào cậu, hôm nay trời đẹp quá nhỉ\" *mỉm cười kéo ghế ngồi xuống*` ở Story thì lượt người chơi (`aria-label=\"Lượt của bạn\"`) có đúng 1 ô lời nói, không còn ngoặc kép ngoài, và một dòng hành động in nghiêng không còn dấu *.",
+      "Bot: ô nhập ở Story có placeholder 'Nhập lời thoại vào \"…\"'; ở DM là 'Nhắn tin…'; lượt người chơi căn phải và có avatar persona."
+    ],
+    "tests": [
+      "frontend/src/lib/playerBlocks.test.ts",
+      "frontend/src/lib/text.test.ts",
+      "backend/tests/test_api.py::test_emoticons_stay_in_player_text",
+      "bot: lượt người chơi có lời nói và hành động không bị bọc ngoặc kép ngoài",
+      "bot: placeholder ô nhập và lượt người chơi căn phải"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:06.998Z"
+  },
+  {
+    "id": "F05",
+    "title": "Chỉ đạo ẩn ((...))",
+    "page": "wiki/features/F05-chi-dao-an.md",
+    "phase": "Phase 1",
+    "stage": "built",
+    "done": [
+      "Unit: `prompt/directives.py` tách mọi `((...))` khỏi lượt người chơi (nhiều chỉ đạo, nhiều dòng, chưa đóng) và bỏ qua emoticon.",
+      "Unit: chỉ đạo vào ghi chú cuối (khối F), không nằm trong lời người chơi gửi model; không còn '((' ở đâu trong prompt, kể cả từ card.",
+      "Unit: checker `directive_leak` của harness bắt được câu trả lời có '(('.",
+      "Bot: ô nhập Story có aria-label 'Lượt của bạn: lời nói, *hành động* hoặc ((chỉ đạo cho AI))'; gửi `Chào. ((cho nhân vật đang ghen nhưng không nói ra))` thì lượt người chơi hiện chỉ đạo thành chip nhỏ (title 'Chỉ đạo cho AI (không hiện trong truyện)') và '((' không hiện trong dòng truyện.",
+      "Model thật: trên gemma4:12b, câu trả lời không chứa '((', không chép lại 5 chữ liền nhau nào của câu chỉ đạo, không có chữ 'chỉ đạo', và khi chỉ đạo bảo ghen mà không nói ra thì nhân vật không nói thẳng chữ 'ghen' trong lời thoại (harness kịch bản `f05-chi-dao`)."
+    ],
+    "tests": [
+      "backend/tests/test_prompt.py::test_directives_go_to_f_not_history_and_no_double_parens_anywhere",
+      "backend/tests/test_prompt.py::test_extract_directives_multiple_and_multiline",
+      "backend/tests/test_prompt.py::test_extract_directives_ignores_emoticons",
+      "backend/tests/test_prompt.py::test_extract_directives_unclosed_is_directive",
+      "backend/tests/test_prompt.py::test_no_double_parens_even_from_card_or_unclosed_input",
+      "backend/tests/test_api.py::test_directive_handling",
+      "backend/tests/test_harness_checks.py::test_directive_leak",
+      "frontend/src/lib/text.test.ts",
+      "bot: chỉ đạo ((...)) hiện thành chip",
+      "model: f05-chi-dao"
+    ],
+    "state": "claimed"
+  },
+  {
+    "id": "F06",
+    "title": "Tạo lại, phiên bản, sửa, xoá, thích/chê",
+    "page": "wiki/features/F06-thao-tac-tin-nhan.md",
+    "phase": "Phase 1",
+    "stage": "built",
+    "done": [
+      "Unit: 'Tạo lại câu trả lời' sinh variant mới ở cùng `turn_index`; chọn variant nào thì variant đó active; tạo lại sai chỗ bị từ chối.",
+      "Unit: lật variant, sửa hay xoá lượt thì ký ức và chỉ số cảm xúc tính lại theo variant đang chọn (rollback qua `state_events`).",
+      "Unit: 'Sửa' lưu nguyên văn và xoá gợi ý của lượt đó.",
+      "Unit: 'Xoá từ đây' xoá lượt đó và mọi lượt sau, kể cả lượt mode kia nằm sau.",
+      "Unit: thích/chê lưu vào bảng feedback qua `PUT /messages/{id}/feedback`.",
+      "Unit: thao tác bị khoá thì có lý do (`actionLockReason`, `messageLockReason`): nhân vật đang trả lời (đợi xong hoặc bấm 'Dừng'), đang nghĩ gợi ý, đang lưu, lượt chưa lưu xong; nút 'Sửa' và 'Xoá từ đây' đặt lý do đó vào `title`.",
+      "Bot: bấm 'Tạo lại câu trả lời' trên lượt nhân vật cuối thì có câu trả lời mới và bộ đếm '2/2' trong nhóm 'Các phiên bản trả lời'.",
+      "Bot: dưới lượt nhân vật có 'Thích', 'Chê', 'Sửa', 'Xoá từ đây'; bấm 'Xoá từ đây' thì hiện hộp 'Xác nhận xoá' có câu 'Xoá lượt này và mọi lượt sau?' và nút 'Xoá'.",
+      "Bot: trong lúc nhân vật đang trả lời (nút 'Dừng' đang hiện), mọi nút 'Sửa' và 'Xoá từ đây' đều bị khoá (disabled) và có lý do (`title` là một câu lý do, không chỉ lặp tên nút)."
+    ],
+    "tests": [
+      "backend/tests/test_api.py::test_regenerate_and_switch_variants",
+      "backend/tests/test_api.py::test_regenerate_invalid_targets",
+      "backend/tests/test_api.py::test_edit_assistant_and_user",
+      "backend/tests/test_api.py::test_delete_from_here",
+      "backend/tests/test_api.py::test_feedback",
+      "backend/tests/test_jobs.py::test_regenerate_and_select_variant_roll_state_back",
+      "backend/tests/test_phase3_e2e.py::test_variants_edit_and_delete_roll_state",
+      "backend/tests/test_api_state.py::test_regenerate_and_delete_through_api_roll_back",
+      "backend/tests/test_phase3b.py::test_edit_clears_suggestions",
+      "backend/tests/test_repo.py::test_add_variant_and_select_variant",
+      "backend/tests/test_repo.py::test_truncate_from",
+      "frontend/src/lib/threadRows.test.ts",
+      "frontend/src/lib/actionLock.test.ts",
+      "bot: tạo lại ra phiên bản mới",
+      "bot: hàng thao tác có Thích, Chê, Sửa, Xoá từ đây hỏi lại",
+      "bot: đang trả lời thì Sửa và Xoá từ đây bị khoá, có lý do (title)"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:16:26.189Z"
+  },
+  {
+    "id": "F07",
+    "title": "Thẻ suy nghĩ (Tiếng lòng giấu kín)",
+    "page": "wiki/features/F07-the-suy-nghi.md",
+    "phase": "Phase 1, 2b",
+    "stage": "built",
+    "done": [
+      "Unit: kiểu suy nghĩ lưu theo story (`thought_style`); mặc định 'Lồng trong truyện' (inline) và ghi chú cuối dặn đúng kiểu; 'Một đoạn ở cuối' (end) dặn một Thought dài hơn ở cuối lượt.",
+      "Unit: checker harness đếm đúng số Thought, Thought liền nhau, Thought ở cuối và Thought chưa đóng.",
+      "Bot: thẻ suy nghĩ trong lượt nhân vật (nút có `aria-pressed`) bị làm mờ (`filter: blur`) kèm chữ 'Chạm để lắng nghe'; chạm thì hết mờ và `aria-pressed=\"true\"`.",
+      "Bot: bật 'Luôn hiện suy nghĩ' trong menu 'Suy nghĩ' thì mọi thẻ hiện rõ và localStorage có khoá `lyris.revealThoughts`.",
+      "Bot: menu 'Suy nghĩ' có nhóm radio 'Lồng trong truyện' / 'Một đoạn ở cuối'; chọn kiểu kia thì `GET /api/stories/{id}` trả `thought_style` mới.",
+      "Bot: ở DM, lượt nhân vật có Thought hiện thẻ suy nghĩ thu gọn.",
+      "Model thật: kiểu 'Lồng trong truyện' cho 2-4 Thought, không có hai Thought liền nhau; kiểu 'Một đoạn ở cuối' cho đúng một Thought cuối lượt; không có Thought chưa đóng (harness `run_eval.py`, kịch bản `f07-thought-long`, `f07-thought-cuoi`)."
+    ],
+    "tests": [
+      "backend/tests/test_prompt.py::test_thought_style_inline_is_default_and_in_note",
+      "backend/tests/test_prompt.py::test_thought_style_end_asks_for_one_longer_thought",
+      "backend/tests/test_prompt.py::test_thought_style_en",
+      "backend/tests/test_repo.py::test_v1_database_upgrades_with_default_thought_style",
+      "backend/tests/test_harness_checks.py::test_thought_range_checks",
+      "backend/tests/test_harness_checks.py::test_thought_at_end_check",
+      "backend/tests/test_harness_checks.py::test_adjacent_thoughts_check",
+      "backend/tests/test_harness_checks.py::test_unclosed_inline_thought_is_caught",
+      "frontend/src/lib/storyOptions.test.ts",
+      "frontend/src/lib/storyBlocks.test.ts",
+      "bot: thẻ suy nghĩ bị làm mờ, chạm thì hiện",
+      "bot: Luôn hiện suy nghĩ bỏ làm mờ",
+      "bot: đổi kiểu suy nghĩ ở menu Suy nghĩ",
+      "bot: DM có thẻ suy nghĩ thu gọn",
+      "model: f07-thought-long",
+      "model: f07-thought-cuoi"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:38:15.236Z"
+  },
+  {
+    "id": "F08",
+    "title": "Công tắc 'Đọc suy nghĩ của nhân vật'",
+    "page": "wiki/features/F08-doc-suy-nghi.md",
+    "phase": "Phase 4 (B)",
+    "stage": "built",
+    "done": [
+      "Unit: `show_thoughts` lưu theo story (tạo, sửa, đọc qua API); story cũ thiếu trường thì coi là bật; đổi công tắc không đổi prompt.",
+      "Unit: `visibleBlocks` bỏ khối thought khi tắt, cả lúc đang stream; lượt chỉ có suy nghĩ cho dòng 'Lượt này chỉ có suy nghĩ của {tên}.' thay vì bong bóng rỗng.",
+      "Unit: sheet Bước vào câu chuyện chỉ gửi `show_thoughts` khi tắt; khi tắt, ngăn cảm xúc không có nhóm 'Điều {tên} giữ trong lòng'.",
+      "Bot: trong menu 'Suy nghĩ' tắt công tắc 'Đọc suy nghĩ của nhân vật' thì số thẻ suy nghĩ trong chat về 0 (không còn trong DOM); bật lại thì thẻ hiện lại.",
+      "Bot: khi tắt, nút trên header có aria-label 'Suy nghĩ (đang ẩn)' và ở DM cũng không có thẻ suy nghĩ; công tắc cũng có ở sheet Bước vào câu chuyện (trong 'Tuỳ chỉnh story') và ở Thiết lập story.",
+      "Bot: chat thử ở Studio vẫn hiện thẻ suy nghĩ."
+    ],
+    "tests": [
+      "backend/tests/test_lore_api.py::test_show_thoughts_create_patch_and_list",
+      "backend/tests/test_lore_api.py::test_show_thoughts_does_not_change_prompt",
+      "backend/tests/test_lore_api.py::test_story_model_default_show_thoughts",
+      "frontend/src/lib/storyBlocks.test.ts",
+      "frontend/src/lib/storyOptions.test.ts",
+      "frontend/src/pages/character/startLogic.test.ts",
+      "frontend/src/pages/chat/loreLogic.test.ts",
+      "frontend/src/pages/chat/chatLogic.test.ts",
+      "bot: tắt Đọc suy nghĩ thì ẩn suy nghĩ",
+      "bot: Đọc suy nghĩ có ở header, sheet bắt đầu, Thiết lập story",
+      "bot: chat thử ở Studio vẫn có suy nghĩ"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.107Z"
+  },
+  {
+    "id": "F09",
+    "title": "Ma trận cảm xúc 6 chỉ số",
+    "page": "wiki/features/F09-ma-tran-cam-xuc.md",
+    "phase": "Phase 3, 3b",
+    "stage": "built",
+    "done": [
+      "Unit: mỗi chỉ số luôn trong 0-100 và đổi tối đa ±5 một lượt (`MAX_DELTA`); dữ liệu rác từ model không làm lỗi.",
+      "Unit: theo `tone`: lượt thường ngày không đổi chỉ số nào; lượt ấm lòng giữ tối đa 2 thay đổi; lượt tổn thương hoặc lẫn lộn tối đa 3.",
+      "Unit: `state/directive.py` đổi số thành 1-2 câu chỉ dẫn diễn xuất, không bao giờ có con số.",
+      "Unit: cảm xúc ban đầu lấy từ `extensions.lyris.initial_relationship` của card và được chụp vào story khi tạo.",
+      "Unit: thẻ story ở hub có chip cảm xúc nổi bật như 'Thương mến 91%' (`dominantEmotion`, `storyChips`); sáu chỉ số theo thứ tự DESIGN.md.",
+      "Bot: bấm 'Cảm xúc & ký ức' mở ngăn cùng tên có đúng 6 thanh `role=\"meter\"`.",
+      "Bot: ngăn 'Cảm xúc & ký ức' có thẻ 'Chỉ dẫn diễn xuất' và mỗi thanh cảm xúc có phần trăm.",
+      "Model thật: ghen, nói dối, quên hẹn thì Tin cậy giảm; xin lỗi thật lòng thì Khoảng cách giảm, Tin cậy tăng; 'chào buổi sáng' hay nhờ giảng bài không đổi chỉ số; xét chỉ số sau khi app lọc, đúng số được lưu (harness kịch bản `f09-cam-xuc`, [phase3.md §10.5](../../docs/phase3.md))."
+    ],
+    "tests": [
+      "backend/tests/test_extract.py",
+      "backend/tests/test_directive.py",
+      "backend/tests/test_state_fold.py",
+      "backend/tests/test_api_state.py::test_create_story_snapshots_card_relationship",
+      "backend/tests/test_jobs.py::test_initial_relationship_used_for_old_story_without_snapshot",
+      "frontend/src/pages/hub/logic.test.ts",
+      "frontend/src/pages/chat/chatLogic.test.ts",
+      "frontend/src/components/ui/logic.test.ts",
+      "frontend/src/lib/cardForm.test.ts",
+      "bot: ngăn trái tim mở với 6 cảm xúc",
+      "bot: ngăn trái tim có Chỉ dẫn diễn xuất và phần trăm",
+      "model: f09-cam-xuc"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:38:15.308Z"
+  },
+  {
+    "id": "F10",
+    "title": "Trí nhớ: ký ức, điều đã biết, tóm tắt, cảnh",
+    "page": "wiki/features/F10-tri-nho.md",
+    "phase": "Phase 3",
+    "stage": "built",
+    "done": [
+      "Unit: sau mỗi lượt, việc nền trích ký ức, điều đã biết và cảnh rồi ghi vào state; lượt bị huỷ giữa chừng không được trích.",
+      "Unit: tìm ký ức lai: từ khoá (FTS giữ dấu tiếng Việt) cộng tìm theo nghĩa khi có model embedding; embedding lỗi thì quay về từ khoá.",
+      "Unit: ký ức nằm ngoài cửa sổ lịch sử được đưa lại vào prompt (tối đa 3); ký ức còn trong cửa sổ thì bỏ qua.",
+      "Unit: tóm tắt theo khúc luôn sẵn khi cửa sổ lịch sử dịch; đổi mode vẫn dùng tóm tắt ngay trước cửa sổ.",
+      "Unit: 'Quên' xoá một ký ức và ngăn cảm xúc bỏ đúng dòng đó; 'Đọc lại story' xếp việc trích các lượt chưa đọc.",
+      "Unit: header chat hiện 'nơi chốn · thời gian' khi có (`headerSubtitle`, `sceneLine`).",
+      "Bot: sau một lượt (LLM giả trả ký ức và cảnh), ngăn 'Cảm xúc & ký ức' liệt kê ký ức có nhãn 'Sự kiện' hoặc 'Điều đã biết', mỗi ký ức có nút 'Quên: …'; header chat hiện 'nơi chốn · thời gian'.",
+      "Model thật: sau vài lượt trên gemma4:12b, ký ức và điều đã biết được trích đúng ý lượt chơi; story dài có '<details> Tóm tắt những lượt cũ' với tóm tắt đúng nội dung.",
+      "Model thật: trên gemma4:12b, việc trích xuất thật ghi ký ức và điều đã biết có đúng chi tiết người chơi hoặc nhân vật vừa kể, điều đã biết nói về đúng người (kịch bản `f10-ky-uc`); tóm tắt thật của một đoạn story dài giữ đủ lời hứa, nơi chốn, tên người và bí mật đã có (kịch bản `f10-tom-tat`)."
+    ],
+    "tests": [
+      "backend/tests/test_jobs.py::test_turn_enqueues_extract_and_worker_writes_state",
+      "backend/tests/test_jobs.py::test_aborted_turn_is_not_extracted",
+      "backend/tests/test_retrieval.py",
+      "backend/tests/test_prompt_state.py::test_memories_before_window_after_truncation",
+      "backend/tests/test_prompt_state.py::test_memories_inside_window_are_skipped_facts_kept",
+      "backend/tests/test_phase3b_e2e.py::test_mode_switch_keeps_summary_right_before_window",
+      "backend/tests/test_window_hysteresis.py",
+      "backend/tests/test_summarize.py",
+      "backend/tests/test_api_state.py::test_forget_memory",
+      "backend/tests/test_api_state.py::test_rebuild_route",
+      "backend/tests/test_phase3_e2e.py::test_turn_flows_into_extras_and_next_prompt",
+      "frontend/src/pages/chat/memoryLogic.test.ts",
+      "frontend/src/pages/chat/chatLogic.test.ts",
+      "frontend/src/pages/chat/extrasPoller.test.ts",
+      "bot: ngăn trái tim có ký ức và nút Quên, header có cảnh",
+      "model: f10-ky-uc",
+      "model: f10-tom-tat"
+    ],
+    "state": "claimed"
+  },
+  {
+    "id": "F11",
+    "title": "Sự kiện: dòng thời gian",
+    "page": "wiki/features/F11-dong-thoi-gian-su-kien.md",
+    "phase": "Phase 3b",
+    "stage": "built",
+    "done": [
+      "Unit: `GET /api/stories/{id}/timeline` trả `TimelineEntry[]` theo thứ tự story, mỗi lượt một mục, có mode.",
+      "Unit: `eventsLogic.ts`: mới nhất ở trên, lượt không có gì bị bỏ; chip '+2 Thương mến' / '−3 Tin cậy' (dấu trừ thật, thứ tự DESIGN.md, bỏ số 0); giờ hôm nay / hôm qua / ngày.",
+      "Unit: `jumpPlan`: lượt cùng mode thì cuộn tới; lượt mode kia thì đổi mode trước; không đổi mode được thì báo một dòng.",
+      "Bot: mở menu 'Thêm' rồi chọn 'Xem sự kiện' thì hiện sheet có nhóm tab 'Loại sự kiện' với 'Dòng thời gian' và 'Khoảnh khắc'.",
+      "Bot: sau một lượt có ký ức, tab 'Dòng thời gian' có mục của lượt đó (nhãn Story/DM, giờ); chạm mục thì sheet đóng và lượt đó được cuộn vào màn hình."
+    ],
+    "tests": [
+      "backend/tests/test_phase3b.py::test_timeline",
+      "backend/tests/test_phase3b_e2e.py::test_timeline_after_several_turns",
+      "frontend/src/pages/chat/eventsLogic.test.ts",
+      "bot: menu cộng mở sheet Sự kiện",
+      "bot: chạm mục dòng thời gian thì nhảy tới lượt"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.164Z"
+  },
+  {
+    "id": "F12",
+    "title": "Story và DM chung một dòng thời gian",
+    "page": "wiki/features/F12-dm-story-chung-dong-thoi-gian.md",
+    "phase": "Phase 3b (§10.8)",
+    "stage": "built",
+    "done": [
+      "Unit: ở Story Mode, prompt gắn '[Tin nhắn điện thoại]' trước mỗi lượt DM và giải thích trong khối F; ở DM Mode không gắn.",
+      "Unit: story không có lượt DM nào thì system message giữ nguyên từng byte như trước.",
+      "Unit: tóm tắt ghi 'Tên [Tin nhắn điện thoại]: ...' cho lượt DM; cửa sổ đánh dấu giống nhau ở cả hai mode.",
+      "Model thật: trên gemma4:12b, nhân vật xưng tên qua DM, sang Story thì Thought (và cả câu trả lời) không còn nói 'chưa nói tên với ai' hay 'sao cô ấy biết tên mình' (kịch bản `f12-dm-xung-ten`)."
+    ],
+    "tests": [
+      "backend/tests/test_dm_continuity.py",
+      "model: f12-dm-xung-ten"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:38:15.383Z"
+  },
+  {
+    "id": "F13",
+    "title": "Chống lặp câu",
+    "page": "wiki/features/F13-chong-lap.md",
+    "phase": "Phase 3",
+    "stage": "built",
+    "done": [
+      "Unit: ghi chú F liệt kê tối đa 3 câu cần tránh của các lượt gần đây, câu trùng thì gộp; system message không đổi.",
+      "Unit: ở DM lấy câu cuối của tin trước (tối đa 90 ký tự); ở Story lấy 9 chữ đầu của lượt trước; bỏ lời mở đầu và lượt của mode kia.",
+      "Model thật: chat thử 10 lượt DM trên gemma4:12b: không còn lượt nào cũng kết bằng cùng một lời dặn: không câu kết nào lặp ở quá 2/10 lượt, 3 chữ cuối không trùng nhau ở quá 3/10 lượt (kịch bản `f13-dm-10-luot`)."
+    ],
+    "tests": [
+      "backend/tests/test_repetition.py",
+      "backend/tests/test_prompt_state.py::test_repetition_avoid_lines_kept_with_state",
+      "model: f13-dm-10-luot"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:38:15.450Z"
+  },
+  {
+    "id": "F14",
+    "title": "Tăng tốc: cửa sổ theo khúc và prefill",
+    "page": "wiki/features/F14-tang-toc-prefill.md",
+    "phase": "Phase 3b (§10.1, §10.6)",
+    "stage": "built",
+    "done": [
+      "Unit: prefill chỉ chạy khi hàng đợi rỗng, chỉ cho story đang chơi, và bị huỷ ngay khi người chơi gửi tin.",
+      "Unit: phần đầu prefill trùng từng message với prompt thật của lượt sau.",
+      "Unit: renderer gemma4 khớp token-từng-token với template /api/chat của Ollama.",
+      "Unit: prefill lỗi chỉ ghi log, không làm hỏng lượt chat.",
+      "Unit: cửa sổ lịch sử cắt theo khúc: điểm bắt đầu chỉ dịch ở ranh giới khúc và không lùi lại.",
+      "Model thật: đo qua app thật trên gemma4:12b (chờ việc nền và prefill xong rồi mới gửi lượt sau): TTFT các lượt sau lượt đầu khoảng 4-5 giây (trung vị ≤ 5 giây), không lượt nào quá 6 giây, kể cả lượt cửa sổ dịch; TTFT đo phía người chơi, từ lúc gửi lượt tới chữ đầu tiên qua HTTP (kịch bản `f14-ttft`; ngưỡng 6 giây tạm chọn, xem [nguong-ttft-f14](../decisions/nguong-ttft-f14.md))."
+    ],
+    "tests": [
+      "backend/tests/test_jobs.py::test_worker_prefills_next_prompt_head_when_idle",
+      "backend/tests/test_jobs.py::test_prefill_only_the_story_being_played",
+      "backend/tests/test_jobs.py::test_chat_cancels_running_prefill",
+      "backend/tests/test_jobs.py::test_prefill_error_is_swallowed",
+      "backend/tests/test_phase3b_e2e.py::test_prefill_prefix_is_exactly_the_next_prompt_head",
+      "backend/tests/test_ollama_client.py::test_render_prefix_gemma4_matches_ollama_chat_template",
+      "backend/tests/test_window_hysteresis.py",
+      "model: f14-ttft"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:38:15.514Z"
+  },
+  {
+    "id": "F15",
+    "title": "Nhận gợi ý (chỉ khi bấm)",
+    "page": "wiki/features/F15-nhan-goi-y.md",
+    "phase": "Phase 3b",
+    "stage": "built",
+    "done": [
+      "Unit: gợi ý chỉ sinh khi người chơi yêu cầu; worker không tự sinh; kết quả thay gợi ý cũ và chỉ gắn với lượt cuối của nhân vật.",
+      "Unit: `suggestAvailability` khoá kèm lý do khi: story đang tải, máy không trả lời, nhân vật đang trả lời, đang nghĩ gợi ý, lượt cuối là của người chơi, chưa có lượt nào, hoặc lượt cuối thuộc mode kia; server cũng từ chối khi bận.",
+      "Unit: gửi lượt mới, sửa hay xoá lượt được gợi ý thì gợi ý biến mất; lỗi là một câu không có chữ 'model' hay 'Ollama', chi tiết kỹ thuật để riêng (`suggestions_error_is_plain_with_technical_detail`).",
+      "Unit: prompt gợi ý có luật an toàn.",
+      "Bot: mở menu 'Thêm' và chọn 'Nhận gợi ý' thì nhóm 'Gợi ý cho bạn' hiện đúng 3 nút 'Gửi: …'; nút 'Ẩn gợi ý' ẩn chúng.",
+      "Bot: trong lúc chờ gợi ý có ba chấm và nút 'Huỷ gợi ý'; bấm một thẻ gợi ý thì lượt người chơi mới có đúng chữ của thẻ và nhóm gợi ý biến mất.",
+      "Model thật: trên gemma4:12b, 'Nhận gợi ý' cho đúng 3 gợi ý tiếng Việt, mỗi gợi ý gửi đi làm lượt người chơi vẫn giữ nguyên văn (không bị tách thành chỉ đạo, nằm nguyên văn trong lượt gửi model); 'Gợi ý khác' cho 3 gợi ý không trùng và không trùng quá 60% từ với lần trước, tính trên gợi ý ngắn hơn (kịch bản `f15-goi-y`)."
+    ],
+    "tests": [
+      "backend/tests/test_phase3b.py::test_suggestions_on_demand_and_replace",
+      "backend/tests/test_phase3b.py::test_suggestions_need_character_last",
+      "backend/tests/test_phase3b.py::test_suggestions_busy_both_ways",
+      "backend/tests/test_phase3b.py::test_suggestions_error_is_plain_with_technical_detail",
+      "backend/tests/test_phase3b.py::test_suggest_validate_and_prompt",
+      "backend/tests/test_phase3b.py::test_repo_replace_suggestions_only_on_last_character_message",
+      "backend/tests/test_phase3b_e2e.py::test_suggestions_requested_shown_then_gone_after_send",
+      "backend/tests/test_phase3b_e2e.py::test_suggestions_survive_reextract_but_not_edit",
+      "backend/tests/test_compliance.py::test_safety_line_in_reply_suggestions",
+      "frontend/src/pages/chat/suggestLogic.test.ts",
+      "bot: menu cộng, Nhận gợi ý hiện gợi ý",
+      "bot: chờ gợi ý có Huỷ gợi ý, chạm thẻ là gửi",
+      "model: f15-goi-y"
+    ],
+    "state": "claimed"
+  },
+  {
+    "id": "F16",
+    "title": "Menu '+' ở ô nhập",
+    "page": "wiki/features/F16-menu-cong.md",
+    "phase": "Phase 3b",
+    "stage": "built",
+    "done": [
+      "Unit: danh sách mục của menu '+' lấy từ dữ liệu; 'Gửi hình ảnh' là mục bị khoá có badge 'Sắp có'; mở menu thì focus vào mục đầu tiên chạy được.",
+      "Bot: nút aria-label 'Thêm' rộng và cao ≥ 44px, có `aria-expanded` đổi từ false sang true khi bấm; ở 390px menu là sheet từ dưới có nền mờ, ở 1280px là popover phía trên nút.",
+      "Bot: ArrowDown, ArrowUp, Home, End di chuyển focus qua mọi mục, kể cả mục bị khoá; Esc đóng menu và focus về nút 'Thêm'.",
+      "Bot: mục 'Gửi hình ảnh' bị khoá (disabled hoặc aria-disabled), có badge 'Sắp có' và một câu giải thích."
+    ],
+    "tests": [
+      "frontend/src/pages/chat/suggestLogic.test.ts",
+      "frontend/src/components/ui/logic.test.ts",
+      "bot: nút Thêm 44px, sheet ở điện thoại, popover ở máy tính",
+      "bot: menu cộng đi bằng phím, Esc trả focus",
+      "bot: Gửi hình ảnh bị khoá, Sắp có"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.219Z"
+  },
+  {
+    "id": "F17",
+    "title": "Sổ thế giới (lorebook)",
+    "page": "wiki/features/F17-so-the-gioi.md",
+    "phase": "Phase 4",
+    "stage": "built",
+    "done": [
+      "Unit: API mục thế giới: thêm, sửa, bật/tắt, xoá, kiểm dữ liệu với câu lỗi tiếng Việt; mục của tài khoản khác hay card khác trả 404.",
+      "Unit: nhập `worlds/luc-bac-uyen/world.md` có bước xem trước (dry run); nhập lại lần hai không tạo gì mới; dòng bí mật không bao giờ được nhập.",
+      "Unit: so khớp từ khoá tiếng Việt giữ dấu, không phân biệt hoa thường, NFC và NFD như nhau.",
+      "Unit: nhắc từ khoá thì mục vào khối D trong ngân sách; mục 'Chỉ bạn biết' không bao giờ vào prompt của nhân vật; không có mục nào thì prompt giữ nguyên từng byte.",
+      "Unit: hồ sơ nhân vật chỉ liệt kê tên người và nơi chốn công khai, không lộ nội dung (`summary_only_lists_public_people_and_places`, `worldTeaser`).",
+      "Bot: mở `#/studio/<id>?section=world` thì thấy phần 'Thế giới'; thêm một mục rồi tải lại trang thì mục vẫn còn, không cần bấm lưu nhân vật.",
+      "Bot: khi 'Công cụ nâng cao' tắt, chữ hiển thị ở `#/studio/<id>?section=world` và `#/character/<id>` không có 'lore', 'keys', 'token'.",
+      "Bot: gửi một lượt có từ khoá của một mục thì ngăn 'Cảm xúc & ký ức' có 'Thế giới đã mở khoá' với mục đó và nút 'Xem lúc được nhắc tới lần đầu'.",
+      "Bot: `#/character/<id>` của nhân vật có mục thế giới hiện phần 'Thế giới' chỉ có tên người / nơi chốn, không có nội dung mục.",
+      "Model thật: trên gemma4:12b, nhắc từ khoá trong chat thì nhân vật dùng đúng chi tiết của mục; mục 'Chỉ bạn biết' (cùng từ khoá) không bao giờ được nhân vật nói ra và không có trong prompt (kịch bản `f17-the-gioi`)."
+    ],
+    "tests": [
+      "backend/tests/test_lore_api.py",
+      "backend/tests/test_lore_parse.py",
+      "backend/tests/test_lore_match.py",
+      "backend/tests/test_lore_select.py",
+      "backend/tests/test_lore_prompt.py",
+      "backend/tests/test_lore_e2e.py",
+      "backend/tests/test_lore_migration.py",
+      "frontend/src/pages/studio/loreLogic.test.ts",
+      "frontend/src/pages/chat/loreLogic.test.ts",
+      "frontend/src/pages/character/logic.test.ts",
+      "bot: thêm mục thế giới lưu ngay",
+      "bot: sổ thế giới không có chữ lore, keys, token",
+      "bot: nhắc từ khoá thì mục thế giới mở khoá",
+      "bot: hồ sơ có phần Thế giới chỉ có tên",
+      "model: f17-the-gioi"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:38:15.581Z"
+  },
+  {
+    "id": "F18",
+    "title": "Studio: tạo và sửa nhân vật",
+    "page": "wiki/features/F18-xuong-nhan-vat.md",
+    "phase": "Phase 2, 2b",
+    "stage": "built",
+    "done": [
+      "Unit: tạo, đọc, sửa, xoá card qua API giữ đủ trường; kiểm dữ liệu báo lỗi tiếng Việt.",
+      "Unit: tải avatar: ảnh được chuẩn hoá (xoay theo EXIF, bỏ metadata, tối đa 768px); file lạ hoặc quá lớn bị từ chối.",
+      "Unit: 'Lời nói đặc trưng (tuỳ chọn)': hơn 3 dòng hoặc một dòng dài quá 140 ký tự thì chặn lưu; lưu thì làm sạch. Trình sửa kiểm chữ ĐANG GÕ (`saveProblems`), không kiểm bản đã làm sạch (bản đó chỉ giữ 3 dòng nên dòng thứ 4 từng bị bỏ âm thầm).",
+      "Unit: nhân bản tạo card mới kèm bản sao avatar; xoá card trả về các story bị xoá theo.",
+      "Unit: chat thử ở Studio stream mà không lưu gì, dùng model chat mặc định.",
+      "Unit: `isDirty` bỏ qua trường không phải nội dung; reset tài khoản (`allowForcedLeave`) cho tải lại trang mà không hỏi.",
+      "Unit: router chạy guard rời trang (`addNavigationGuard`) TRƯỚC khi báo đổi màn cho `useRoute`; guard huỷ thì màn không đổi.",
+      "Bot: ở `#/studio`, mở một nhân vật thì trình sửa `#/studio/<id>` hiện tên đã lưu; sửa tên, bấm Lưu, tải lại thì tên mới còn.",
+      "Bot: nhập 4 dòng vào 'Lời nói đặc trưng (tuỳ chọn)' rồi bấm Lưu thì không lưu được và hiện 'Chưa lưu được:' (Tối đa 3 lời nói đặc trưng); tải lại thì dòng thứ 4 không có.",
+      "Bot: trong 'Xem trước và chat thử', gửi một tin thì có ba chấm khi chờ rồi có câu trả lời.",
+      "Bot: 'Công cụ nâng cao' tắt thì trình sửa không có tab 'Xem trước' và không có chữ 'token'.",
+      "Bot: ở `#/studio/<id>` sửa 'Tên nhân vật' mà chưa lưu rồi bấm 'Về Studio' thì trình duyệt hỏi lại ('Bạn có thay đổi chưa lưu…'); bấm Huỷ thì ở lại và chữ đang sửa còn nguyên, bấm OK thì về `#/studio` và tên đã lưu không đổi."
+    ],
+    "tests": [
+      "backend/tests/test_api_studio.py::test_card_crud",
+      "backend/tests/test_api_studio.py::test_card_validation",
+      "backend/tests/test_api_studio.py::test_card_validation_pydantic_vietnamese",
+      "backend/tests/test_api_studio.py::test_avatar_upload_get_replace_delete",
+      "backend/tests/test_api_studio.py::test_avatar_rejects_bad_and_huge_images",
+      "backend/tests/test_api_studio.py::test_duplicate_copies_avatar_to_new_file",
+      "backend/tests/test_api_studio.py::test_delete_card_with_stories",
+      "backend/tests/test_api_studio.py::test_test_chat_streams_and_saves_nothing",
+      "backend/tests/test_avatars.py",
+      "backend/tests/test_signature_lines.py",
+      "backend/tests/test_review_fixes.py::test_studio_uses_default_chat_model",
+      "frontend/src/lib/cardForm.test.ts",
+      "frontend/src/lib/signatureLines.test.ts",
+      "frontend/src/pages/studio/editorInstance.test.ts",
+      "frontend/src/lib/leaveGuard.test.ts",
+      "frontend/src/lib/router.test.ts",
+      "frontend/src/lib/advancedTools.test.ts",
+      "bot: sửa và lưu nhân vật ở Studio",
+      "bot: lời nói đặc trưng quá 3 dòng bị chặn",
+      "bot: chat thử có ba chấm rồi trả lời",
+      "bot: tắt công cụ nâng cao thì trình sửa không có Xem trước",
+      "bot: rời trình sửa còn thay đổi chưa lưu thì hỏi lại"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T07:23:43.966Z"
+  },
+  {
+    "id": "F19",
+    "title": "AI viết nháp nhân vật",
+    "page": "wiki/features/F19-ai-viet-nhap.md",
+    "phase": "Phase 2",
+    "stage": "built",
+    "done": [
+      "Unit: viết nháp gọi model với schema JSON; kết quả được hậu xử lý (tên, vai trò, tính cách, lời mở đầu, Thought…) kèm cảnh báo khi thiếu; không lưu card.",
+      "Unit: ý tưởng tối đa 2000 ký tự; hai yêu cầu cùng lúc thì một cái báo bận; người dùng ngắt kết nối thì huỷ và nhả khoá.",
+      "Unit: câu lỗi không nhắc 'model' hay 'Ollama'; chữ gốc nằm dưới 'Chi tiết' (`friendlyError`).",
+      "Unit: prompt viết nháp có luật an toàn.",
+      "Bot: ở `#/studio`, bấm 'AI viết nháp' mở hộp thoại có một ô nhập ý tưởng; gửi ý tưởng khi LLM giả báo lỗi thì hộp hiện câu lỗi kèm 'Chi tiết', không có chữ 'model' hay 'Ollama'.",
+      "Bot: ở `#/studio`, bấm 'AI viết nháp', gửi một ý tưởng mà LLM giả viết được card thì app mở `#/studio/new` với ô 'Tên nhân vật' là tên card nháp, header có 'chưa lưu', và `/api/cards` chưa có card đó (rời trang không lưu thì vẫn chưa có).",
+      "Model thật: một dòng ý tưởng cho card đủ tên, vai trò, tính cách, lời mở đầu; trình sửa mở với card đó, chưa lưu (kịch bản `f19-viet-nhap` cho card trên model thật; phần trình sửa: dòng Bot ở trên và `test_integration_phase2.py::test_draft_save_and_open_story`).",
+      "Model thật: trên gemma4:12b, một dòng ý tưởng cho card nháp chưa lưu, đủ tên, vai trò, tính cách, lời mở đầu; tính cách và lời mở đầu bằng tiếng Việt; không có cảnh báo thiếu tên, thiếu lời mở đầu hay thiếu xưng hô (kịch bản `f19-viet-nhap`)."
+    ],
+    "tests": [
+      "backend/tests/test_draft.py",
+      "backend/tests/test_api_studio.py::test_draft_card",
+      "backend/tests/test_api_studio.py::test_draft_errors",
+      "backend/tests/test_api_studio.py::test_draft_concurrent_requests_one_is_busy",
+      "backend/tests/test_api_studio.py::test_draft_client_disconnect_cancels_and_frees_lock",
+      "backend/tests/test_integration_phase2.py::test_draft_save_and_open_story",
+      "backend/tests/test_compliance.py::test_safety_rule_in_draft_prompt",
+      "frontend/src/lib/friendlyError.test.ts",
+      "bot: AI viết nháp mở hộp ý tưởng, lỗi không có chữ kỹ thuật",
+      "bot: AI viết nháp xong thì mở trình sửa với card nháp, chưa lưu",
+      "model: f19-viet-nhap"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:38:15.645Z"
+  },
+  {
+    "id": "F20",
+    "title": "Nhập và xuất card (Character Card V2)",
+    "page": "wiki/features/F20-nhap-xuat-card.md",
+    "phase": "Phase 2",
+    "stage": "built",
+    "done": [
+      "Unit: nhập card V1, V2, V3 ở dạng .json và .png (chunk `chara` / `ccv3`); file hỏng hoặc quá lớn bị từ chối với câu lỗi rõ.",
+      "Unit: xuất .json và .png; file xuất nhập lại được, ghi đúng tác giả và giữ `extensions.lyris` (vai trò, lời nói đặc trưng…).",
+      "Unit: book của Card V2 được đổi thành mục thế giới khi lưu.",
+      "Bot: ở `#/studio` có nút 'Nhập card'; chọn một file `.json` Character Card V2 thì trình sửa mở với tên của card đó, chưa lưu."
+    ],
+    "tests": [
+      "backend/tests/test_card_v2.py",
+      "backend/tests/test_api_studio.py::test_export_json_and_png",
+      "backend/tests/test_api_studio.py::test_import_json_roundtrip",
+      "backend/tests/test_api_studio.py::test_import_v1_card",
+      "backend/tests/test_api_studio.py::test_import_rejects_garbage",
+      "backend/tests/test_api_studio.py::test_import_png_holds_avatar_until_saved",
+      "backend/tests/test_integration_phase2.py::test_png_export_import_roundtrip_with_avatar",
+      "backend/tests/test_integration_phase2.py::test_import_json_save_story_and_reexport_keeps_v2_data",
+      "backend/tests/test_accounts.py::test_export_writes_creator",
+      "backend/tests/test_lore_api.py::test_card_book_import_save_reput_export_roundtrip",
+      "backend/tests/test_signature_lines.py::test_signature_lines_survive_export_and_import",
+      "frontend/src/pages/studio/loreLogic.test.ts",
+      "bot: nhập card .json mở trình sửa"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.330Z"
+  },
+  {
+    "id": "F21",
+    "title": "Persona của người chơi",
+    "page": "wiki/features/F21-persona.md",
+    "phase": "Phase 2, 2c",
+    "stage": "built",
+    "done": [
+      "Unit: tạo, sửa, xoá persona qua API; xoá persona đang có story thì 409, xác nhận thì xoá kèm story và trả các story bị xoá.",
+      "Unit: avatar persona tải lên được; story mới dùng persona mặc định của tài khoản.",
+      "Unit: persona không có ảnh dùng chữ cái đầu (giữ dấu tiếng Việt).",
+      "Bot: bấm 'Bước vào câu chuyện' ở hồ sơ mở sheet 'Chọn persona' có nhóm radio 'Persona' với ít nhất một persona chọn được.",
+      "Bot: ở `#/personas`, bấm 'Thêm persona', điền tên, lưu thì persona mới có trong danh sách với avatar chữ cái đầu.",
+      "Bot: sheet Tài khoản có nhóm radio 'Persona đang dùng'; chọn persona khác rồi tải lại thì lựa chọn vẫn giữ."
+    ],
+    "tests": [
+      "backend/tests/test_api_studio.py::test_persona_crud",
+      "backend/tests/test_integration_phase2.py::test_delete_card_and_persona_409_then_with_stories",
+      "backend/tests/test_integration_phase2.py::test_persona_edit_accepts_persona_out_as_sent_by_ui",
+      "backend/tests/test_phase3_fixes.py::test_delete_card_and_persona_return_deleted_story_ids",
+      "backend/tests/test_accounts.py::test_persona_avatar",
+      "backend/tests/test_lyris_design.py::test_default_persona_and_model_for_new_story",
+      "frontend/src/pages/personaLogic.test.ts",
+      "frontend/src/components/ui/logic.test.ts",
+      "bot: bắt đầu story qua sheet và persona, story mở với lời chào",
+      "bot: thêm persona",
+      "bot: đổi persona mặc định ở sheet Tài khoản"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.385Z"
+  },
+  {
+    "id": "F22",
+    "title": "Khám phá và nhân vật mẫu",
+    "page": "wiki/features/F22-kham-pha.md",
+    "phase": "Phase 2b, 4b",
+    "stage": "built",
+    "done": [
+      "Unit: danh sách: card của người dùng trước, mẫu đã cài gộp vào; nhân vật nổi bật (mặc định Hạ Vy) không lặp lại trong lưới trừ khi đang lọc.",
+      "Unit: lọc theo vibe so sánh sau chuẩn hoá: không phân biệt hoa thường, giữ dấu.",
+      "Unit: dòng tác giả: 'Mẫu của Lyris' cho mẫu, 'bởi @handle' cho card người dùng; không có dòng nguồn ảnh.",
+      "Unit: Khám phá liệt kê nhân vật công khai của tài khoản khác.",
+      "Bot: ở 390px `#/explore` có khung nổi bật và lưới nhân vật; các thẻ rộng bằng nhau, thẻ cùng hàng cao bằng nhau; không cuộn ngang.",
+      "Bot: khi không lọc, nhân vật trong khung nổi bật không xuất hiện lại trong lưới.",
+      "Bot: lưới có 2 cột ở 390px, 3 cột ở 800px, 5 cột ở 1280px; hàng cuối thiếu ô thì không kéo giãn.",
+      "Bot: bấm một chip trong nhóm 'Lọc theo cảm xúc' thì chip có `aria-pressed=\"true\"`, bộ đếm thành 'x / tổng' (x > 0), lưới còn đúng x thẻ và chỉ còn nhân vật có tag đó (đủ mọi nhân vật có tag, đối chiếu tag từ `/api/cards`, `/api/templates`); bấm lại thì bộ đếm về tổng và lưới về như cũ (cùng các thẻ, cùng thứ tự)."
+    ],
+    "tests": [
+      "frontend/src/pages/explore/logic.test.ts",
+      "backend/tests/test_public_cards.py::test_explore_lists_other_accounts_public_cards",
+      "backend/tests/test_lyris_design.py::test_featured_template_is_ha_vy",
+      "backend/tests/test_lyris_design.py::test_templates_list",
+      "backend/tests/test_lyris_design.py::test_template_install_idempotent",
+      "bot: Khám phá tải xong, thẻ đều nhau, không tràn ngang 390px",
+      "bot: nhân vật nổi bật không lặp trong lưới",
+      "bot: lưới Khám phá 2/3/5 cột",
+      "bot: chip cảm xúc chỉ giữ nhân vật có tag đó, bấm lại thì lưới như cũ"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:16:26.254Z"
+  },
+  {
+    "id": "F23",
+    "title": "Hồ sơ nhân vật (chỉ xem)",
+    "page": "wiki/features/F23-ho-so-nhan-vat.md",
+    "phase": "Phase 2b (§16)",
+    "stage": "built",
+    "done": [
+      "Unit: route `#/character/<id>` và `#/character/template/<slug>` đọc và dựng lại đúng; link hỏng về hub.",
+      "Unit: tab 'Giới thiệu' chỉ có trường cho người đọc, `{{user}}` thành 'bạn', không bao giờ có trường bí mật; tab 'Thiết lập' có xưng hô, giọng kể, cảm xúc ban đầu.",
+      "Unit: 'Lời nói đặc trưng' có 2-3 câu, tự chọn từ ví dụ thoại khi card không có.",
+      "Unit: hồ sơ nhân vật công khai chỉ trả các trường trong whitelist.",
+      "Bot: bấm nhân vật nổi bật ở `#/explore` thì URL thành `#/character/...` (không mở story); hồ sơ có nút 'Bước vào câu chuyện', nhóm tab 'Thông tin nhân vật', và không có ô nhập nào.",
+      "Bot: hồ sơ nhân vật mẫu không có nút 'Sửa nhân vật'; ở 390px có thanh dính sát đáy màn hình chứa nút 'Bước vào câu chuyện', và khi đã có story với nhân vật đó thì thanh có thêm 'Tiếp tục story' (bấm thì mở lại story `#/chat/<id>`).",
+      "Bot: `#/character/999999` hiện 'Không tìm thấy nhân vật này' và nút 'Về Khám phá'."
+    ],
+    "tests": [
+      "frontend/src/pages/character/logic.test.ts",
+      "frontend/src/lib/router.test.ts",
+      "frontend/src/lib/signatureLines.test.ts",
+      "backend/tests/test_public_cards.py::test_public_card_view_whitelist",
+      "backend/tests/test_public_cards.py::test_story_detail_of_copy_is_public_view",
+      "bot: hồ sơ nhân vật chỉ đọc, có nút Bước vào câu chuyện",
+      "bot: hồ sơ mẫu không có Sửa nhân vật, có thanh dính đáy",
+      "bot: đã có story thì thanh dính đáy của hồ sơ có Tiếp tục story",
+      "bot: nhân vật không có thì báo không tìm thấy"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:16:26.318Z"
+  },
+  {
+    "id": "F24",
+    "title": "Bắt đầu story ('Bước vào câu chuyện')",
+    "page": "wiki/features/F24-buoc-vao-cau-chuyen.md",
+    "phase": "Phase 2b (§16)",
+    "stage": "built",
+    "done": [
+      "Unit: không mở 'Tuỳ chỉnh story' thì chỉ gửi `card_id` và `persona_id`; server tự điền mặc định (tiêu đề, ngôn ngữ, đại từ, lời mở đầu).",
+      "Unit: link cũ `#/new-story?card=12` chuyển sang `#/character/12?start=1`.",
+      "Unit: persona mặc định được chọn sẵn; bắt đầu story với nhân vật công khai của người khác thì chụp một bản sao đầy đủ.",
+      "Bot: bấm 'Bước vào câu chuyện' ở hồ sơ mở sheet 'Chọn persona'; chọn persona rồi bấm 'Bước vào câu chuyện' trong sheet thì sang `#/chat/<id>` và có lời chào của nhân vật.",
+      "Bot: sheet mở với persona đang dùng (đã đổi ở sheet Tài khoản, không phải persona mới thêm gần nhất) được chọn sẵn và 'Tuỳ chỉnh story' đang gập.",
+      "Bot: mở `#/new-story?card=<id>` (link cũ) thì về hồ sơ `#/character/<id>` với sheet 'Chọn persona' đang mở.",
+      "Bot: tài khoản thứ hai bắt đầu story với nhân vật công khai của người khác thì sheet có dòng '@{handle} sửa nhân vật sau này thì story của bạn không đổi.'"
+    ],
+    "tests": [
+      "frontend/src/pages/character/startLogic.test.ts",
+      "frontend/src/lib/router.test.ts",
+      "backend/tests/test_studio_stories.py",
+      "backend/tests/test_api_studio.py::test_story_defaults",
+      "backend/tests/test_lyris_design.py::test_default_persona_and_model_for_new_story",
+      "backend/tests/test_lyris_design.py::test_story_defaults_without_any_persona",
+      "backend/tests/test_public_cards.py::test_start_story_makes_a_full_copy",
+      "bot: bắt đầu story qua sheet và persona, story mở với lời chào",
+      "bot: sheet bắt đầu chọn sẵn persona mặc định, Tuỳ chỉnh gập",
+      "bot: link new-story cũ chuyển sang hồ sơ",
+      "bot: nhân vật công khai có dòng bản sao"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.551Z"
+  },
+  {
+    "id": "F25",
+    "title": "Tương tác: danh sách story",
+    "page": "wiki/features/F25-danh-sach-story.md",
+    "phase": "Phase 2b",
+    "stage": "built",
+    "done": [
+      "Unit: giờ hiện '23:15' (hôm nay), 'Hôm qua', hoặc '12/11', kể cả qua ranh giới tháng.",
+      "Unit: tìm story khớp mọi từ ở tên nhân vật, tiêu đề, nơi chốn; không cần gõ dấu.",
+      "Unit: dòng xem trước bỏ Thought và ((...)); story mới hoạt động nhất ở trên.",
+      "Bot: tài khoản đã có story đăng nhập thẳng ở `#/login` thì vào màn Tương tác `#/` (header hub có nút '… Mở tài khoản', danh sách có link `#/chat/<id>`), không tự nhảy vào story gần nhất.",
+      "Bot: gõ tên nhân vật vào ô 'Tìm story' thì danh sách chỉ còn story của nhân vật đó; gõ chữ không khớp thì danh sách rỗng; dòng xem trước không chứa '[Thought' hay '(('.",
+      "Bot: tài khoản không có story nào thấy 'Chưa có story nào…' và nút 'Mở Khám phá'; tài khoản chưa đặt profile thấy khối 'Đặt tên cho tài khoản của bạn'."
+    ],
+    "tests": [
+      "frontend/src/pages/hub/logic.test.ts",
+      "backend/tests/test_lyris_design.py::test_story_list_fields",
+      "backend/tests/test_repo.py::test_list_stories_newest_first",
+      "backend/tests/test_repo.py::test_story_activity_and_list_order",
+      "bot: đăng nhập ở #/login thì vào Tương tác, không tự mở story",
+      "bot: Tìm story lọc danh sách, xem trước sạch",
+      "bot: hub rỗng có Mở Khám phá, khối mời đặt profile"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T07:23:44.026Z"
+  },
+  {
+    "id": "F26",
+    "title": "Thiết kế Lyris: theme sáng/tối, điều hướng",
+    "page": "wiki/features/F26-giao-dien-theme.md",
+    "phase": "Phase 2b",
+    "stage": "built",
+    "done": [
+      "Unit: theme chỉ nhận 'light' / 'dark'; thứ tự chọn: tham số URL, lựa chọn đã lưu (`lyris.theme`), hệ thống, rồi tối; màu meta khớp token nền.",
+      "Unit: thanh tab chỉ có ở hub, Khám phá và danh sách Studio (`tabOf`).",
+      "Unit: nút nhỏ trên form đăng nhập, ngăn cảm xúc và header chat (nút 'Suy nghĩ', công tắc Story/DM) cao ≥ 44px ở điện thoại.",
+      "Unit: `Button` và `IconButton` cỡ `sm` cao 44px ở điện thoại (`max-sm:h-11`, icon thêm `max-sm:w-11`), vẫn 36px từ 640px trở lên.",
+      "Bot: ở 1280px `#/explore` không cuộn ngang.",
+      "Bot: suốt lượt chạy bot không có lỗi console.",
+      "Bot: bấm 'Chuyển sang giao diện sáng' / 'Chuyển sang giao diện tối' ở header thì `document.documentElement.dataset.theme` đổi và localStorage `lyris.theme` lưu giá trị mới; tải lại vẫn giữ.",
+      "Bot: thanh 'Điều hướng chính' có 3 tab (Khám phá, Tương tác, Studio) ở `#/`, `#/explore`, `#/studio`; không có ở `#/chat/<id>`, `#/studio/<id>`, `#/personas`, `#/character/<id>`.",
+      "Bot: ở 390px, `#/`, `#/studio`, `#/chat/<id>` không cuộn ngang và mọi nút trên header (cả 'Suy nghĩ' và hai nút Story/DM ở `#/chat/<id>`), mọi tab của thanh 'Điều hướng chính' rộng và cao ≥ 44px.",
+      "Bot: ở 390px, mọi nút dưới lượt cuối của nhân vật trong story (hàng thao tác: Tạo lại, Thích, Chê, Sửa, Xoá từ đây…) và nút 'Huỷ', 'Xoá' của hộp 'Xác nhận xoá' rộng và cao ≥ 44px.",
+      "Bot: suốt lượt chạy của bot (mọi trang) không có request nào ra ngoài máy (font, icon, ảnh đều tự host)."
+    ],
+    "tests": [
+      "frontend/src/theme/theme.test.ts",
+      "frontend/src/lib/router.test.ts",
+      "frontend/src/components/ui/logic.test.ts",
+      "frontend/src/pages/auth/tapTargets.test.ts",
+      "frontend/src/pages/chat/tapTargets.test.ts",
+      "bot: màn desktop 1280px không tràn ngang",
+      "bot: không có lỗi console",
+      "bot: nút đổi theme và nhớ lựa chọn",
+      "bot: thanh tab 3 tab, ẩn ở màn con",
+      "bot: 390px không tràn ngang, nút header và thanh tab ≥ 44px ở #/, #/studio, #/chat",
+      "bot: 390px nút dưới lượt chat và nút hộp Xác nhận xoá ≥ 44px",
+      "bot: không có request ra ngoài"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:16:26.381Z"
+  },
+  {
+    "id": "F27",
+    "title": "Ẩn chữ kỹ thuật, mục 'Nâng cao'",
+    "page": "wiki/features/F27-an-chu-ky-thuat.md",
+    "phase": "Phase 3b",
+    "stage": "built",
+    "done": [
+      "Unit: mọi lỗi đi qua `errorMessage`: câu dễ hiểu, chữ gốc giữ riêng cho 'Chi tiết'; câu lỗi không nhắc 'model', 'Ollama'.",
+      "Unit: chữ giao diện gọi là 'story'; 'câu chuyện' chỉ có trong CTA 'Bước vào câu chuyện'.",
+      "Unit: 'Công cụ nâng cao' (`lyris.advanced`) mặc định tắt; storage lỗi thì coi là tắt.",
+      "Unit: dòng trạng thái máy chỉ hiện khi có chuyện, không có chữ kỹ thuật; `/api/system` không bao giờ trả 500.",
+      "Bot: các màn bot đi qua (đăng nhập, hub, Khám phá, hồ sơ, chat, các sheet, quản trị) không có chữ 'ollama', 'token', 'model', 'gemma', 'num_ctx', 'credits' trong chữ hiển thị.",
+      "Bot: sheet Tài khoản có mục 'Nâng cao' đang gập; `/api/system` chỉ được gọi sau khi mở mục này.",
+      "Bot: bật 'Công cụ nâng cao' thì trình sửa nhân vật có 'Xem trước' và 'Ước lượng token'; tắt thì không có.",
+      "Bot: link 'Giới thiệu & bản quyền ảnh' trong sheet Tài khoản mở phần giới thiệu có danh sách nguồn ảnh."
+    ],
+    "tests": [
+      "frontend/src/lib/friendlyError.test.ts",
+      "frontend/src/copyWords.test.ts",
+      "frontend/src/lib/advancedTools.test.ts",
+      "frontend/src/components/shell/status.test.ts",
+      "frontend/src/api/client.test.ts",
+      "backend/tests/test_phase3b.py::test_friendly_errors_never_mention_ollama_or_model",
+      "backend/tests/test_phase3b_e2e.py::test_plain_error_messages_match_frontend_contract",
+      "backend/tests/test_lyris_design.py::test_system_endpoint_never_500",
+      "bot: không lộ chữ kỹ thuật trên các trang",
+      "bot: Nâng cao gập, /api/system chỉ gọi khi mở",
+      "bot: công tắc Công cụ nâng cao",
+      "bot: trang giới thiệu có nguồn ảnh"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.717Z"
+  },
+  {
+    "id": "F28",
+    "title": "Tài khoản và trang profile",
+    "page": "wiki/features/F28-tai-khoan-profile.md",
+    "phase": "Phase 2c",
+    "stage": "built",
+    "done": [
+      "Unit: handle theo luật (chữ thường, không trùng, so trùng không phân biệt hoa thường); trùng thì 422; sai thì báo ngay dưới ô, mỗi luật một câu.",
+      "Unit: profile công khai đọc theo handle; handle không có thì 404.",
+      "Unit: mọi card, persona, story thuộc một tài khoản và có `uid`; hai tài khoản không thấy dữ liệu của nhau.",
+      "Unit: đổi tên profile thì trạng thái đăng nhập nhận tên mới ngay, không cần tải lại.",
+      "Bot: `#/me` có số liệu và hai tab 'Nhân vật', 'Persona'.",
+      "Bot: bấm 'Sửa profile', đổi tên hiển thị, lưu thì nút tài khoản trên header có tên mới (aria-label 'Tài khoản: {tên}. …') mà không tải lại trang; gõ handle có khoảng trắng hoặc ký tự lạ (vd `chu may!`) thì ô có `aria-invalid=\"true\"` và câu lỗi ngay dưới ô.",
+      "Bot: `#/u/<handle của mình>` hiện profile; `#/u/khong_ton_tai_xyz` hiện 'Không có tài khoản @khong_ton_tai_xyz trên Lyris.'"
+    ],
+    "tests": [
+      "backend/tests/test_accounts.py",
+      "backend/tests/test_auth_api.py::test_completed_profile_ignores_setup_profile_fields",
+      "frontend/src/pages/profile/logic.test.ts",
+      "frontend/src/lib/auth.test.ts",
+      "bot: #/me có số liệu và hai tab",
+      "bot: Sửa profile đổi tên ngay, handle sai báo dưới ô",
+      "bot: profile công khai theo handle"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.772Z"
+  },
+  {
+    "id": "F29",
+    "title": "Đăng nhập, mã mời và nhiều tài khoản",
+    "page": "wiki/features/F29-dang-nhap.md",
+    "phase": "Phase 4b",
+    "stage": "built",
+    "done": [
+      "Unit: lần đầu, backend in mã thiết lập ra stderr (hết hạn sau 24 giờ); trang thiết lập chủ máy dùng mã đó; hai người cùng thiết lập thì chỉ một người thắng.",
+      "Unit: tạo tài khoản bằng mã mời; mã được chuẩn hoá (viết thường, gạch ngang của iPhone); mã sai hay hết hạn cho cùng một câu lỗi.",
+      "Unit: mật khẩu tạm bắt phải đổi trước khi vào app (403 `password_change_required`).",
+      "Unit: đăng xuất, đăng xuất mọi thiết bị; đổi mật khẩu xoay phiên; cookie HttpOnly; giới hạn đăng nhập theo IP và theo cặp.",
+      "Unit: mọi route được phân loại; quét mọi route với hai tài khoản không đọc chéo dữ liệu, 404 giống nhau cho thiếu và của người khác.",
+      "Unit: đổi tài khoản trên cùng trình duyệt xoá bản nháp của người trước, giữ theme; trang cần đăng nhập được nhớ để quay lại sau khi đăng nhập.",
+      "Unit: `scripts/lyris-admin.sh` đặt lại mật khẩu và mở khoá được cả khi app đang chạy.",
+      "Bot: `#/login` có tiêu đề 'Đăng nhập', ô tên đăng nhập và mật khẩu; đăng nhập đúng thì vào app (header có nút '… Mở tài khoản').",
+      "Bot: chưa đăng nhập mà mở `#/studio` thì sang `#/login`; đăng nhập xong quay lại `#/studio`.",
+      "Bot: mở `#/signup?code=<mã>` thì ô 'Mã mời' được điền và thanh địa chỉ không còn mã.",
+      "Bot: sheet Tài khoản có 'Đổi mật khẩu', 'Đăng xuất', 'Đăng xuất mọi thiết bị'; bấm 'Đăng xuất mọi thiết bị' thì hỏi lại trước khi làm."
+    ],
+    "tests": [
+      "backend/tests/test_auth_api.py",
+      "backend/tests/test_auth_routes.py",
+      "backend/tests/test_auth_units.py",
+      "backend/tests/test_auth_hardening.py",
+      "backend/tests/test_auth_cli.py",
+      "backend/tests/test_auth_migration.py",
+      "backend/tests/test_isolation_sweep.py",
+      "frontend/src/lib/auth.test.ts",
+      "frontend/src/lib/inviteCode.test.ts",
+      "frontend/src/lib/passwordRules.test.ts",
+      "frontend/src/lib/leaveGuard.test.ts",
+      "frontend/src/pages/auth/logic.test.ts",
+      "frontend/src/pages/auth/tapTargets.test.ts",
+      "frontend/src/hooks/accountLogic.test.ts",
+      "bot: trang đăng nhập hiện và đăng nhập được",
+      "bot: chưa đăng nhập thì sang login rồi quay lại",
+      "bot: link mời điền mã và bỏ mã khỏi URL",
+      "bot: sheet Tài khoản có đổi mật khẩu và đăng xuất"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.829Z"
+  },
+  {
+    "id": "F30",
+    "title": "Quản lý tài khoản (chủ máy)",
+    "page": "wiki/features/F30-quan-ly-tai-khoan.md",
+    "phase": "Phase 4b",
+    "stage": "built",
+    "done": [
+      "Unit: route của chủ máy trả 403 cho thành viên.",
+      "Unit: mã mời hết hạn sau 1/7/30 ngày, có giới hạn số mã còn hiệu lực; badge Còn hiệu lực / Đã dùng bởi @x / Hết hạn / Đã huỷ.",
+      "Unit: mã mới và mật khẩu tạm chỉ hiện một lần: nền mờ và Esc không đóng được hộp đó; sao chép lỗi thì liên kết hiện ra để chọn tay.",
+      "Unit: đặt lại mật khẩu cho mật khẩu tạm và đăng xuất mọi phiên cũ của người đó; tạm khoá thì không đăng nhập được, mở khoá thì được lại.",
+      "Bot: chủ máy mở `#/admin` thấy nhóm 'Mục quản lý' có 'Tài khoản' và 'Số liệu', mục Mã mời và mục Thành viên có @handle của chủ máy.",
+      "Bot: tạo mã mời 7 ngày thì mã hiện kèm 'Sao chép mã' và 'Sao chép liên kết'.",
+      "Bot: tài khoản thành viên mở `#/admin` thì về `#/` và không có request nào tới `/api/admin`."
+    ],
+    "tests": [
+      "backend/tests/test_auth_api.py::test_admin_accounts_disable_enable",
+      "backend/tests/test_auth_api.py::test_admin_reset_then_forced_change",
+      "backend/tests/test_auth_api.py::test_active_invite_cap",
+      "backend/tests/test_auth_api.py::test_invites_and_signup",
+      "backend/tests/test_auth_routes.py::test_member_gets_403_on_owner_routes",
+      "backend/tests/test_auth_hardening.py::test_admin_reset_clears_change_password_failures",
+      "frontend/src/pages/admin/logic.test.ts",
+      "frontend/src/pages/admin/secrets.test.ts",
+      "bot: trang quản trị của chủ máy có tài khoản, mã mời, Số liệu",
+      "bot: chủ máy tạo mã mời",
+      "bot: thành viên mở #/admin thì về hub"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.887Z"
+  },
+  {
+    "id": "F31",
+    "title": "Nhân vật công khai",
+    "page": "wiki/features/F31-nhan-vat-cong-khai.md",
+    "phase": "Phase 4b",
+    "stage": "built",
+    "done": [
+      "Unit: luật bật/tắt 'Công khai' (nhân vật mẫu không có công tắc); Khám phá của tài khoản khác liệt kê nhân vật công khai; người tạo bị khoá thì nhân vật ẩn.",
+      "Unit: bắt đầu story với nhân vật công khai chụp một bản sao đầy đủ; chủ sửa, ẩn hay xoá nhân vật thì story của người chơi vẫn chạy; sổ thế giới của bản sao không lọt vào xem trước hay chat thử.",
+      "Unit: hồ sơ công khai chỉ có trường whitelist; mô tả công tắc không hứa giữ bí mật; danh sách Studio ghi 'Công khai' thay 'Riêng tư'.",
+      "Bot: trình sửa nhân vật của mình (bot nhập từ card .json rồi lưu) có công tắc 'Công khai' trong phần 'Cơ bản', trình sửa nhân vật cài từ mẫu không có; bật 'Công khai' và lưu thì có nút 'Người khác thấy gì'.",
+      "Bot: tài khoản thứ hai mở `#/explore` thấy nhân vật đó trong 'Nhân vật được chia sẻ'; hồ sơ của nó không có 'Sửa nhân vật' và 'bởi @handle' là link tới `#/u/<handle>`."
+    ],
+    "tests": [
+      "backend/tests/test_public_cards.py",
+      "frontend/src/pages/studio/shareLogic.test.ts",
+      "frontend/src/pages/explore/logic.test.ts",
+      "frontend/src/pages/character/logic.test.ts",
+      "bot: công tắc Công khai trong phần Cơ bản, mẫu không có, lưu thì có Người khác thấy gì",
+      "bot: tài khoản khác thấy nhân vật được chia sẻ"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T09:16:26.457Z"
+  },
+  {
+    "id": "F32",
+    "title": "Nhiều người dùng chung một máy",
+    "page": "wiki/features/F32-dung-chung-may.md",
+    "phase": "Phase 4b",
+    "stage": "built",
+    "done": [
+      "Unit: cổng sinh chung cho tối đa 2 lượt cùng lúc; lượt thứ ba chờ rồi chạy theo thứ tự đến; việc nền xen kẽ theo tài khoản.",
+      "Unit: cùng một tài khoản gửi lượt thứ hai khi lượt đầu chưa xong thì 409.",
+      "Unit: chờ quá thời hạn (mặc định 120 giây) thì báo bận, tin người chơi vẫn được giữ; huỷ khi đang chờ không để lại dấu vết.",
+      "Unit: dòng chờ là 'Có người khác đang trò chuyện. {Tên} sẽ trả lời ngay sau.'; câu báo bận không có 'model', 'slot', 'Ollama'."
+    ],
+    "tests": [
+      "backend/tests/test_generation_gate.py",
+      "backend/tests/test_api.py::test_concurrent_send_is_busy",
+      "backend/tests/test_phase3b.py::test_friendly_errors_never_mention_ollama_or_model",
+      "frontend/src/pages/chat/chatLogic.test.ts"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:07.998Z"
+  },
+  {
+    "id": "F33",
+    "title": "Dùng trên điện thoại cùng Wi-Fi",
+    "page": "wiki/features/F33-truy-cap-lan.md",
+    "phase": "Phase 3, 4b",
+    "stage": "built",
+    "done": [
+      "Unit: Vite không đặt `allowedHosts: true`, chỉ phục vụ `frontend/` và chặn `data/`; proxy `/api` chuyển IP thật (xfwd) và giữ Host gốc.",
+      "Unit: backend đọc IP thật từ phần tử cuối của `X-Forwarded-For`; header giả từ máy khác trong LAN bị bỏ qua.",
+      "Unit: chưa đăng nhập thì mọi route (trừ route mở) trả 401."
+    ],
+    "tests": [
+      "frontend/src/viteConfig.test.ts",
+      "backend/tests/test_auth_units.py::test_client_ip_uses_last_of_repeated_headers",
+      "backend/tests/test_auth_api.py::test_spoofed_forwarded_for_from_lan_is_ignored",
+      "backend/tests/test_auth_routes.py::test_no_cookie_is_401_except_open_routes"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:08.054Z"
+  },
+  {
+    "id": "F34",
+    "title": "Theo dõi sự kiện (số liệu sử dụng)",
+    "page": "wiki/features/F34-theo-doi-su-kien.md",
+    "phase": "Ra mắt",
+    "stage": "built",
+    "done": [
+      "Unit: mọi sự kiện trong [tracking-plan.md §4](../../docs/tracking-plan.md#4-event-catalog) có trong `events.py` (tên snake_case) và được ghi ở đúng chỗ của vòng chính.",
+      "Unit: một phiên hai tài khoản đầy chữ riêng tư: không chữ nào nằm trong DB số liệu hay dữ liệu gửi PostHog; client bỏ cả sự kiện nếu có chữ tự do.",
+      "Unit: `POST /api/events`: chỉ sự kiện của client, tối đa 20, cần `X-Lyris: 1`, 30 lần/phút; chưa đăng nhập chỉ `app_opened` / `signup_viewed`; `story_id` của người khác bị bỏ.",
+      "Unit: tắt chia sẻ thì sự kiện của tài khoản bị xoá, không ghi thêm, client không gửi nữa; `Sec-GPC: 1` không bị ghi.",
+      "Unit: sự kiện cũ hơn 180 ngày bị xoá lúc khởi động và mỗi giờ.",
+      "Unit: `/api/admin/analytics/export.csv` và `.jsonl` chỉ chủ máy gọi được; tóm tắt đếm phễu và giữ chân.",
+      "Unit: bộ chuyển tiếp PostHog gom 50, thử lại có backoff, không trùng khi thử lại, không gửi IP (transport giả).",
+      "Bot: chủ máy mở `#/admin`, chọn 'Số liệu' thì hiện nội dung số liệu có phần xuất (`#metrics-export`).",
+      "Bot: sheet Tài khoản có công tắc 'Chia sẻ dữ liệu sử dụng ẩn danh'."
+    ],
+    "tests": [
+      "backend/tests/test_analytics.py",
+      "backend/tests/test_analytics_api.py",
+      "backend/tests/test_launch_fixes.py::test_gpc_browser_gets_no_identifier_cookie",
+      "backend/tests/test_launch_fixes.py::test_signed_out_events_cannot_flood",
+      "backend/tests/test_launch_fixes.py::test_opt_out_covers_the_device_after_sign_out",
+      "backend/tests/test_launch_fixes.py::test_no_forwarding_before_the_policy_is_accepted",
+      "frontend/src/lib/track.test.ts",
+      "frontend/src/launchWiring.test.ts",
+      "frontend/src/lib/compliance.test.ts",
+      "bot: trang quản trị của chủ máy có tài khoản, mã mời, Số liệu",
+      "bot: sheet tài khoản có quyền riêng tư, chia sẻ dữ liệu, xuất, xoá tài khoản"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:08.108Z"
+  },
+  {
+    "id": "F35",
+    "title": "Quyền riêng tư, an toàn nội dung và báo cáo",
+    "page": "wiki/features/F35-quyen-rieng-tu-va-bao-cao.md",
+    "phase": "Ra mắt",
+    "stage": "built",
+    "done": [
+      "Unit: prompt story, DM, ngôi thứ nhất (vi + en), AI viết nháp và gợi ý đều có luật an toàn; hash prompt chỉ đổi đúng dòng này.",
+      "Unit: `#/privacy`, `#/terms` và văn bản pháp lý mở được khi chưa đăng nhập và cả trước khi chủ máy thiết lập.",
+      "Unit: tạo tài khoản không đánh dấu đồng ý thì 400 `terms_required`, không ghi gì, mã mời còn dùng được; tài khoản cũ thấy màn đồng ý một lần, tới khi đổi phiên bản.",
+      "Unit: báo cáo câu trả lời chỉ được trong story của mình; không đồng ý gửi kèm thì DB không có chữ câu trả lời (CHECK trong DB).",
+      "Unit: báo cáo và ẩn một nhân vật công khai (`target: character`): báo cáo lại thì cập nhật; nhân vật của mình 422; nhân vật riêng tư của người khác 404.",
+      "Unit: tab 'Báo cáo' của chủ máy không có người báo cáo, id story hay id tin nhắn; sự kiện báo cáo không nối được với ai trong file xuất.",
+      "Unit: xoá tài khoản: mọi bảng không còn dòng nào của tài khoản đó, file ảnh bị xoá, dữ liệu tài khoản khác không đổi.",
+      "Unit: tải dữ liệu có đủ profile, persona, nhân vật, story, tin nhắn, ký ức; không có hash mật khẩu, token hay dữ liệu của người khác.",
+      "Unit: liên hệ lấy từ `LYRIS_CONTACT` (email hoặc `https://`); chưa đặt thì văn bản pháp lý giữ chỗ trống.",
+      "Bot: chưa đăng nhập mở `#/privacy` và `#/terms` thì thấy tiêu đề 'Chính sách quyền riêng tư' / 'Điều khoản sử dụng' và nội dung dài hơn 500 ký tự.",
+      "Bot: bấm 'Báo cáo' trên lời trả lời cuối thì mở sheet 'Báo cáo câu trả lời' có nhóm radio 'Lý do'.",
+      "Bot: sheet Tài khoản có link `#/privacy`, `#/terms`, công tắc 'Chia sẻ dữ liệu sử dụng ẩn danh', nút 'Tải dữ liệu của tôi' và 'Xoá tài khoản'.",
+      "Bot: chủ máy mở `#/admin` thấy mục 'Báo cáo'."
+    ],
+    "tests": [
+      "backend/tests/test_compliance.py",
+      "backend/tests/test_prompt_state.py::test_safety_rule_is_the_only_change",
+      "backend/tests/test_launch_fixes.py::test_public_character_can_be_reported_and_hidden",
+      "backend/tests/test_launch_fixes.py::test_contact_setting_is_an_email_or_https",
+      "backend/tests/test_launch_fixes.py::test_without_contact_the_placeholder_stays",
+      "backend/tests/test_launch_fixes.py::test_contact_reaches_login_page_and_legal_texts",
+      "backend/tests/test_launch_fixes.py::test_report_event_is_not_linkable_in_the_owner_export",
+      "frontend/src/lib/compliance.test.ts",
+      "frontend/src/launchWiring.test.ts",
+      "frontend/src/lib/markdown.test.ts",
+      "frontend/src/lib/auth.test.ts",
+      "bot: trang pháp lý mở được khi chưa đăng nhập",
+      "bot: sheet báo cáo mở trên một lời trả lời",
+      "bot: sheet tài khoản có quyền riêng tư, chia sẻ dữ liệu, xuất, xoá tài khoản",
+      "bot: chủ máy có mục Báo cáo"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T06:28:08.162Z"
+  },
+  {
+    "id": "F36",
+    "title": "Harness: bake-off và chấm hành vi model",
+    "page": "wiki/features/F36-harness-kiem-tra.md",
+    "phase": "Phase 0, 1, 2",
+    "stage": "built",
+    "done": [
+      "Unit: `harness/checks.py` (chỉ thư viện chuẩn) bắt được: lộ '((', số Thought sai, Thought liền nhau hay chưa đóng, xưng hô cấm, sai ngôn ngữ, viết thay người chơi.",
+      "Unit: `run_eval.py` chạy hết kịch bản với Ollama giả và lưu báo cáo; kịch bản hỏng bị từ chối; bake-off dùng chung bộ check.",
+      "Unit: mỗi luật máy của các loại kịch bản model thật (trích xuất, tóm tắt, gợi ý, viết nháp, nhiều lượt DM, TTFT qua app thật, bake-off, chạy lồng) báo lỗi với kết quả sai và không báo với kết quả đúng (Ollama giả); lượt chạy lồng và bake-off không in dòng \"Đã ghi kết quả vào\" mà `verify.sh` đọc.",
+      "Model thật: `backend/.venv/bin/python harness/bakeoff.py` chạy trên Ollama thật và in bảng so sánh model có TTFT, tok/s của từng model, không câu nào lỗi (kịch bản `f36-bakeoff`: chạy đúng `main()` của lệnh đó với `--models gemma4:12b --limit 2`, 2 câu đầu của prompts.json).",
+      "Model thật: `backend/.venv/bin/python harness/run_eval.py --model gemma4:12b` chạy trọn trên Ollama thật và lưu `report.md` + `raw.json` vào `harness/results/` (kịch bản `f36-chay-long`: chạy lồng run_eval trên ba kịch bản khác loại, đủ kết quả, không lỗi sinh)."
+    ],
+    "tests": [
+      "backend/tests/test_harness_checks.py",
+      "backend/tests/test_run_eval_kinds.py",
+      "model: f36-bakeoff",
+      "model: f36-chay-long"
+    ],
+    "state": "claimed"
+  },
+  {
+    "id": "F37",
+    "title": "Dùng trên iPhone qua Tailscale",
+    "page": "wiki/features/F37-iphone-tailscale.md",
+    "phase": "Phase 6",
+    "stage": "planned",
+    "done": [
+      "Unit: cookie phiên có `Secure` khi request tới qua HTTPS tin cậy (đã có ở `auth/net.py`).",
+      "Unit: `allowedHosts` của Vite chỉ thêm đúng tên `*.ts.net` của Mac, không bao giờ `true`.",
+      "Unit: chưa đăng nhập thì mọi route (trừ route mở) trả 401.",
+      "Bot: trang chủ có link `manifest.webmanifest` và apple-touch-icon, cả hai tải được (200)."
+    ],
+    "tests": [
+      "backend/tests/test_auth_api.py::test_secure_cookie_only_from_trusted_https",
+      "backend/tests/test_auth_routes.py::test_no_cookie_is_401_except_open_routes",
+      "frontend/src/viteConfig.test.ts"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F38",
+    "title": "Gửi hình ảnh trong chat",
+    "page": "wiki/features/F38-gui-hinh-anh.md",
+    "phase": "Chưa xếp phase",
+    "stage": "planned",
+    "done": [
+      "Unit: ảnh gửi đi được lưu theo trang thiết kế; ảnh quá giới hạn dung lượng hoặc không phải ảnh bị từ chối.",
+      "Bot: chọn 'Gửi hình ảnh' trong menu 'Thêm' mở trình chọn ảnh (`input[type=file]` nhận ảnh).",
+      "Bot: ảnh gửi đi hiện trong lượt của người chơi ở cả Story và DM.",
+      "Model thật: nhân vật phản ứng với nội dung ảnh, hoặc giao diện nói rõ nhân vật không xem được ảnh."
+    ],
+    "tests": [],
+    "state": "pending"
+  },
+  {
+    "id": "F39",
+    "title": "Cộng đồng",
+    "page": "wiki/features/F39-cong-dong.md",
+    "phase": "Phase 7",
+    "stage": "planned",
+    "done": [
+      "Unit: tài khoản trên máy chủ chung nối với tài khoản trên máy qua `uid`.",
+      "Unit: handle được kiểm trùng trên toàn hệ thống.",
+      "Unit: đăng nhân vật công khai lên máy chủ chung; story và chat không rời máy."
+    ],
+    "tests": [],
+    "state": "pending"
+  },
+  {
+    "id": "F40",
+    "title": "Đạo diễn truyện và Khoảnh khắc",
+    "page": "wiki/features/F40-dao-dien-khoanh-khac.md",
+    "phase": "Phase 8 (tuỳ chọn)",
+    "stage": "planned",
+    "done": [
+      "Unit: backend sinh `extras.moment` khi có khoảnh khắc đáng nhớ.",
+      "Bot: banner 'Khoảnh khắc' hiện dưới header chat khi `extras.moment` có dữ liệu.",
+      "Bot: tab 'Khoảnh khắc' trong sheet Sự kiện có nội dung."
+    ],
+    "tests": [],
+    "state": "pending"
+  },
+  {
+    "id": "F41",
+    "title": "Tự train model (LoRA)",
+    "page": "wiki/features/F41-tu-train-model.md",
+    "phase": "Phase 5",
+    "stage": "planned",
+    "done": [
+      "Unit: chỉ chat của tài khoản có `training_opt_in = 1` vào dataset.",
+      "Unit: `build_dataset.py` gộp, lọc, chia 90/10.",
+      "Bot: chủ máy chọn được model theo story trong 'Nâng cao'; 'Tạo lại câu trả lời' có A/B mù giữa hai model.",
+      "Model thật: `train.sh` chạy hết trên máy 24GB không swap nặng; `deploy.sh` tạo được `lyris-v1` trong Ollama.",
+      "Model thật: harness: `lyris-v1` bằng hoặc hơn base ở godmodding, format, xưng hô."
+    ],
+    "tests": [],
+    "state": "pending"
+  }
+]

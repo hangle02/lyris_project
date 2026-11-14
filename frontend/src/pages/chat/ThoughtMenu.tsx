@@ -76,7 +76,8 @@ export function ThoughtMenu({
         aria-controls={open ? panelId : undefined}
         aria-haspopup="dialog"
         onClick={() => setOpen((o) => !o)}
-        className={cx("px-3", open && "bg-surface-2 text-fg")}
+        // 44px tall on phones (tap target, F26); 36px in the one-row header from 640px.
+        className={cx("px-3 max-sm:h-11", open && "bg-surface-2 text-fg")}
       >
         Suy nghĩ
       </Button>

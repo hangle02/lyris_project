@@ -22,6 +22,7 @@ from fastapi import FastAPI
 from lyris.api.app import create_app
 from lyris.auth import clock, codes, passwords, store
 from lyris.auth import setup as owner_setup
+from lyris.compliance.legal import LEGAL_VERSION
 from lyris.config import Settings
 from lyris.db.repo import ANY_ACCOUNT, Repo
 from lyris.llm.fake import FakeLLM
@@ -207,9 +208,9 @@ async def test_startup_prints_setup_code_to_stderr_only(settings: Settings, caps
         assert saved is not None and saved[0] == hashlib.sha256(codes.normalize_code(printed).encode()).hexdigest()  # type: ignore[union-attr]
         async with client(application) as c:
             me = (await c.get("/api/auth/me")).json()
-            assert me == {"setup_required": True, "setup_needs_profile": True, "account": None}
+            assert me == {"setup_required": True, "setup_needs_profile": True, "account": None, "legal_version": LEGAL_VERSION, "contact": None}
             assert "ban" not in str(me)
-            resp = await c.post("/api/auth/setup-owner", json={"setup_code": printed.lower(), "password": OWNER_PW})
+            resp = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": printed.lower(), "password": OWNER_PW})
             assert resp.status_code == 200, resp.text
     # Khởi động lại khi đã có mật khẩu: không in mã, không còn owner_setup.
     application = create_app(settings, FakeLLM(replies=["Chào."]))
@@ -223,12 +224,12 @@ async def test_setup_owner_flow(app: FastAPI) -> None:
     code = new_setup_code(app)
     async with client(app) as c:
         assert (await c.get("/api/stories")).json()["code"] == "setup_required"
-        bad = await c.post("/api/auth/setup-owner", json={"setup_code": "AAAA-BBBB-CCCC", "password": OWNER_PW})
+        bad = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": "AAAA-BBBB-CCCC", "password": OWNER_PW})
         assert bad.status_code == 400
         assert bad.json()["detail"] == "Mã thiết lập không đúng. Xem lại dòng in trong cửa sổ Terminal đang chạy Lyris."
-        weak = await c.post("/api/auth/setup-owner", json={"setup_code": code, "password": "12345678"})
+        weak = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": code, "password": "12345678"})
         assert weak.status_code == 422 and weak.json()["detail"] == "Mật khẩu này quá dễ đoán. Hãy chọn mật khẩu khác."
-        ok = await c.post("/api/auth/setup-owner", json={"setup_code": code, "password": OWNER_PW})
+        ok = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": code, "password": OWNER_PW})
         assert ok.status_code == 200, ok.text
         body = ok.json()
         assert body["setup_required"] is False and body["account"]["role"] == "owner"
@@ -238,7 +239,7 @@ async def test_setup_owner_flow(app: FastAPI) -> None:
         )
         assert store.read_setup(repo.conn) is None
         assert (await c.get("/api/stories")).status_code == 200
-        again = await c.post("/api/auth/setup-owner", json={"setup_code": code, "password": OWNER_PW})
+        again = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": code, "password": OWNER_PW})
         assert again.status_code == 409 and again.json()["detail"] == "Lyris đã được thiết lập. Hãy đăng nhập."
     async with client(app) as c:
         assert (await login(c, "ban", OWNER_PW)).status_code == 200
@@ -248,8 +249,8 @@ async def test_setup_owner_race_has_one_winner(app: FastAPI) -> None:
     code = new_setup_code(app)
     async with client(app) as a, client(app) as b:
         results = await asyncio.gather(
-            a.post("/api/auth/setup-owner", json={"setup_code": code, "password": OWNER_PW}),
-            b.post("/api/auth/setup-owner", json={"setup_code": code, "password": "một mật khẩu khác"}),
+            a.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": code, "password": OWNER_PW}),
+            b.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": code, "password": "một mật khẩu khác"}),
         )
     assert sorted(r.status_code for r in results) == [200, 409]
     assert count(repo_of(app), "SELECT COUNT(*) FROM sessions") == 1
@@ -261,23 +262,23 @@ async def test_setup_rate_limit_is_per_ip_and_never_burns_the_code(app: FastAPI,
     for ip in ("192.168.1.30", "192.168.1.31", "192.168.1.32"):
         async with client(app, peer=(ip, 1)) as c:
             for _ in range(5):
-                resp = await c.post("/api/auth/setup-owner", json={"setup_code": "AAAA-BBBB-CCCC", "password": OWNER_PW})
+                resp = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": "AAAA-BBBB-CCCC", "password": OWNER_PW})
                 assert resp.status_code == 400
             before = count(repo, "SELECT COUNT(*) FROM auth_attempts")
-            blocked = await c.post("/api/auth/setup-owner", json={"setup_code": code, "password": OWNER_PW})
+            blocked = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": code, "password": OWNER_PW})
             assert blocked.status_code == 429 and blocked.json()["code"] == "rate_limited"
             assert 0 < int(blocked.headers["retry-after"]) <= 900
             assert count(repo, "SELECT COUNT(*) FROM auth_attempts") == before  # bị chặn: không ghi dòng
     assert scrypt_calls == []  # mã sai và bị chặn đều không băm
     async with client(app, peer=("192.168.1.40", 1)) as c:  # mã vẫn dùng được từ IP khác
-        assert (await c.post("/api/auth/setup-owner", json={"setup_code": code, "password": OWNER_PW})).status_code == 200
+        assert (await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": code, "password": OWNER_PW})).status_code == 200
 
 
 async def test_setup_code_expires_after_24h(app: FastAPI, fake_clock: FakeClock) -> None:
     code = new_setup_code(app)
     fake_clock.advance(hours=24, seconds=1)
     async with client(app) as c:
-        resp = await c.post("/api/auth/setup-owner", json={"setup_code": code, "password": OWNER_PW})
+        resp = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": code, "password": OWNER_PW})
         assert resp.status_code == 400
 
 
@@ -287,7 +288,7 @@ async def test_fresh_db_setup_takes_profile(app: FastAPI) -> None:
         assert (await c.get("/api/auth/me")).json()["setup_needs_profile"] is True
         resp = await c.post(
             "/api/auth/setup-owner",
-            json={"setup_code": code, "password": OWNER_PW, "display_name": "  Trăng  Non ", "handle": "@TrangNon"},
+            json={"accept_terms": True, "setup_code": code, "password": OWNER_PW, "display_name": "  Trăng  Non ", "handle": "@TrangNon"},
         )
         assert resp.status_code == 200, resp.text
         account = resp.json()["account"]
@@ -303,8 +304,8 @@ async def test_completed_profile_ignores_setup_profile_fields(app: FastAPI) -> N
     code = new_setup_code(app)
     async with client(app) as c:
         me = (await c.get("/api/auth/me")).json()
-        assert me == {"setup_required": True, "setup_needs_profile": False, "account": None}
-        resp = await c.post("/api/auth/setup-owner", json={"setup_code": code, "password": OWNER_PW, "handle": "khac"})
+        assert me == {"setup_required": True, "setup_needs_profile": False, "account": None, "legal_version": LEGAL_VERSION, "contact": None}
+        resp = await c.post("/api/auth/setup-owner", json={"accept_terms": True, "setup_code": code, "password": OWNER_PW, "handle": "khac"})
         assert resp.json()["account"]["handle"] == "chu"
 
 
@@ -368,7 +369,7 @@ async def test_disabled_and_expired_temp_only_with_right_password(app: FastAPI, 
         assert wrong.status_code == 401 and wrong.json()["detail"] == "Tên đăng nhập hoặc mật khẩu không đúng."
         right = await login(c, "mai", MEMBER_PW)
         assert right.status_code == 403
-        assert right.json() == {"detail": "Tài khoản này đang tạm khoá. Hãy hỏi chủ máy.", "technical": None, "code": "account_disabled"}
+        assert right.json() == {"detail": "Tài khoản này đang tạm khoá. Hãy liên hệ người quản lý Lyris.", "technical": None, "code": "account_disabled"}
         assert not any(h.startswith("lyris_session=") for h in right.headers.get_list("set-cookie"))
     with repo.transaction():
         store.set_status(repo.conn, mid, "active", clock.now())
@@ -378,7 +379,7 @@ async def test_disabled_and_expired_temp_only_with_right_password(app: FastAPI, 
     async with client(app) as c:
         assert (await login(c, "mai", "sai rồi nhé")).json()["detail"] == "Tên đăng nhập hoặc mật khẩu không đúng."
         expired = await login(c, "mai", "mật khẩu tạm thời")
-        assert expired.status_code == 401 and expired.json()["detail"] == "Mật khẩu tạm đã hết hạn. Hãy nhờ chủ máy đặt lại."
+        assert expired.status_code == 401 and expired.json()["detail"] == "Mật khẩu tạm đã hết hạn. Hãy nhờ người quản lý Lyris đặt lại."
         owner = await login(c, "ban", "mật khẩu tạm chủ máy")
         assert owner.json()["detail"] == "Mật khẩu tạm đã hết hạn. Chạy lại lệnh đặt lại mật khẩu trên Mac."
 
@@ -681,9 +682,9 @@ async def test_signup_and_change_password_limits(app: FastAPI) -> None:
     ready_owner(app)
     async with client(app, peer=LAN_PEER) as c:
         for _ in range(10):
-            resp = await c.post("/api/auth/signup", json={"invite_code": "LYR-AAAA-BBBB-CCCC", "handle": "lan", "display_name": "Lan", "password": MEMBER_PW})
+            resp = await c.post("/api/auth/signup", json={"accept_terms": True, "invite_code": "LYR-AAAA-BBBB-CCCC", "handle": "lan", "display_name": "Lan", "password": MEMBER_PW})
             assert resp.status_code == 400
-        assert (await c.post("/api/auth/signup", json={"invite_code": "x", "handle": "lan", "display_name": "Lan", "password": MEMBER_PW})).status_code == 429
+        assert (await c.post("/api/auth/signup", json={"accept_terms": True, "invite_code": "x", "handle": "lan", "display_name": "Lan", "password": MEMBER_PW})).status_code == 429
     async with client(app) as c:
         await login(c, "ban", OWNER_PW)
         for _ in range(5):
@@ -790,18 +791,18 @@ async def test_invites_and_signup(app: FastAPI, fake_clock: FakeClock, auth_log:
     # Mã gõ chữ thường, không gạch, đổi 0 thành O: vẫn nhận.
     typed = normalized.lower().replace("0", "o")
     async with client(app) as newbie:
-        taken = await newbie.post("/api/auth/signup", json={"invite_code": typed, "handle": "BAN", "display_name": "Mai", "password": MEMBER_PW})
+        taken = await newbie.post("/api/auth/signup", json={"accept_terms": True, "invite_code": typed, "handle": "BAN", "display_name": "Mai", "password": MEMBER_PW})
         assert taken.status_code == 422 and "đã có người dùng" in taken.json()["detail"]
-        weak = await newbie.post("/api/auth/signup", json={"invite_code": typed, "handle": "mai", "display_name": "Mai", "password": "matkhau123"})
+        weak = await newbie.post("/api/auth/signup", json={"accept_terms": True, "invite_code": typed, "handle": "mai", "display_name": "Mai", "password": "matkhau123"})
         assert weak.status_code == 422
-        resp = await newbie.post("/api/auth/signup", json={"invite_code": typed, "handle": "@Mai", "display_name": " Mai ", "password": MEMBER_PW})
+        resp = await newbie.post("/api/auth/signup", json={"accept_terms": True, "invite_code": typed, "handle": "@Mai", "display_name": " Mai ", "password": MEMBER_PW})
         assert resp.status_code == 200, resp.text
         account = resp.json()["account"]
         assert (account["handle"], account["display_name"], account["role"], account["profile_completed"]) == ("mai", "Mai", "member", True)
         assert (await newbie.get("/api/stories")).json() == []
         # Lần dùng thứ hai: cùng chữ lỗi như mã sai.
     async with client(app) as again:
-        reused = await again.post("/api/auth/signup", json={"invite_code": code, "handle": "lan", "display_name": "Lan", "password": MEMBER_PW})
+        reused = await again.post("/api/auth/signup", json={"accept_terms": True, "invite_code": code, "handle": "lan", "display_name": "Lan", "password": MEMBER_PW})
         assert reused.status_code == 400 and reused.json()["detail"] == "Mã mời không đúng hoặc đã hết hạn."
     row = rows(repo, "SELECT a.invited_by, i.used_by, i.used_at FROM accounts a JOIN invites i ON i.used_by = a.id WHERE a.handle = 'mai'")[0]
     assert row[0] == owner_id(app) and row[2] is not None
@@ -831,7 +832,7 @@ async def test_invite_errors_look_the_same(app: FastAPI, fake_clock: FakeClock) 
     async with client(app) as c:
         details = set()
         for code in (expired["code"], revoked["code"], "LYR-AAAA-BBBB-CCCC", "rác"):
-            resp = await c.post("/api/auth/signup", json={"invite_code": code, **body})
+            resp = await c.post("/api/auth/signup", json={"accept_terms": True, "invite_code": code, **body})
             assert resp.status_code == 400  # mã kiểm trước: handle "ban" đã có người dùng không bị lộ
             details.add(resp.json()["detail"])
         assert details == {"Mã mời không đúng hoặc đã hết hạn."}
@@ -844,8 +845,8 @@ async def test_signup_race_on_one_invite(app: FastAPI) -> None:
         code = (await owner.post("/api/admin/invites", json={})).json()["code"]
     async with client(app) as a, client(app) as b:
         results = await asyncio.gather(
-            a.post("/api/auth/signup", json={"invite_code": code, "handle": "mai", "display_name": "Mai", "password": MEMBER_PW}),
-            b.post("/api/auth/signup", json={"invite_code": code, "handle": "lan", "display_name": "Lan", "password": MEMBER_PW}),
+            a.post("/api/auth/signup", json={"accept_terms": True, "invite_code": code, "handle": "mai", "display_name": "Mai", "password": MEMBER_PW}),
+            b.post("/api/auth/signup", json={"accept_terms": True, "invite_code": code, "handle": "lan", "display_name": "Lan", "password": MEMBER_PW}),
         )
     assert sorted(r.status_code for r in results) == [200, 400]
     assert count(repo_of(app), "SELECT COUNT(*) FROM accounts WHERE role = 'member'") == 1

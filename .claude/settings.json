@@ -1,0 +1,67 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash verification/verify.sh)",
+      "Bash(bash verification/verify.sh:*)",
+      "Bash(bash verification/plan-check.sh)",
+      "Bash(node memory/features.mjs:*)",
+      "Bash(node environment/bot.mjs)",
+      "Bash(node environment/bot.mjs:*)",
+      "Bash(node environment/doctor.mjs)",
+      "Bash(node environment/doctor.mjs:*)",
+      "Bash(node environment/raw.mjs:*)",
+      "Bash(backend/.venv/bin/pytest:*)",
+      "Bash(.venv/bin/pytest:*)",
+      "Bash(backend/.venv/bin/python -m pytest:*)",
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run build)",
+      "Bash(node --experimental-strip-types --test:*)",
+      "Bash(node --test:*)",
+      "Bash(bash scripts/dev.sh)",
+      "Bash(open reports/latest/report.html)",
+      "Read(reports/**)",
+      "Edit(wiki/**)",
+      "Edit(backend/lyris/**)",
+      "Edit(backend/tests/**)",
+      "Edit(frontend/src/**)",
+      "Edit(memory/progress.md)",
+      "Edit(memory/po-questions.md)"
+    ],
+    "deny": [
+      "Edit(memory/features.json)",
+      "Edit(wiki/raw/**)",
+      "Edit(verification/**)",
+      "Edit(data/**)",
+      "Bash(node memory/features.mjs promote:*)",
+      "Bash(node memory/features.mjs fail:*)",
+      "Edit(memory/features.mjs)",
+      "Edit(harness.config)",
+      "Edit(environment/bot.mjs)",
+      "Edit(environment/fake-server.py)",
+      "Edit(.claude/**)",
+      "Bash(node -e:*)",
+      "Bash(sed -i:*)",
+      "Bash(*features.json*)",
+      "Bash(*features.mjs promote*)",
+      "Bash(*features.mjs demote*)",
+      "Bash(*features.mjs fail*)",
+      "Bash(*verification/*.sh*>*)",
+      "Bash(cp * verification/*)",
+      "Bash(mv * verification/*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/environment/doctor.mjs\" --hook"
+          }
+        ]
+      }
+    ]
+  }
+}

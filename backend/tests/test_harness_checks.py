@@ -157,9 +157,23 @@ def test_run_checks_dm_actions() -> None:
 # ---- run_eval.py: kịch bản và prompt -----------------------------------------------------------
 
 
+# Bộ 8 kịch bản trả lời gốc (01-08). Các kịch bản model thật của từng tính năng (f05-…, f36-…, nhiều loại khác
+# `reply`) có test riêng ở test_run_eval_kinds.py.
+CORE_IDS = [
+    "01-mo-dau",
+    "02-bay-im-lang",
+    "03-hanh-dong-cho-ai",
+    "04-chi-dao",
+    "05-dm",
+    "06-viet-hien-dai",
+    "07-co-trang",
+    "08-tieng-anh",
+]
+
+
 @pytest.fixture(scope="module")
 def scenarios() -> list[Any]:
-    return run_eval.load_scenarios(run_eval.DEFAULT_SCENARIOS)
+    return run_eval.load_scenarios(run_eval.DEFAULT_SCENARIOS, CORE_IDS)
 
 
 @pytest.fixture(scope="module")
@@ -430,7 +444,8 @@ async def test_run_end_to_end_with_fake_ollama(tmp_path: Path, scenarios: list[A
         "who was that": GOOD_EN,  # 08
     }
     fake = FakeOllama(replies)
-    args = run_eval.parse_args(["--model", "gemma4:12b", "--ollama-url", "http://ollama"])
+    only = [arg for sid in CORE_IDS for arg in ("--only", sid)]
+    args = run_eval.parse_args(["--model", "gemma4:12b", "--ollama-url", "http://ollama", *only])
     code = await run_eval.run(args, transport=httpx.MockTransport(fake), results_dir=tmp_path)
     assert code == 0
 

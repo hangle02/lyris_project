@@ -1,0 +1,15 @@
+# F05 — chỉ đạo ẩn ((...)): luật máy của dòng "Model thật" (judge mới chấm được "làm theo", "giữ giọng").
+id: f05-chi-dao
+title: Chỉ đạo ẩn không lọt, không bị chép, không nói thẳng
+note: >-
+  Chỉ đạo "Lạc Dương ghen nhưng không nói ra". Luật máy: câu trả lời không có "((", không chép lại 5 chữ liền
+  nhau nào của câu chỉ đạo, không có chữ "chỉ đạo", và Lạc Dương không nói thẳng chữ "ghen" trong lời thoại
+  (Thought thì được). Việc ghen ngầm qua hành động, giữ giọng nhân vật là phần người chấm (Ngoài Done when).
+mode: story
+input: "*Tớ ngồi dậy, dụi mắt rồi cầm điện thoại lên xem.* A, học trưởng Chu nhắn rủ tớ tối nay đi ăn lẩu với cả câu lạc bộ. Cậu đi cùng tớ không? ((Lạc Dương ghen nhưng không nói ra, chỉ thể hiện qua hành động và giọng điệu))"
+judge: false
+checks:
+  directive_leak: true
+  directive_echo: true
+  say_forbidden: [ghen]
+  forbidden_phrases: ["chỉ đạo"]

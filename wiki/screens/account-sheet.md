@@ -39,9 +39,9 @@ Từ 640px: hộp thoại giữa màn hình, cỡ vừa.
 
 ## Tính năng
 
-- [Tài khoản và profile](../features/tai-khoan-profile.md)
-- [Persona](../features/persona.md)
-- [Đăng nhập](../features/dang-nhap.md)
-- [Ẩn chữ kỹ thuật](../features/an-chu-ky-thuat.md)
+- [Tài khoản và profile](../features/F28-tai-khoan-profile.md)
+- [Persona](../features/F21-persona.md)
+- [Đăng nhập](../features/F29-dang-nhap.md)
+- [Ẩn chữ kỹ thuật](../features/F27-an-chu-ky-thuat.md)
 
 Chi tiết: [accounts.md §5](../../docs/accounts.md), [auth.md](../../docs/auth.md), [design-impl.md §6.6 và §13](../../docs/design-impl.md).

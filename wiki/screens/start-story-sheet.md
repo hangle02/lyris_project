@@ -42,7 +42,7 @@ Với nhân vật mẫu chưa cài, bấm nút sẽ cài nhân vật vào tài k
 
 ## Tính năng
 
-- [Bước vào câu chuyện](../features/buoc-vao-cau-chuyen.md)
-- [Persona](../features/persona.md)
-- [Văn phong và xưng hô](../features/van-phong-xung-ho.md)
-- [Đọc suy nghĩ](../features/doc-suy-nghi.md)
+- [Bước vào câu chuyện](../features/F24-buoc-vao-cau-chuyen.md)
+- [Persona](../features/F21-persona.md)
+- [Văn phong và xưng hô](../features/F03-van-phong-xung-ho.md)
+- [Đọc suy nghĩ](../features/F08-doc-suy-nghi.md)

@@ -1,0 +1,33 @@
+# F10 — trí nhớ: tóm tắt thật (summarize) của một đoạn story dài giữ đúng nội dung.
+id: f10-tom-tat
+title: Tóm tắt những lượt cũ đúng nội dung
+kind: summarize
+note: >-
+  Đoạn story có lời hứa (đi xem pháo hoa ở Tây Hồ đêm giao thừa), người khác (học trưởng Chu) và một bí mật
+  (Lạc Dương lén mua chiếc vòng tay bạc). Chạy đúng lời gọi tóm tắt của việc nền: tóm tắt tiếng Việt phải giữ
+  đủ các chi tiết đó.
+mode: story
+messages:
+  - role: user
+    content: "*Tớ chìa ra hai tấm vé, mắt sáng rỡ.* Đêm giao thừa có bắn pháo hoa ở Tây Hồ đó. Cậu đi với tớ nhé? Hứa đi!"
+  - role: assistant
+    content: "Lạc Dương nhìn hai tấm vé trong tay cô, rồi nhìn gương mặt đang chờ đợi kia.\n\n[Thought: Năm nào cô ấy cũng rủ, năm nào mình cũng đi.]\n\n\"Ừ. Tớ hứa.\" Anh cất một tấm vé vào ví, cẩn thận như cất thứ gì quý giá."
+  - role: user
+    content: "Học trưởng Chu cũng rủ tớ đi xem pháo hoa, nhưng tớ từ chối rồi. Tớ nói tớ đi với cậu."
+  - role: assistant
+    content: "Bàn tay đang lật sách của Lạc Dương khựng lại một chút.\n\n[Thought: Cô ấy từ chối học trưởng Chu. Vì mình.]\n\n\"Vậy à.\" Giọng anh vẫn đều đều, nhưng khoé môi cong lên rất khẽ."
+  - role: user
+    content: "*Tớ dừng trước tủ kính tiệm trang sức ở cổng trường.* Cái vòng tay bạc khắc hình mặt trăng kia đẹp ghê. Mà đắt quá, thôi đi."
+  - role: assistant
+    content: "Lạc Dương liếc chiếc vòng, không nói gì, kéo cô đi tiếp.\n\nTối hôm đó, anh quay lại tiệm một mình, mua chiếc vòng tay bạc khắc mặt trăng, rồi giấu hộp quà trong ngăn bàn ký túc xá.\n\n[Thought: Đợi đêm giao thừa ở Tây Hồ rồi đưa cho cô ấy.]"
+  - role: user
+    content: "*Tớ ôm bụng.* Tớ đói quá, mình xuống căn tin ăn mì bò nhé."
+  - role: assistant
+    content: "\"Đi.\" Lạc Dương đứng dậy trước, cầm luôn áo khoác của cô."
+required_all:
+  - ["Tây Hồ"]
+  - ["pháo hoa"]
+  - ["giao thừa"]
+  - ["Chu"]
+  - ["vòng tay", "vòng bạc", "chiếc vòng"]
+language: vi

@@ -6,6 +6,7 @@ import {
   clearAccountData,
   gateOf,
   isAccountDataKey,
+  isPublicRoute,
   NEXT_KEY,
   rememberNext,
   safeNext,
@@ -171,4 +172,20 @@ test("withAccountProfile: a profile rename reaches the sign-in state", () => {
   assert.equal(withAccountProfile(state, { id: 99, handle: "x", display_name: "X", avatar_url: null, profile_completed: true }), state);
   const out: AuthState = { setup_required: false, setup_needs_profile: false, account: null };
   assert.equal(withAccountProfile(out, { id: 3, handle: "x", display_name: "X", avatar_url: null, profile_completed: true }), out);
+});
+
+test("gateOf: the legal pages open for everyone; an account that has not agreed sees the terms screen", () => {
+  for (const h of ["#/privacy", "#/terms"]) {
+    const r = parseRoute(h);
+    assert.equal(gateOf({ setup_required: true, setup_needs_profile: false, account: null }, r), "public", h);
+    assert.equal(gateOf(OUT, r), "public", h);
+    assert.equal(gateOf({ ...IN, account: { ...ACCOUNT, terms_required: true } }, r), "public", h);
+  }
+  const studio = parseRoute("#/studio");
+  assert.equal(gateOf({ ...IN, account: { ...ACCOUNT, terms_required: true } }, studio), "terms");
+  // A temporary password comes first (the terms screen needs a full sign-in).
+  assert.equal(gateOf({ ...IN, account: { ...ACCOUNT, terms_required: true, must_change_password: true } }, studio), "forceChange");
+  assert.equal(gateOf({ ...IN, account: { ...ACCOUNT, terms_required: false } }, studio), "app");
+  assert.equal(isPublicRoute(parseRoute("#/privacy")), true);
+  assert.equal(isPublicRoute(parseRoute("#/login")), false);
 });

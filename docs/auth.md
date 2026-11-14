@@ -256,7 +256,7 @@ Sau migration, chủ máy chưa có mật khẩu. Nếu trang thiết lập ch�
    ```
    ────────────────────────────────────────────────────────
     Lyris: đặt mật khẩu cho tài khoản chủ máy
-    Mở http://localhost:5173 trên Mac này và nhập mã thiết lập:
+    Mở trang Lyris trong trình duyệt và nhập mã thiết lập:
 
         7KQ2-M9XD-4TPA
 
@@ -389,7 +389,7 @@ Ghi mỗi lần thử vào `auth_attempts`. IP là `client_ip()` của §3.7. Đ
 
 ### 3.6 Ghi log gì
 
-Logger `lyris.auth`, mức INFO. Lưu ý: uvicorn chỉ cấu hình logger `uvicorn.*`; logger `lyris.*` hiện không có handler nên dòng INFO bị bỏ (Python chỉ in WARNING trở lên qua handler dự phòng). Phase này gắn một `StreamHandler` ra stderr cho `lyris.auth` trong `create_app` (chỉ khi chưa có handler), nếu không mọi dòng dưới đây biến mất. Nhật ký bền vững là bảng `auth_attempts`; log chỉ để xem trong Terminal.
+Logger `lyris.auth`, mức INFO. Lưu ý: uvicorn chỉ cấu hình logger `uvicorn.*`; logger `lyris.*` hiện không có handler nên dòng INFO bị bỏ (Python chỉ in WARNING trở lên qua handler dự phòng). Phase này gắn một `StreamHandler` ra stderr cho `lyris.auth` trong `create_app` (chỉ khi chưa có handler), nếu không mọi dòng dưới đây biến mất. Nhật ký bền vững là bảng `auth_attempts`; log để xem trong Terminal khi chạy ở nhà. Khi ra mắt bằng systemd (docs/deploy.md §5.3) log nằm trong journald, có @handle và IP: đặt `MaxRetentionSec=30day` (Chính sách quyền riêng tư §2, §6 hứa tối đa 30 ngày; xoá tài khoản không xoá được các dòng này, chúng tự hết hạn).
 - đăng nhập đúng/sai (handle đã chuẩn hoá, IP, nhãn thiết bị), bị chặn, tạo tài khoản (handle, mã mời số mấy), tạo/huỷ mã mời (id, `code_hint`), đặt lại mật khẩu (ai đặt cho ai), khoá/mở khoá, đăng xuất mọi thiết bị, đổi mật khẩu.
 
 **Không bao giờ** ghi: mật khẩu (kể cả mật khẩu tạm), token, header `Cookie`/`Set-Cookie`, mã mời đầy đủ, mã thiết lập (chỉ in ra stderr đúng một lần lúc khởi động, §2.4). Mật khẩu tạm chỉ có trong response của `reset-password` (hiện một lần) hoặc trong cửa sổ Terminal của lệnh trên Mac. Log truy cập của uvicorn có method, path và query string; không path hay query nào chứa bí mật (mã mời trong liên kết nằm sau `#`, frontend gửi nó trong body). Không log body của request `/api/auth/*`, kể cả khi lỗi; bộ xử lý 422 hiện chỉ in tên trường và loại lỗi, không in giá trị, giữ nguyên như vậy. "Handle" trong log theo cùng luật với `auth_attempts` (§3.4): chữ không đúng luật handle thì không ghi.

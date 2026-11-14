@@ -106,7 +106,9 @@ def test_trim_leaves_headroom_of_about_one_chunk() -> None:
 
 def test_not_full_history_is_untouched() -> None:
     card, persona, story = make_card(), make_persona(), make_story()
-    hist = grow(10)[-1]
+    # 2026-11-15: khối A có thêm luật an toàn nội dung (~115 token, docs/compliance.md §1), nên 10 lượt không còn vừa
+    # 4096 nữa; 8 lượt vẫn chưa đầy (còn ~600 token trống).
+    hist = grow(8)[-1]
     built = build_prompt(card, persona, story, hist, budget=BUDGET)
     huge = build_prompt(card, persona, story, hist, budget=PromptBudget(num_ctx=10**6))
     assert built.dropped_turns == 0

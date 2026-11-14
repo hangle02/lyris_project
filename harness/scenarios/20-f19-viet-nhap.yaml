@@ -1,0 +1,12 @@
+# F19 — AI viết nháp nhân vật: một dòng ý tưởng -> card nháp đủ trường, tiếng Việt, chưa lưu.
+id: f19-viet-nhap
+title: Viết nháp card từ một dòng ý tưởng
+kind: draft
+note: >-
+  Gọi đúng draft_card như route POST /api/cards/draft (schema JSON, hậu xử lý, chưa lưu). Card nháp phải có tên,
+  vai trò, tính cách, lời mở đầu; tính cách và lời mở đầu bằng tiếng Việt; không có cảnh báo thiếu tên, thiếu lời
+  mở đầu hay thiếu xưng hô; card chưa có id (chưa lưu).
+idea: "Một cô thủ thư trầm tính ở thư viện cũ phố Hàng Bài, Hà Nội, thầm để ý người hay mượn sách thơ vào chiều thứ bảy."
+language: vi
+required_fields: [name, role, personality, greeting]
+forbidden_warnings: ["Model không đặt tên", "Model không viết lời mở đầu", "Chưa có"]

@@ -34,9 +34,9 @@ Từ 640px: menu là popover rộng 300px nổi ngay trên nút "+". Dùng phím
 
 ## Tính năng
 
-- [Menu +](../features/menu-cong.md)
-- [Nhận gợi ý](../features/nhan-goi-y.md)
-- [Gửi hình ảnh](../features/gui-hinh-anh.md) (chưa làm, chỉ có mục "Sắp có")
-- [Dòng thời gian sự kiện](../features/dong-thoi-gian-su-kien.md)
+- [Menu +](../features/F16-menu-cong.md)
+- [Nhận gợi ý](../features/F15-nhan-goi-y.md)
+- [Gửi hình ảnh](../features/F38-gui-hinh-anh.md) (chưa làm, chỉ có mục "Sắp có")
+- [Dòng thời gian sự kiện](../features/F11-dong-thoi-gian-su-kien.md)
 
 Chi tiết: [design-impl.md §15](../../docs/design-impl.md) (Phase 3b).

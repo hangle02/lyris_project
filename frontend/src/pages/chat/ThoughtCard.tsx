@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IconEye } from "../../components/icons";
 import { cx } from "../../components/ui";
 import { spaceAfterHorn } from "../../lib/text";
+import { trackInStory } from "../../lib/track";
 import { useRevealThoughts } from "./revealThoughts";
 
 interface Props {
@@ -66,7 +67,11 @@ export function ThoughtCard({ text, streaming = false, compact = false, classNam
     <button
       type="button"
       aria-pressed={open}
-      onClick={() => setOpen((o) => !o)}
+      onClick={() => {
+        // Usage: a thought was opened (in a story only; never its words).
+        if (!open) trackInStory("thought_revealed");
+        setOpen((o) => !o);
+      }}
       className={cx(shell, "group cursor-pointer")}
     >
       <span className="sr-only">{open ? "Suy nghĩ (chạm để giấu lại): " : "Suy nghĩ đang giấu. "}</span>

@@ -34,6 +34,7 @@ from lyris.auth.net import (
     set_cookie_header,
     token_hash,
 )
+from lyris.compliance import legal
 from lyris.db.repo import HandleTaken, NotFound, Repo, new_uid
 
 logger = logging.getLogger("lyris.auth")
@@ -289,8 +290,15 @@ async def login(request: Request, raw_handle: str, password: str) -> store.AuthR
 
 
 async def setup_owner(
-    request: Request, setup_code: str, password: str, display_name: str | None, handle: str | None
+    request: Request,
+    setup_code: str,
+    password: str,
+    display_name: str | None,
+    handle: str | None,
+    *,
+    terms_version: str | None = None,
 ) -> store.AuthRow:
+    """`terms_version`: phiên bản Điều khoản người dùng vừa đồng ý (docs/compliance.md §3), ghi cùng transaction."""
     repo = _repo(request)
     ip = client_ip(request)
     now = clock.now()
@@ -343,6 +351,8 @@ async def setup_owner(
                 )
             except sqlite3.IntegrityError as exc:
                 raise HandleTaken(final_handle) from exc
+        if terms_version is not None:
+            legal.accept(conn, owner_id, now, terms_version)
         token, expires = _new_session(conn, request, owner_id, now)
         store.mark_login(conn, owner_id, now)
         store.record_attempt(conn, "setup", handle=final_handle, ip=ip, ok=True, now=now, device=device_hash)
@@ -355,8 +365,15 @@ async def setup_owner(
 
 
 async def signup(
-    request: Request, invite_code: str, raw_handle: str, display_name: str, password: str
+    request: Request,
+    invite_code: str,
+    raw_handle: str,
+    display_name: str,
+    password: str,
+    *,
+    terms_version: str | None = None,
 ) -> store.AuthRow:
+    """`terms_version`: phiên bản Điều khoản người dùng vừa đồng ý (docs/compliance.md §3), ghi cùng transaction."""
     repo = _repo(request)
     if setup_needed(repo):
         raise errors.setup_required()
@@ -397,6 +414,8 @@ async def signup(
             raise HandleTaken(handle) from exc  # rollback: mã chưa bị dùng
         store.set_invite_user(conn, invite.id, account_id)
         store.write_password(conn, account_id, hashed, now, temporary=False)
+        if terms_version is not None:
+            legal.accept(conn, account_id, now, terms_version)
         token, expires = _new_session(conn, request, account_id, now)
         store.mark_login(conn, account_id, now)
         store.record_attempt(conn, "signup", handle=handle, ip=ip, ok=True, now=now, device=device_hash)

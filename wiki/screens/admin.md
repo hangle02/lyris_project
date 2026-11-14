@@ -32,6 +32,6 @@ Từ 640px: các hộp thành hộp thoại giữa màn hình.
 
 ## Tính năng
 
-- [Quản lý tài khoản](../features/quan-ly-tai-khoan.md)
+- [Quản lý tài khoản](../features/F30-quan-ly-tai-khoan.md)
 
 Chi tiết: [auth.md](../../docs/auth.md) (mã mời, đặt lại mật khẩu, khoá tài khoản).

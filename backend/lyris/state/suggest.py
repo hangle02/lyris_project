@@ -132,7 +132,8 @@ def _prompt_vi(
     user = "\n\n".join(["\n".join(head), "\n".join(recent), "\n".join(task)])
     system = (
         "Bạn giúp người chơi một story roleplay tương tác nghĩ ra lượt tiếp theo của họ. Viết bằng tiếng Việt, "
-        "đúng giọng và đúng xưng hô của người chơi. Chỉ trả JSON."
+        "đúng giọng và đúng xưng hô của người chơi. Gợi ý luôn an toàn: không tình dục hay gợi dục, không máu me "
+        "tàn bạo, không tự làm hại bản thân. Chỉ trả JSON."
     )
     return [ChatTurn(role="system", content=system), ChatTurn(role="user", content=user)]
 
@@ -178,7 +179,8 @@ def _prompt_en(
     user = "\n\n".join(["\n".join(head), "\n".join(recent), "\n".join(task)])
     system = (
         "You help the player of an interactive roleplay story come up with their next turn. Write in English, "
-        "in the player's own voice. Reply with JSON only."
+        "in the player's own voice. Keep every option safe: nothing sexual or suggestive, no graphic gore, no "
+        "self-harm. Reply with JSON only."
     )
     return [ChatTurn(role="system", content=system), ChatTurn(role="user", content=user)]
 

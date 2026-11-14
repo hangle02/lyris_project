@@ -18,7 +18,7 @@ Action = Literal["reply", "suggest", "draft", "preview"]
 
 # Câu theo loại lỗi (không phụ thuộc việc đang làm).
 _BY_KIND: dict[str, str] = {
-    "connect": "Chưa kết nối được với phần AI chạy trên máy này. Hãy kiểm tra nó đã được mở rồi thử lại.",
+    "connect": "Chưa kết nối được với phần AI của Lyris. Hãy thử lại sau ít phút.",
     "timeout": "Máy đang bận nên phản hồi quá lâu. Hãy thử lại sau ít phút.",
 }
 

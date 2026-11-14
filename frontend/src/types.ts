@@ -515,6 +515,18 @@ export interface AccountOut extends Account {
   card_count: number;
   story_count: number;
   persona_count: number;
+  /** "Chia sẻ dữ liệu sử dụng ẩn danh" turned off (docs/tracking-plan.md). Older servers: missing. */
+  analytics_opt_out?: boolean;
+  /** docs/compliance.md §3: the current Terms / Privacy Policy not accepted yet. */
+  terms_required?: boolean;
+  terms_accepted_at?: string | null;
+  privacy_version?: string | null;
+  legal_version?: string;
+}
+
+/** PATCH /api/account: the account's own settings (only usage sharing for now). */
+export interface AccountPatch {
+  analytics_opt_out?: boolean;
 }
 
 export interface AccountUpdate {
@@ -548,6 +560,8 @@ export interface AuthAccount {
   role: AccountRole;
   must_change_password: boolean;
   profile_completed: boolean;
+  /** docs/compliance.md §3: has not accepted the current Terms / Privacy Policy (asked once). */
+  terms_required?: boolean;
 }
 
 /** GET /api/auth/me (always 200), and the answer of login, signup, setup-owner, change-password. */
@@ -556,6 +570,10 @@ export interface AuthState {
   /** Only with setup_required, on a brand-new machine: the setup page also asks for a name and handle. */
   setup_needs_profile: boolean;
   account: AuthAccount | null;
+  /** Version of the Terms + Privacy Policy now in force (sent back when agreeing). */
+  legal_version?: string;
+  /** The operator's contact (LYRIS_CONTACT: an email or an https address), null when not set. */
+  contact?: string | null;
 }
 
 export interface LoginRequest {
@@ -568,6 +586,9 @@ export interface SignupRequest {
   handle: string;
   display_name: string;
   password: string;
+  /** Required true (docs/compliance.md §3): the box "Tôi đồng ý với Điều khoản…" is ticked. */
+  accept_terms: boolean;
+  terms_version?: string;
 }
 
 export interface SetupOwnerRequest {
@@ -575,6 +596,8 @@ export interface SetupOwnerRequest {
   password: string;
   display_name?: string;
   handle?: string;
+  accept_terms: boolean;
+  terms_version?: string;
 }
 
 export interface ChangePasswordRequest {
@@ -831,4 +854,97 @@ export interface LoreUse {
   title: string;
   slot: "carried" | "fresh";
   tokens: number;
+}
+
+// ---- launch: legal pages, consent, reports, account data, usage numbers (docs/compliance.md) ----
+
+export type LegalDoc = "terms" | "privacy";
+
+/** GET /api/legal/{doc} (no sign-in needed). */
+export interface LegalOut {
+  doc: LegalDoc;
+  version: string;
+  markdown: string;
+}
+
+/** POST /api/account/terms. */
+export interface TermsState {
+  terms_required: boolean;
+  legal_version: string;
+  terms_accepted_at: string | null;
+  privacy_version: string | null;
+}
+
+export type ReportReason = "sexual" | "minor_safety" | "violent" | "hateful" | "self_harm" | "harassment" | "other";
+export type ReportStatus = "open" | "reviewed" | "dismissed";
+/** What a report is about: an AI reply, or a public character's profile. */
+export type ReportTarget = "message" | "character";
+
+/** POST /api/cards/{id}/report body (a public character's profile). */
+export interface CardReportRequest {
+  reason: ReportReason;
+  /** At most 300 characters. */
+  note: string;
+}
+
+/** POST /api/messages/{id}/report body. */
+export interface ReportRequest {
+  reason: ReportReason;
+  /** At most 300 characters. */
+  note: string;
+  /** Send the reply text along for the owner to review (off unless the reporter turns it on). */
+  share_text: boolean;
+}
+
+export interface ReportOut {
+  id: number;
+  reason: ReportReason;
+  shared_text: boolean;
+  status: ReportStatus;
+}
+
+/** GET /api/admin/reports (owner): never who reported, nor the story or message. */
+export interface AdminReport {
+  id: number;
+  target: ReportTarget;
+  created_at: string;
+  updated_at: string;
+  reason: ReportReason;
+  note: string;
+  mode: Mode | null;
+  language: Language | null;
+  model_name: string | null;
+  shared_text: boolean;
+  message_text: string | null;
+  status: ReportStatus;
+  reviewed_at: string | null;
+  public_card_id: number | null;
+  public_card_name: string | null;
+  public_card_creator: string | null;
+}
+
+/** DELETE /api/account. */
+export interface AccountDeleted {
+  deleted: boolean;
+  /** The owner deleted the last account: Lyris is back to its first-run setup. */
+  setup_required: boolean;
+}
+
+/** GET /api/admin/analytics/summary (owner). */
+export interface AnalyticsSummary {
+  since: string;
+  until: string;
+  days: number;
+  total_events: number;
+  counts: { name: string; count: number }[];
+  dau: number;
+  wau: number;
+  mau: number;
+  daily: { date: string; active: number }[];
+  funnel: { step: string; label: string; users: number; converted: number }[];
+  retention: {
+    d1: { cohort: number; retained: number; rate: number | null };
+    d7: { cohort: number; retained: number; rate: number | null };
+  };
+  posthog_enabled: boolean;
 }

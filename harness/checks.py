@@ -311,6 +311,73 @@ def dialogue_problems(
     return problems
 
 
+def _plain_words(text: str) -> list[str]:
+    """Các từ (chữ/số) viết thường, NFC: dùng để so khớp chuỗi từ, bỏ qua dấu câu và emoji."""
+    return [w.casefold() for w in _WORD.findall(_nfc(text))]
+
+
+ECHO_MIN_WORDS = 5
+
+
+def directive_echo(text: str, directive: str | None, min_words: int = ECHO_MIN_WORDS) -> str | None:
+    """Câu trả lời chép lại `min_words` chữ liền nhau của chỉ đạo ẩn: trả cụm bị chép, không thì None."""
+    if not directive:
+        return None
+    source = _plain_words(directive)
+    if len(source) < min_words:
+        phrase = " ".join(source)
+        return phrase if phrase and phrase in " ".join(_plain_words(text)) else None
+    grams = {tuple(source[i : i + min_words]) for i in range(len(source) - min_words + 1)}
+    words = _plain_words(text)
+    for i in range(len(words) - min_words + 1):
+        gram = tuple(words[i : i + min_words])
+        if gram in grams:
+            return " ".join(gram)
+    return None
+
+
+def say_problems(text: str, forbidden: Iterable[str], *, names: Iterable[str] | None = None, dm: bool = False) -> list[str]:
+    """Từ không được nói thành lời: chỉ xét lời thoại (trong ngoặc kép; DM: cả tin nhắn), không xét Thought."""
+    words = [w for w in forbidden if w and w.strip()]
+    if not words:
+        return []
+    full_names = [n for n in (names or []) if n and n.strip()]
+    spoken = "\n".join(remove_phrases(d, full_names) for d in dialogue_parts(text, dm=dm))
+    hits = find_words(spoken, words)
+    return [f"nói thẳng trong lời thoại x{len(hits)} ({_examples(hits)})"] if hits else []
+
+
+def pattern_problems(text: str, patterns: Iterable[str]) -> list[str]:
+    """Regex (không phân biệt hoa thường, NFC) không được khớp ở đâu trong câu trả lời (kể cả Thought)."""
+    body = _nfc(text)
+    out: list[str] = []
+    for pattern in patterns:
+        match = re.search(_nfc(pattern), body, re.I)
+        if match:
+            out.append(f"có câu bị cấm «{match.group(0).strip()}»")
+    return out
+
+
+def phrase_in(text: str, phrase: str) -> bool:
+    """Cụm có trong văn bản không, theo NGUYÊN TỪ (NFC, gộp khoảng trắng): "Chu" không khớp "chuyện", "đàn" không
+    khớp "đàng". Cụm viết thường thì không phân biệt hoa thường; cụm có chữ hoa (tên riêng: "Chu", "Tây Hồ") thì
+    phải đúng chữ hoa, để "chu đáo" không được tính là tên "Chu"."""
+    words = _nfc(phrase).split()
+    if not words:
+        return False
+    flags = 0 if any(ch.isupper() for ch in "".join(words)) else re.I
+    pattern = r"(?<!\w)" + r"\s+".join(map(re.escape, words)) + r"(?!\w)"
+    return re.search(pattern, _nfc(text), flags) is not None
+
+
+def required_any_problems(text: str, phrases: Iterable[str]) -> list[str]:
+    """Câu trả lời (kể cả Thought) phải có ít nhất một cụm trong `phrases` (nguyên từ, xem `phrase_in`)."""
+    wanted = [p for p in phrases if p and p.strip()]
+    if wanted and not any(phrase_in(text, p) for p in wanted):
+        return [f"không có chi tiết nào trong [{', '.join(wanted)}]"]
+    return []
+
+
 def run_checks(
     text: str,
     rules: dict[str, Any],
@@ -318,6 +385,7 @@ def run_checks(
     persona_name: str | None = None,
     names: Iterable[str] | None = None,
     dm: bool = False,
+    directive: str | None = None,
 ) -> list[str]:
     """Mọi lỗi máy của một câu trả lời theo `checks` của kịch bản (rỗng = không lỗi).
 
@@ -333,8 +401,13 @@ def run_checks(
       language                            "vi" | "en": xem language_problems (bỏ tên trong `names`)
       dialogue_forbidden                  list từ không được có trong lời thoại và Thought
       dialogue_required_any               list từ; có lời thoại thì phải dùng ít nhất một từ
+      directive_echo                      báo lỗi khi chép lại ECHO_MIN_WORDS chữ liền nhau của `directive`
+      say_forbidden                       list từ không được nói ra trong lời thoại (Thought thì được)
+      forbidden_patterns                  list regex không được khớp ở đâu (kể cả Thought)
+      required_any                        list cụm; câu trả lời (kể cả Thought) phải có ít nhất một cụm
     `names`: tên riêng (nhân vật, persona, tên thân mật) bỏ qua khi xét ngôn ngữ và xưng hô.
     `dm`: DM Mode, cả tin nhắn được coi là lời thoại.
+    `directive`: chỉ đạo ẩn ((...)) của lượt người chơi (cho `directive_echo`).
     Luôn kiểm tra thêm câu trả lời rỗng và Thought chưa đóng.
     """
     if not text.strip():
@@ -383,4 +456,11 @@ def run_checks(
             dm=dm,
         )
     )
+    if rules.get("directive_echo"):
+        echoed = directive_echo(text, directive)
+        if echoed:
+            problems.append(f"chép lại chỉ đạo «{echoed}»")
+    problems.extend(say_problems(text, rules.get("say_forbidden") or [], names=names, dm=dm))
+    problems.extend(pattern_problems(text, rules.get("forbidden_patterns") or []))
+    problems.extend(required_any_problems(text, rules.get("required_any") or []))
     return problems

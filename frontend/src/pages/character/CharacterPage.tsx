@@ -2,11 +2,15 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react"
 import type { KeyboardEvent } from "react";
 import { ApiError, api, errorMessage, errorTechnical } from "../../api/client";
 import { CharacterPicture } from "../../components/CharacterPicture";
-import { IconEdit } from "../../components/icons";
+import { IconEdit, IconFlag } from "../../components/icons";
 import { SubpageHeader } from "../../components/shell/SubpageHeader";
-import { Button, Chip, EmptyState, InlineAlert, Meter, Skeleton } from "../../components/ui";
+import { Button, Chip, EmptyState, InlineAlert, Meter, Skeleton, Toast } from "../../components/ui";
+import { REPORT_CARD_LABEL, REPORT_DONE } from "../../lib/compliance";
+import { ReportSheet } from "../chat/ReportSheet";
 import { cx } from "../../components/ui/logic";
 import { characterRoute, navigate, replaceRoute, routeHref, templateRoute } from "../../lib/router";
+import { previousRouteName, profileFrom, track } from "../../lib/track";
+import type { CardSource } from "../../lib/track";
 import type { CharacterTarget } from "../../lib/router";
 import { signatureLinesFor } from "../../lib/signatureLines";
 import { formatActivity } from "../../lib/storyOptions";
@@ -344,6 +348,10 @@ export function CharacterPage({ target, start }: Props) {
   const sheetOpenRef = useRef(start);
   sheetOpenRef.current = sheetOpen;
   const [tab, setTab] = useState<TabKey>("intro");
+  // "Báo cáo nhân vật" (someone else's public character, or the original of a story's copy).
+  const [reporting, setReporting] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const hideToast = useCallback(() => setToast(null), []);
   const idBase = useId();
   /** Card id once a template got installed from the sheet. */
   const installedId = useRef<number | null>(null);
@@ -422,6 +430,19 @@ export function CharacterPage({ target, start }: Props) {
     if (name) document.title = `${name} · Lyris`;
   }, [name]);
 
+  // Usage: which kind of character (own, Lyris template, someone's public one) and from which screen.
+  const source: CardSource | null = profile ? (profile.shared ? "public" : profile.isTemplate ? "template" : "own") : null;
+  const viewed = useRef(false);
+  useEffect(() => {
+    if (source === null || viewed.current) return;
+    viewed.current = true;
+    track("character_profile_viewed", { source, from: profileFrom(previousRouteName()) });
+  }, [source]);
+  const openStart = () => {
+    if (source !== null) track("story_start_clicked", { source });
+    setSheetOpen(true);
+  };
+
   const ensureCardId = useCallback(async () => {
     if (!profile) throw new Error("Nhân vật chưa tải xong.");
     if (profile.cardId !== null) return profile.cardId;
@@ -442,6 +463,8 @@ export function CharacterPage({ target, start }: Props) {
   // A story's copy (opened from the chat) cannot start another story; everything else can.
   const canStart = profile !== null && (profile.shared?.canStart ?? true);
   const lang = profile?.card.language === "en" ? "en" : "vi";
+  // User-made content shown to others can be reported from its profile (not your own, not Lyris templates).
+  const reportable = profile !== null && profile.cardId !== null && profile.shared !== null;
 
   const openStory = (story: StoryOut) => {
     setSheetOpen(false);
@@ -511,7 +534,7 @@ export function CharacterPage({ target, start }: Props) {
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <div className="hidden flex-wrap items-center gap-3 md:flex">
                 {canStart && (
-                  <Button variant="primary" onClick={() => setSheetOpen(true)}>
+                  <Button variant="primary" onClick={openStart}>
                     {ENTER_LABEL}
                   </Button>
                 )}
@@ -529,6 +552,17 @@ export function CharacterPage({ target, start }: Props) {
                   <IconEdit aria-hidden="true" className="text-[16px]" />
                   Sửa nhân vật
                 </a>
+              )}
+              {reportable && (
+                <button
+                  type="button"
+                  onClick={() => setReporting(true)}
+                  aria-haspopup="dialog"
+                  className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 text-[14px] font-medium text-muted transition-colors duration-150 hover:bg-surface-2 hover:text-fg max-md:-ml-3 md:h-11"
+                >
+                  <IconFlag aria-hidden="true" className="text-[16px]" />
+                  {REPORT_CARD_LABEL}
+                </button>
               )}
             </div>
           </div>
@@ -594,13 +628,26 @@ export function CharacterPage({ target, start }: Props) {
               </Button>
             )}
             {canStart && (
-              <Button variant="primary" block onClick={() => setSheetOpen(true)} className="min-w-0 flex-1">
+              <Button variant="primary" block onClick={openStart} className="min-w-0 flex-1">
                 {ENTER_LABEL}
               </Button>
             )}
           </div>
         </div>
       )}
+
+      {reportable && (
+        <ReportSheet
+          cardId={reporting ? (profile?.cardId ?? null) : null}
+          characterName={name}
+          onClose={() => setReporting(false)}
+          onDone={() => {
+            setReporting(false);
+            setToast(REPORT_DONE);
+          }}
+        />
+      )}
+      <Toast text={toast} onDone={hideToast} />
 
       {profile && canStart && (
         <StartStorySheet

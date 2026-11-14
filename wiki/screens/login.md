@@ -31,6 +31,6 @@ Từ 640px: cột vẫn rộng tối đa 400px, nằm giữa màn hình.
 
 ## Tính năng
 
-- [Đăng nhập](../features/dang-nhap.md)
+- [Đăng nhập](../features/F29-dang-nhap.md)
 
 Chi tiết: [auth.md §7.3 và §7.4](../../docs/auth.md).

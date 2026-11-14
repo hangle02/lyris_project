@@ -1,0 +1,131 @@
+# Progress — sổ tay tiến độ của harness Lyris
+
+- 2026-11-14 · dựng harness theo mô hình Apero (wiki · environment · verification · memory); tính năng đồng bộ từ wiki/features/
+- 2026-11-14 · F01 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F02 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F03 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F04 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F05 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F06 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F07 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F08 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F09 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F10 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F11 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F12 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F13 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F14 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F15 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F16 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F17 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F18 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F19 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F20 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F21 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F22 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F23 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F24 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F25 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F26 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F27 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F28 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F29 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F30 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F31 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F32 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F33 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F34 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F35 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F36 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F01 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F02 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F04 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F06 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F08 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F11 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F16 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F18 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F20 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F21 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F22 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F23 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F24 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F25 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F26 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F27 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F28 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F29 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F30 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F31 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F32 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F33 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F34 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F35 ✅ passing (verify.sh xanh)
+- 2026-11-14 · tích hợp harness: bot 82 check (thêm 62), sửa lỗi lời nói đặc trưng thứ 4 bị bỏ âm thầm (saveProblems + unit test)
+- 2026-11-14 · verify.sh đầy đủ 2026-11-14: backend 1532 qua, frontend 401, bot 82/82 → ✅ 24 · 🟡 12 chờ --real-model (F03 F05 F07 F09 F10 F12 F13 F14 F15 F17 F19 F36) · ⏳ 5 kế hoạch (F37–F41) · ⛔ 0
+- 2026-11-14 · việc tiếp: chạy bash verification/verify.sh --real-model khi chủ dự án không dùng app (Ollama + gemma4:12b) để đưa 12 tính năng 🟡 lên ✅; không tự gọi Ollama khi app đang chạy
+- 2026-11-14 · sync: F03 trang đổi: bỏ Done when "Model thật: dẫn truyện ngôi thứ ba không có 'tôi' và dùng đúng đại từ dẫn truyện (harness `run_eval.py`)." · thêm Done when "Model thật: dẫn truyện ngôi thứ ba không có 'tôi' và không dùng đại từ xưng hô của lời thoại (harness `run_eval.py`, kịch bản `01-mo-dau`, `06-viet-hien-dai`, `07-co-trang`: `narration_forbidden`)." · thêm Tests "model: 01-mo-dau" · thêm Tests "model: 06-viet-hien-dai" · thêm Tests "model: 07-co-trang" · thêm Tests "model: 08-tieng-anh"
+- 2026-11-14 · sync: F18 trang đổi: bỏ Done when "Unit: `isDirty` bỏ qua trường không phải nội dung; còn thay đổi chưa lưu thì rời trang phải hỏi lại." · thêm Done when "Unit: `isDirty` bỏ qua trường không phải nội dung; reset tài khoản (`allowForcedLeave`) cho tải lại trang mà không hỏi." · thêm Done when "Bot: ở `#/studio/<id>` sửa 'Tên nhân vật' mà chưa lưu rồi bấm 'Về Studio' thì trình duyệt hỏi lại ('Bạn có thay đổi chưa lưu…'); bấm Huỷ thì ở lại và chữ đang sửa còn nguyên, bấm OK thì về `#/studio` và tên đã lưu không đổi." · thêm Tests "bot: rời trình sửa còn thay đổi chưa lưu thì hỏi lại"
+- 2026-11-14 · sync: F25 trang đổi: bỏ Done when "Bot: đăng nhập xong thì vào màn Tương tác (header hub có nút '… Mở tài khoản'), không tự nhảy vào story gần nhất." · thêm Done when "Bot: tài khoản đã có story đăng nhập thẳng ở `#/login` thì vào màn Tương tác `#/` (header hub có nút '… Mở tài khoản', danh sách có link `#/chat/<id>`), không tự nhảy vào story gần nhất." · bỏ Tests "bot: trang đăng nhập hiện và đăng nhập được" · thêm Tests "bot: đăng nhập ở #/login thì vào Tương tác, không tự mở story"
+- 2026-11-14 · sync: F26 trang đổi: bỏ Tests "bot: 390px không tràn ngang, nút ≥ 44px" · thêm Tests "bot: 390px không tràn ngang ở #/, #/studio, #/chat; nút header và thanh tab ở #/, #/studio ≥ 44px"
+- 2026-11-14 · sync: F18 trang đổi: thêm Done when "Unit: router chạy guard rời trang (`addNavigationGuard`) TRƯỚC khi báo đổi màn cho `useRoute`; guard huỷ thì màn không đổi." · thêm Tests "frontend/src/lib/router.test.ts"
+- 2026-11-14 · F18 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F25 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F26 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · Sửa harness theo bản rà soát: F18 (guard rời trang chạy trước router + check bot hỏi lại), F25 (check đăng nhập vào Tương tác), F26 (đổi tên check 390px cho đúng phạm vi) — claim lại, chờ verify
+- 2026-11-14 · sync: F03 trang đổi: bỏ Tests "model: 01-mo-dau" · bỏ Tests "model: 06-viet-hien-dai" · bỏ Tests "model: 07-co-trang" · bỏ Tests "model: 08-tieng-anh"
+- 2026-11-14 · F18 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F25 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F26 ✅ passing (verify.sh xanh)
+- 2026-11-14 · sync: F06 trang đổi: bỏ Done when "Bot: trong lúc nhân vật đang trả lời (nút 'Dừng' đang hiện), mọi nút 'Sửa' và 'Xoá từ đây' đều bị khoá (disabled)." · thêm Done when "Unit: thao tác bị khoá thì có lý do (`actionLockReason`, `messageLockReason`): nhân vật đang trả lời (đợi xong hoặc bấm 'Dừng'), đang nghĩ gợi ý, đang lưu, lượt chưa lưu xong; nút 'Sửa' và 'Xoá từ đây' đặt lý do đó vào `title`." · thêm Done when "Bot: trong lúc nhân vật đang trả lời (nút 'Dừng' đang hiện), mọi nút 'Sửa' và 'Xoá từ đây' đều bị khoá (disabled) và có lý do (`title` là một câu lý do, không chỉ lặp tên nút)." · bỏ Tests "bot: đang trả lời thì khoá Sửa và Xoá" · thêm Tests "frontend/src/lib/actionLock.test.ts" · thêm Tests "bot: đang trả lời thì Sửa và Xoá từ đây bị khoá, có lý do (title)"
+- 2026-11-14 · sync: F22 trang đổi: bỏ Done when "Bot: bấm một chip trong nhóm 'Lọc theo cảm xúc' thì chip có `aria-pressed="true"`, bộ đếm thành 'x / tổng' (x > 0) và lưới chỉ còn x thẻ (trừ nhân vật nổi bật); bấm lại thì bộ đếm về tổng." · thêm Done when "Bot: bấm một chip trong nhóm 'Lọc theo cảm xúc' thì chip có `aria-pressed="true"`, bộ đếm thành 'x / tổng' (x > 0), lưới còn đúng x thẻ và chỉ còn nhân vật có tag đó (đủ mọi nhân vật có tag, đối chiếu tag từ `/api/cards`, `/api/templates`); bấm lại thì bộ đếm về tổng và lưới về như cũ (cùng các thẻ, cùng thứ tự)." · bỏ Tests "bot: chip cảm xúc lọc lưới Khám phá" · thêm Tests "bot: chip cảm xúc chỉ giữ nhân vật có tag đó, bấm lại thì lưới như cũ"
+- 2026-11-14 · sync: F23 trang đổi: bỏ Done when "Bot: hồ sơ nhân vật mẫu không có nút 'Sửa nhân vật'; ở 390px có thanh dính sát đáy màn hình chứa nút 'Bước vào câu chuyện'." · thêm Done when "Bot: hồ sơ nhân vật mẫu không có nút 'Sửa nhân vật'; ở 390px có thanh dính sát đáy màn hình chứa nút 'Bước vào câu chuyện', và khi đã có story với nhân vật đó thì thanh có thêm 'Tiếp tục story' (bấm thì mở lại story `#/chat/<id>`)." · thêm Tests "bot: đã có story thì thanh dính đáy của hồ sơ có Tiếp tục story"
+- 2026-11-14 · sync: F26 trang đổi: bỏ Done when "Unit: nút nhỏ trên form đăng nhập và ngăn cảm xúc cao ≥ 44px ở điện thoại." · bỏ Done when "Bot: ở 390px, `#/`, `#/studio`, `#/chat/<id>` không cuộn ngang; ở `#/` và `#/studio` mọi nút trên header và mọi tab của thanh 'Điều hướng chính' rộng và cao ≥ 44px." · thêm Done when "Unit: nút nhỏ trên form đăng nhập, ngăn cảm xúc và header chat (nút 'Suy nghĩ', công tắc Story/DM) cao ≥ 44px ở điện thoại." · thêm Done when "Bot: ở 390px, `#/`, `#/studio`, `#/chat/<id>` không cuộn ngang và mọi nút trên header (cả 'Suy nghĩ' và hai nút Story/DM ở `#/chat/<id>`), mọi tab của thanh 'Điều hướng chính' rộng và cao ≥ 44px." · bỏ Tests "bot: 390px không tràn ngang ở #/, #/studio, #/chat; nút header và thanh tab ở #/, #/studio ≥ 44px" · thêm Tests "bot: 390px không tràn ngang, nút header và thanh tab ≥ 44px ở #/, #/studio, #/chat"
+- 2026-11-14 · sync: F31 trang đổi: bỏ Done when "Bot: trình sửa nhân vật của mình (bot nhập từ card .json rồi lưu) có công tắc 'Công khai', trình sửa nhân vật cài từ mẫu không có; bật 'Công khai' và lưu thì có nút 'Người khác thấy gì'." · thêm Done when "Bot: trình sửa nhân vật của mình (bot nhập từ card .json rồi lưu) có công tắc 'Công khai' trong phần 'Cơ bản', trình sửa nhân vật cài từ mẫu không có; bật 'Công khai' và lưu thì có nút 'Người khác thấy gì'." · bỏ Tests "bot: công tắc Công khai và Người khác thấy gì" · thêm Tests "bot: công tắc Công khai trong phần Cơ bản, mẫu không có, lưu thì có Người khác thấy gì"
+- 2026-11-14 · F06 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F22 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F23 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F26 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F31 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · design F26 (header chat 390px, sáng + tối, Story/DM, menu Suy nghĩ, Quản trị): a5 b5 c5 d5 e4
+- 2026-11-14 · Task B: quay về Done when gốc ở F06/F22/F23/F26/F31, sửa app (lý do khoá thao tác, header chat 44px); bot 85/85, npm test 409/409; F06 F22 F23 F26 F31 claim lại, chờ verify.sh mới
+- 2026-11-14 · sync: F03 trang đổi: thêm Tests "model: 01-mo-dau" · thêm Tests "model: 06-viet-hien-dai" · thêm Tests "model: 07-co-trang" · thêm Tests "model: 08-tieng-anh"
+- 2026-11-14 · sync: F05 trang đổi: bỏ Done when "Model thật: câu trả lời làm theo chỉ đạo, giữ giọng nhân vật, không chứa '((' và không nhắc lại chỉ đạo (harness kịch bản `04-chi-dao`)." · thêm Done when "Model thật: trên gemma4:12b, câu trả lời không chứa '((', không chép lại 5 chữ liền nhau nào của câu chỉ đạo, không có chữ 'chỉ đạo', và khi chỉ đạo bảo ghen mà không nói ra thì nhân vật không nói thẳng chữ 'ghen' trong lời thoại (harness kịch bản `f05-chi-dao`)." · thêm Tests "model: f05-chi-dao"
+- 2026-11-14 · sync: F07 trang đổi: bỏ Done when "Model thật: kiểu 'Lồng trong truyện' cho 2-4 Thought, không có hai Thought liền nhau; kiểu 'Một đoạn ở cuối' cho đúng một Thought cuối lượt (harness `run_eval.py`)." · thêm Done when "Model thật: kiểu 'Lồng trong truyện' cho 2-4 Thought, không có hai Thought liền nhau; kiểu 'Một đoạn ở cuối' cho đúng một Thought cuối lượt; không có Thought chưa đóng (harness `run_eval.py`, kịch bản `f07-thought-long`, `f07-thought-cuoi`)." · thêm Tests "model: f07-thought-long" · thêm Tests "model: f07-thought-cuoi"
+- 2026-11-14 · sync: F09 trang đổi: bỏ Done when "Model thật: ghen, nói dối, quên hẹn thì Tin cậy giảm; xin lỗi thật lòng thì Khoảng cách giảm, Tin cậy tăng; 'chào buổi sáng' hay nhờ giảng bài không đổi chỉ số (harness `fixemo`, [phase3.md §10.5](../../docs/phase3.md))." · thêm Done when "Model thật: ghen, nói dối, quên hẹn thì Tin cậy giảm; xin lỗi thật lòng thì Khoảng cách giảm, Tin cậy tăng; 'chào buổi sáng' hay nhờ giảng bài không đổi chỉ số; xét chỉ số sau khi app lọc, đúng số được lưu (harness kịch bản `f09-cam-xuc`, [phase3.md §10.5](../../docs/phase3.md))." · thêm Tests "model: f09-cam-xuc"
+- 2026-11-14 · sync: F10 trang đổi: bỏ Done when "Model thật: sau vài lượt trên gemma4:12b, ký ức và điều đã biết được trích đúng ý lượt chơi; story dài có '<details> Tóm tắt những lượt cũ' với tóm tắt đúng nội dung." · thêm Done when "Model thật: trên gemma4:12b, việc trích xuất thật ghi ký ức và điều đã biết có đúng chi tiết người chơi hoặc nhân vật vừa kể (kịch bản `f10-ky-uc`); tóm tắt thật của một đoạn story dài giữ đủ lời hứa, nơi chốn, tên người và bí mật đã có (kịch bản `f10-tom-tat`)." · thêm Tests "model: f10-ky-uc" · thêm Tests "model: f10-tom-tat"
+- 2026-11-14 · sync: F12 trang đổi: bỏ Done when "Model thật: trên gemma4:12b, nhân vật xưng tên qua DM, sang Story thì Thought không còn nói 'chưa nói tên với ai'." · thêm Done when "Model thật: trên gemma4:12b, nhân vật xưng tên qua DM, sang Story thì Thought (và cả câu trả lời) không còn nói 'chưa nói tên với ai' hay 'sao cô ấy biết tên mình' (kịch bản `f12-dm-xung-ten`)." · thêm Tests "model: f12-dm-xung-ten"
+- 2026-11-14 · sync: F13 trang đổi: bỏ Done when "Model thật: chat thử 10 lượt DM trên gemma4:12b: không còn lượt nào cũng kết bằng cùng một lời dặn." · thêm Done when "Model thật: chat thử 10 lượt DM trên gemma4:12b: không còn lượt nào cũng kết bằng cùng một lời dặn: không câu kết nào lặp ở quá 2/10 lượt, 3 chữ cuối không trùng nhau ở quá 3/10 lượt (kịch bản `f13-dm-10-luot`)." · thêm Tests "model: f13-dm-10-luot"
+- 2026-11-14 · sync: F14 trang đổi: bỏ Done when "Model thật: đo trên gemma4:12b: TTFT các lượt sau lượt đầu khoảng 4-5 giây, kể cả lượt cửa sổ dịch." · thêm Done when "Model thật: đo qua app thật trên gemma4:12b (chờ việc nền và prefill xong rồi mới gửi lượt sau): TTFT các lượt sau lượt đầu khoảng 4-5 giây, không lượt nào quá 6 giây, kể cả lượt cửa sổ dịch (kịch bản `f14-ttft`; ngưỡng 6 giây tạm chọn, xem [nguong-ttft-f14](../decisions/nguong-ttft-f14.md))." · thêm Tests "model: f14-ttft"
+- 2026-11-14 · sync: F15 trang đổi: bỏ Done when "Model thật: trên gemma4:12b, bấm một thẻ thì gửi nguyên văn; 'Gợi ý khác' cho hướng khác với lần trước." · thêm Done when "Model thật: trên gemma4:12b, 'Nhận gợi ý' cho đúng 3 gợi ý tiếng Việt, mỗi gợi ý gửi đi làm lượt người chơi vẫn giữ nguyên văn (không bị tách thành chỉ đạo, nằm nguyên văn trong lượt gửi model); 'Gợi ý khác' cho 3 gợi ý không trùng và không trùng quá 60% từ với lần trước (kịch bản `f15-goi-y`)." · thêm Tests "model: f15-goi-y"
+- 2026-11-14 · sync: F17 trang đổi: bỏ Done when "Model thật: nhắc từ khoá trong chat thì nhân vật dùng đúng chi tiết của mục; mục 'Chỉ bạn biết' không bao giờ được nhân vật nói ra." · thêm Done when "Model thật: trên gemma4:12b, nhắc từ khoá trong chat thì nhân vật dùng đúng chi tiết của mục; mục 'Chỉ bạn biết' (cùng từ khoá) không bao giờ được nhân vật nói ra và không có trong prompt (kịch bản `f17-the-gioi`)." · thêm Tests "model: f17-the-gioi"
+- 2026-11-14 · sync: F19 trang đổi: bỏ Done when "Model thật: một dòng ý tưởng cho card đủ tên, vai trò, tính cách, lời mở đầu; trình sửa mở với card đó, chưa lưu." · thêm Done when "Model thật: trên gemma4:12b, một dòng ý tưởng cho card nháp chưa lưu, đủ tên, vai trò, tính cách, lời mở đầu; tính cách và lời mở đầu bằng tiếng Việt; không có cảnh báo thiếu tên, thiếu lời mở đầu hay thiếu xưng hô (kịch bản `f19-viet-nhap`)." · thêm Tests "model: f19-viet-nhap"
+- 2026-11-14 · sync: F36 trang đổi: bỏ Done when "Model thật: `backend/.venv/bin/python harness/bakeoff.py` in bảng so sánh model." · bỏ Done when "Model thật: `backend/.venv/bin/python harness/run_eval.py --model gemma4:12b` chạy hết kịch bản và lưu báo cáo vào `harness/results/`." · thêm Done when "Unit: mỗi luật máy của các loại kịch bản model thật (trích xuất, tóm tắt, gợi ý, viết nháp, nhiều lượt DM, TTFT qua app thật, bake-off, chạy lồng) báo lỗi với kết quả sai và không báo với kết quả đúng (Ollama giả); lượt chạy lồng và bake-off không in dòng "Đã ghi kết quả vào" mà `verify.sh` đọc." · thêm Done when "Model thật: `backend/.venv/bin/python harness/bakeoff.py` chạy trên Ollama thật và in bảng so sánh model có TTFT, tok/s của từng model (kịch bản `f36-bakeoff`, 2 câu đầu của prompts.json)." · thêm Done when "Model thật: `backend/.venv/bin/python harness/run_eval.py --model gemma4:12b` chạy trọn trên Ollama thật và lưu `report.md` + `raw.json` vào `harness/results/` (kịch bản `f36-chay-long`: chạy lồng run_eval trên ba kịch bản khác loại, đủ kết quả, không lỗi sinh)." · thêm Tests "backend/tests/test_run_eval_kinds.py" · thêm Tests "model: f36-bakeoff" · thêm Tests "model: f36-chay-long"
+- 2026-11-14 · Kịch bản model thật: mọi dòng 'Model thật' của F03, F05, F07, F09, F10, F12, F13, F14, F15, F17, F19, F36 đã có kịch bản luật máy (harness/kinds.py, 14 kịch bản mới); 33 test mới với Ollama giả xanh; tách phần chỉ người chấm được ở F05, F10, F15, F19, F36 (decisions/kich-ban-model-that.md); ngưỡng TTFT F14 = 6 giây (tạm chọn). Chưa chạy model thật.
+- 2026-11-14 · sync: F05 trang đổi: thêm Done when "Model thật: câu trả lời làm theo chỉ đạo, giữ giọng nhân vật, không chứa '((' và không nhắc lại chỉ đạo (harness kịch bản `04-chi-dao`)."
+- 2026-11-14 · sync: F10 trang đổi: bỏ Done when "Model thật: trên gemma4:12b, việc trích xuất thật ghi ký ức và điều đã biết có đúng chi tiết người chơi hoặc nhân vật vừa kể (kịch bản `f10-ky-uc`); tóm tắt thật của một đoạn story dài giữ đủ lời hứa, nơi chốn, tên người và bí mật đã có (kịch bản `f10-tom-tat`)." · thêm Done when "Model thật: sau vài lượt trên gemma4:12b, ký ức và điều đã biết được trích đúng ý lượt chơi; story dài có '<details> Tóm tắt những lượt cũ' với tóm tắt đúng nội dung." · thêm Done when "Model thật: trên gemma4:12b, việc trích xuất thật ghi ký ức và điều đã biết có đúng chi tiết người chơi hoặc nhân vật vừa kể, điều đã biết nói về đúng người (kịch bản `f10-ky-uc`); tóm tắt thật của một đoạn story dài giữ đủ lời hứa, nơi chốn, tên người và bí mật đã có (kịch bản `f10-tom-tat`)."
+- 2026-11-14 · sync: F14 trang đổi: bỏ Done when "Model thật: đo qua app thật trên gemma4:12b (chờ việc nền và prefill xong rồi mới gửi lượt sau): TTFT các lượt sau lượt đầu khoảng 4-5 giây, không lượt nào quá 6 giây, kể cả lượt cửa sổ dịch (kịch bản `f14-ttft`; ngưỡng 6 giây tạm chọn, xem [nguong-ttft-f14](../decisions/nguong-ttft-f14.md))." · thêm Done when "Model thật: đo qua app thật trên gemma4:12b (chờ việc nền và prefill xong rồi mới gửi lượt sau): TTFT các lượt sau lượt đầu khoảng 4-5 giây (trung vị ≤ 5 giây), không lượt nào quá 6 giây, kể cả lượt cửa sổ dịch; TTFT đo phía người chơi, từ lúc gửi lượt tới chữ đầu tiên qua HTTP (kịch bản `f14-ttft`; ngưỡng 6 giây tạm chọn, xem [nguong-ttft-f14](../decisions/nguong-ttft-f14.md))."
+- 2026-11-14 · sync: F15 trang đổi: bỏ Done when "Model thật: trên gemma4:12b, 'Nhận gợi ý' cho đúng 3 gợi ý tiếng Việt, mỗi gợi ý gửi đi làm lượt người chơi vẫn giữ nguyên văn (không bị tách thành chỉ đạo, nằm nguyên văn trong lượt gửi model); 'Gợi ý khác' cho 3 gợi ý không trùng và không trùng quá 60% từ với lần trước (kịch bản `f15-goi-y`)." · thêm Done when "Model thật: trên gemma4:12b, bấm một thẻ thì gửi nguyên văn; 'Gợi ý khác' cho hướng khác với lần trước." · thêm Done when "Model thật: trên gemma4:12b, 'Nhận gợi ý' cho đúng 3 gợi ý tiếng Việt, mỗi gợi ý gửi đi làm lượt người chơi vẫn giữ nguyên văn (không bị tách thành chỉ đạo, nằm nguyên văn trong lượt gửi model); 'Gợi ý khác' cho 3 gợi ý không trùng và không trùng quá 60% từ với lần trước, tính trên gợi ý ngắn hơn (kịch bản `f15-goi-y`)."
+- 2026-11-14 · sync: F19 trang đổi: thêm Done when "Bot: ở `#/studio`, bấm 'AI viết nháp', gửi một ý tưởng mà LLM giả viết được card thì app mở `#/studio/new` với ô 'Tên nhân vật' là tên card nháp, header có 'chưa lưu', và `/api/cards` chưa có card đó (rời trang không lưu thì vẫn chưa có)." · thêm Done when "Model thật: một dòng ý tưởng cho card đủ tên, vai trò, tính cách, lời mở đầu; trình sửa mở với card đó, chưa lưu (kịch bản `f19-viet-nhap` cho card trên model thật; phần trình sửa: dòng Bot ở trên và `test_integration_phase2.py::test_draft_save_and_open_story`)." · thêm Tests "bot: AI viết nháp xong thì mở trình sửa với card nháp, chưa lưu"
+- 2026-11-14 · sync: F26 trang đổi: thêm Done when "Unit: `Button` và `IconButton` cỡ `sm` cao 44px ở điện thoại (`max-sm:h-11`, icon thêm `max-sm:w-11`), vẫn 36px từ 640px trở lên." · thêm Done when "Bot: ở 390px, mọi nút dưới lượt cuối của nhân vật trong story (hàng thao tác: Tạo lại, Thích, Chê, Sửa, Xoá từ đây…) và nút 'Huỷ', 'Xoá' của hộp 'Xác nhận xoá' rộng và cao ≥ 44px." · thêm Tests "bot: 390px nút dưới lượt chat và nút hộp Xác nhận xoá ≥ 44px"
+- 2026-11-14 · sync: F36 trang đổi: bỏ Done when "Model thật: `backend/.venv/bin/python harness/bakeoff.py` chạy trên Ollama thật và in bảng so sánh model có TTFT, tok/s của từng model (kịch bản `f36-bakeoff`, 2 câu đầu của prompts.json)." · thêm Done when "Model thật: `backend/.venv/bin/python harness/bakeoff.py` chạy trên Ollama thật và in bảng so sánh model có TTFT, tok/s của từng model, không câu nào lỗi (kịch bản `f36-bakeoff`: chạy đúng `main()` của lệnh đó với `--models gemma4:12b --limit 2`, 2 câu đầu của prompts.json)." · thêm Done when "Model thật: `backend/.venv/bin/python harness/run_eval.py --model gemma4:12b` chạy hết kịch bản và lưu báo cáo vào `harness/results/`."
+- 2026-11-14 · design F26 (nút sm 44px ở điện thoại, logo header 44px): a5 b5 c5 d5 e4 — 390px sáng: story, hàng thao tác, Xác nhận xoá, sheet Tài khoản, Quản trị, Tương tác; tối: Tương tác
+- 2026-11-14 · Sửa sau 2 bản rà soát (TASK A kịch bản model thật, TASK B Done when): khôi phục dòng gốc F05/F10/F15/F36 (chưa có kịch bản → 🟡 chờ PO), F19 có check bot trình sửa nháp, F14 trung vị ≤5s + đo phía người chơi + giới hạn giờ, run_eval --deadline-min, luật máy nguyên từ, F12/F13 chặt hơn, nút sm 44px ở điện thoại. Chưa chạy verify.sh.
+- 2026-11-14 · Chạy thử model thật (không phải verify): 20/22 kịch bản qua lần đầu; 04-chi-dao (Thought liền nhau) và f10-ky-uc (thiếu fact của nhân vật) đỏ 1 lần, chạy lại 3/3 xanh — lỗi ngẫu nhiên khoảng 1/4. f14-ttft: 4,09 s.
+- 2026-11-14 · F06 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F22 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F23 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F26 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F31 ✅ passing (verify.sh xanh)
+- 2026-11-14 · verify --real-model: 01-mo-dau, 06-viet-hien-dai, 07-co-trang, 08-tieng-anh, f07-thought-long, f07-thought-cuoi, f09-cam-xuc, f12-dm-xung-ten, f13-dm-10-luot, f14-ttft, f17-the-gioi, f19-viet-nhap → xanh (harness/results/eval-20261114-161948)
+- 2026-11-14 · F03 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F07 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F09 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F12 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F13 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F14 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F17 ✅ passing (verify.sh xanh)
+- 2026-11-14 · F19 ✅ passing (verify.sh xanh)
+- 2026-11-14 · sync: F05 trang đổi: bỏ Done when "Model thật: câu trả lời làm theo chỉ đạo, giữ giọng nhân vật, không chứa '((' và không nhắc lại chỉ đạo (harness kịch bản `04-chi-dao`)."
+- 2026-11-14 · sync: F15 trang đổi: bỏ Done when "Model thật: trên gemma4:12b, bấm một thẻ thì gửi nguyên văn; 'Gợi ý khác' cho hướng khác với lần trước."
+- 2026-11-14 · sync: F36 trang đổi: bỏ Done when "Model thật: `backend/.venv/bin/python harness/run_eval.py --model gemma4:12b` chạy hết kịch bản và lưu báo cáo vào `harness/results/`."

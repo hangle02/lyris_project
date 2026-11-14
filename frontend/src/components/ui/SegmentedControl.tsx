@@ -15,15 +15,18 @@ export interface SegmentedControlProps<T extends string> {
   onChange: (value: T) => void;
   /** Accessible name of the group (e.g. "Kiểu hiển thị"). */
   label: string;
-  /** md = 36px segments (default), sm = 28px (inside a 56px header). */
+  /**
+   * md = 36px segments (default), sm = 28px (inside a 56px header). On phones (below 640px) both are
+   * 44px tall and at least 44px wide: the minimum tap target (wiki/design/README.md §2, F26).
+   */
   size?: "md" | "sm";
   disabled?: boolean;
   className?: string;
 }
 
 const SEG = {
-  md: "h-9 px-3.5 text-[14px] [&_svg]:text-[16px]",
-  sm: "h-7 px-3 text-[13px] [&_svg]:text-[14px]",
+  md: "h-9 px-3.5 text-[14px] [&_svg]:text-[16px] max-sm:h-11 max-sm:min-w-11",
+  sm: "h-7 px-3 text-[13px] [&_svg]:text-[14px] max-sm:h-11 max-sm:min-w-11 max-sm:px-4 max-sm:text-[14px]",
 } as const;
 
 /**
@@ -63,7 +66,7 @@ export function SegmentedControl<T extends string>({
       aria-label={label}
       aria-disabled={disabled || undefined}
       onKeyDown={disabled ? undefined : onKeyDown}
-      className={cx("inline-flex w-fit shrink-0 items-center gap-0.5 rounded-full bg-surface-2 p-1", className)}
+      className={cx("inline-flex w-fit shrink-0 items-center gap-0.5 rounded-full bg-surface-2 p-1 max-sm:p-0.5", className)}
     >
       {options.map((o, i) => {
         const on = o.value === value;

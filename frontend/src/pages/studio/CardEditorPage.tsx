@@ -8,7 +8,7 @@ import {
   isDirty,
   prepareForSave,
   toCard,
-  validateCard,
+  saveProblems,
 } from "../../lib/cardForm";
 import type { SettingsOverrides } from "../../lib/cardForm";
 import { clearNotice, clearPendingDraft, peekNotice, peekPendingDraft, setNotice } from "../../lib/draftStore";
@@ -223,7 +223,7 @@ function CardEditor({ initialId, onAdopt }: { initialId: number | null; onAdopt:
   const update: CardUpdater = useCallback((fn) => setCard((c) => fn(c)), []);
   const prepared = useMemo(() => prepareForSave(card), [card]);
   const styleNames = useMemo(() => styles.map((s) => s.name), [styles]);
-  const errors = useMemo(() => validateCard(prepared, styleNames), [prepared, styleNames]);
+  const errors = useMemo(() => saveProblems(card, styleNames), [card, styleNames]);
   const profile = useMemo(() => styles.find((s) => s.name === card.style_profile) ?? null, [styles, card.style_profile]);
   const hints = useMemo(() => cardHints(card, profile), [card, profile]);
   const persona = personas?.find((p) => p.id === personaId) ?? null;
@@ -249,7 +249,7 @@ function CardEditor({ initialId, onAdopt }: { initialId: number | null; onAdopt:
   // ---- save ----
   const save = useCallback(async () => {
     if (saving || status !== "ready") return;
-    const errs = validateCard(prepared, styleNames);
+    const errs = saveProblems(card, styleNames);
     if (errs.length > 0) {
       setSaveErrors(errs);
       setTab("form");
@@ -264,7 +264,8 @@ function CardEditor({ initialId, onAdopt }: { initialId: number | null; onAdopt:
       let out: CardOut;
       let note = "Đã lưu.";
       if (savedId === null) {
-        out = await api.createCard(prepared, pendingFile ? null : avatarToken);
+        const via = draft?.source === "draft" ? "ai_draft" : draft?.source === "import" ? "import" : "form";
+        out = await api.createCard(prepared, pendingFile ? null : avatarToken, via, pendingFile !== null);
         const newId = out.id as number;
         // Saved: the draft is now a real card, a later "Tạo nhân vật" must start empty.
         clearPendingDraft();
@@ -298,7 +299,7 @@ function CardEditor({ initialId, onAdopt }: { initialId: number | null; onAdopt:
     } finally {
       setSaving(false);
     }
-  }, [saving, status, prepared, styleNames, savedId, pendingFile, avatarToken, onAdopt, guard]);
+  }, [saving, status, card, prepared, styleNames, savedId, pendingFile, avatarToken, onAdopt, guard]);
 
   // Ctrl/⌘ + S saves.
   const saveRef = useRef(save);

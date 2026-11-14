@@ -32,9 +32,9 @@ Quy tắc lưới (người dùng chọn 2026-11-14): số cột cố định, m
 
 ## Tính năng
 
-- [Khám phá](../features/kham-pha.md)
-- [Nhân vật công khai](../features/nhan-vat-cong-khai.md)
-- [Bước vào câu chuyện](../features/buoc-vao-cau-chuyen.md) (nút trên khung nổi bật)
-- [Giao diện và theme](../features/giao-dien-theme.md)
+- [Khám phá](../features/F22-kham-pha.md)
+- [Nhân vật công khai](../features/F31-nhan-vat-cong-khai.md)
+- [Bước vào câu chuyện](../features/F24-buoc-vao-cau-chuyen.md) (nút trên khung nổi bật)
+- [Giao diện và theme](../features/F26-giao-dien-theme.md)
 
 Chi tiết: [DESIGN.md](../../DESIGN.md) trang 2, [design-impl.md §6.4 và "Lưới Khám phá"](../../docs/design-impl.md), [accounts.md §5](../../docs/accounts.md) (dòng tác giả).
