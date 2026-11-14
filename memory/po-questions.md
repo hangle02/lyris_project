@@ -3,8 +3,6 @@
 AI ghi ở đây khi Wiki chưa nói rõ: mỗi câu một dòng, kèm cách đang tạm chọn. Chủ dự án trả lời thì ghi câu trả lời vào
 `wiki/raw/` (file mới có ngày), sửa trang wiki, rồi xoá dòng ở đây.
 
-Câu hỏi cho PO: Danh sách thành viên nhóm (tên, vai trò, phần đóng góp) cho mục "Nhóm" trong README là gì? Tạm thời README vẫn ghi "(Nhóm sẽ điền)".
-Câu hỏi cho PO: Link video demo là gì? Tạm thời README ghi "sắp có link"; kịch bản quay ở docs/demo-script.md.
 Câu hỏi cho PO: Khoá PostHog (`LYRIS_POSTHOG_KEY`) của dự án là gì, và có muốn bật gửi sự kiện khi ra mắt không? Tạm thời không có khoá: sự kiện chỉ lưu trong DB của app.
 Câu hỏi cho PO: "Chế độ người lớn" có xác minh tuổi thật có làm không, xác minh bằng cách nào (giấy tờ, bên thứ ba), và tuổi tối thiểu là bao nhiêu? Tạm thời chỉ là kế hoạch: nội dung mặc định an toàn, chưa có cổng tuổi.
 - 2026-11-14 · PO trả lời câu hỏi giá coin (wiki/raw/2026-11-14-coin-tra-loi.md): mỗi lượt tốn 6 coin, tài khoản mới 300, đăng nhập mỗi ngày +60; nạp coin ở chế độ thử (mã nạp, cộng tay), cổng thật khi ra mắt — đã viết kế hoạch F42–F45 và docs/coins.md. Các điểm còn mở ở các dòng dưới.
@@ -50,3 +48,4 @@ Câu hỏi cho PO: (F55) Lần ra mắt đầu trên App Store và Google Play c
 Câu hỏi cho PO: (F61) Bản host hỏi năm sinh khi đăng ký (chỉ lưu năm) để có cơ chế "tuổi đã khai" mà App Store 1.2.1(a) cần cho app có nội dung người tạo (tạm chọn). Quà 300 coin trên web chỉ trao sau khi xác minh email hoặc số điện thoại (chống nuôi tài khoản). Đồng ý không?
 - 2026-11-14 · README theo bài ENG201 (các ý doanh thu trong bài chưa có quyết định; xung đột với điều đã chốt thì README đã ghi theo bản đã chốt, không hỏi lại):
 - 2026-11-14 · PO trả lời (wiki/raw/2026-11-14-po-tra-loi-lo-trinh.md): gọi điện tính coin theo mỗi lượt {{user}} nói và nhân vật đáp, câu đáp giới hạn độ dài (vài câu ngắn); gói tháng, giảm giá 24 giờ đầu, thưởng giới thiệu, theme/khung chat: AI tự điền chung chung trong README (gói đầu giảm giá; cả hai người được thưởng khi người được mời chat vài lượt, có trần tháng; cá nhân hoá mua bằng coin, gói tháng có bộ cơ bản). Chốt con số khi làm.
+- 2026-11-15 · PO trả lời: link video demo và danh sách 5 thành viên (Hang làm chính) — đã điền README, phần Team và Video demo.

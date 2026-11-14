@@ -25,10 +25,9 @@ Lyris is a Vietnamese-first AI roleplay app. You pick a character, or write your
 
 ### Demo video
 
-> **TODO (team):** add the link to the 2–3 minute demo video here before submission.
-> Script with timestamps, actions and voice-over: [docs/demo-script.md](docs/demo-script.md).
+**Demo video (2–3 minutes, core flow):** [watch on Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
 
-**Demo video:** *link coming soon*
+Script with timestamps, actions and voice-over: [docs/demo-script.md](docs/demo-script.md).
 
 ### The problem
 
@@ -39,8 +38,8 @@ Immersive roleplay needs more than a coherent next reply. The AI has to keep eac
 | Problem | What goes wrong | Supporting research |
 |---|---|---|
 | **1. Player agency** | Roleplay models drift from standing instructions such as "never write for the player" within a few turns. In the team's own use, hosted apps such as WHIF sometimes ignored what the player just wrote, spoke and acted *for* the player's character, and drifted off the scene. | Li et al. (2024) measured significant instruction drift within eight rounds of conversation. |
-| **2. Vietnamese adaptation** | Models are neither evaluated nor tuned for relationship-dependent forms of address. English-trained roleplay models get them wrong, mix in English or Chinese words, and forget how two characters address each other. | Truong et al. (2024) evaluate Vietnamese LLMs on 10 tasks and 31 metrics; none targets forms of address in dialogue. Wang & Guo (2024) document inconsistent names and forms of address in translated fiction. |
-| **3. Memory and continuity** | Characters lose names, promises, facts and personality over long sessions, even with long context or retrieval, and their attitude never changes whatever the player does. | Maharana et al. (2024); Araujo et al. (2025). |
+| **2. Vietnamese adaptation** | Models are neither evaluated nor tuned for relationship-dependent forms of address. English-trained roleplay models get them wrong, mix in English or Chinese words, and forget how two characters address each other. | Truong et al. (2024) evaluate Vietnamese LLMs on 10 tasks and 31 metrics; none targets forms of address in dialogue. |
+| **3. Memory and continuity** | Characters lose names, promises, facts and personality over long sessions, even with long context or retrieval, and their attitude never changes whatever the player does. | Maharana et al. (2024). |
 
 Together, these make roleplay feel like a series of disconnected chats rather than an ongoing story.
 
@@ -101,12 +100,7 @@ The same problems seen from the user's side: what progress people "hire" Lyris t
 | Static relationships | Six emotion dimensions that rise and fall with the player's actions | Relationships that respond and evolve |
 | Inconsistent worlds | A Lorebook per character, with "who knows this" on every entry | Consistent worlds and controlled reveals |
 
-**References**
-- Perez, S. (2025, August). AI companion apps on track to pull in $120M in 2025. *TechCrunch* (Appfigures data).
-- Li, K., et al. (2024). Measuring and controlling instruction (in)stability in language model dialogs. *Conference on Language Modeling (COLM 2024)*. arXiv:2402.10962.
-- Truong, S. T., et al. (2024). Crossing linguistic horizons: Finetuning and comprehensive evaluation of Vietnamese large language models. *Findings of NAACL 2024*.
-- Maharana, A., et al. (2024). Evaluating very long-term conversational memory of LLM agents. *ACL 2024*.
-- Wang & Guo (2024) and Araujo et al. (2025): *(TODO team: copy the full entries from the ENG201 reference list.)*
+References: see [References](#references) at the end of this README.
 
 ### Target users
 
@@ -471,14 +465,13 @@ The bot found a real bug on its first pass. The character editor validated the c
 
 ### Team
 
-> **Nhóm sẽ điền / to be filled by the team** before submission: every member, their role and what they contributed.
-
-| Tên | Vai trò | Đóng góp |
-|---|---|---|
-| *(Nhóm sẽ điền)* | *(e.g. Product owner)* | *(e.g. vision, DESIGN.md, character worlds, product decisions)* |
-| *(Nhóm sẽ điền)* | | |
-| *(Nhóm sẽ điền)* | | |
-| *(Nhóm sẽ điền)* | | |
+| Name | Student ID | Role | Contributions |
+|---|---|---|---|
+| **Le Thu Hang** | 240116 | Product owner, lead builder | Product vision and every product decision; built the app with Claude Code (wiki as source of truth, harness, verification); hands-on QA; demo video |
+| Nguyen Ngoc Anh Thu | 240065 | Research, tester | Problem statement, market data and research review, Jobs to be done, personas; app testing and bug reports |
+| Nguyen Thi Hai An | 240032 | Content and design, tester | Sample characters and worlds, character art, UI feedback; app testing and bug reports |
+| Nguyen Anh Hong | 240169 | Business | Revenue model and coin pricing, launch channels |
+| Huynh Quoc Toi | 240193 | Tracking and QA | Tracking plan, privacy and terms review, app testing |
 
 ---
 
@@ -496,10 +489,9 @@ Lyris là app nhập vai với nhân vật AI, ưu tiên tiếng Việt. Bạn c
 
 ### Video demo
 
-> **TODO (nhóm):** dán link video demo 2–3 phút vào đây trước khi nộp.
-> Kịch bản (thời điểm, thao tác, lời đọc): [docs/demo-script.md](docs/demo-script.md).
+**Video demo (2–3 phút, luồng chính):** [xem trên Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
 
-**Video demo:** *sắp có link*
+Kịch bản (thời điểm, thao tác, lời đọc): [docs/demo-script.md](docs/demo-script.md).
 
 ### Vấn đề
 
@@ -510,8 +502,8 @@ Nhập vai cuốn hút cần nhiều hơn một câu trả lời trôi chảy. A
 | Vấn đề | Sai ở đâu | Nghiên cứu liên quan |
 |---|---|---|
 | **1. Quyền của người chơi** | Model nhập vai trôi khỏi chỉ dẫn cố định như "không bao giờ viết thay người chơi" chỉ sau vài lượt. Theo trải nghiệm của chính nhóm, các app chạy trên server như WHIF đôi khi bỏ qua điều người chơi vừa viết, nói và làm thay nhân vật của người chơi, rồi trôi khỏi cảnh. | Li và cộng sự (2024) đo được độ trôi chỉ dẫn đáng kể trong vòng tám lượt hội thoại. |
-| **2. Thích ứng tiếng Việt** | Model không được đánh giá hay tinh chỉnh cho xưng hô theo quan hệ. Model nhập vai huấn luyện bằng tiếng Anh dùng sai xưng hô, chêm chữ Anh hay chữ Trung, và quên hai nhân vật gọi nhau thế nào. | Truong và cộng sự (2024) đánh giá LLM tiếng Việt trên 10 tác vụ và 31 chỉ số; không chỉ số nào nhắm vào xưng hô trong hội thoại. Wang & Guo (2024) ghi nhận tên và xưng hô không nhất quán trong truyện dịch. |
-| **3. Trí nhớ và mạch truyện** | Nhân vật quên tên, lời hứa, sự kiện và tính cách qua các phiên dài, kể cả khi có context dài hay truy xuất, và thái độ không đổi dù người chơi làm gì. | Maharana và cộng sự (2024); Araujo và cộng sự (2025). |
+| **2. Thích ứng tiếng Việt** | Model không được đánh giá hay tinh chỉnh cho xưng hô theo quan hệ. Model nhập vai huấn luyện bằng tiếng Anh dùng sai xưng hô, chêm chữ Anh hay chữ Trung, và quên hai nhân vật gọi nhau thế nào. | Truong và cộng sự (2024) đánh giá LLM tiếng Việt trên 10 tác vụ và 31 chỉ số; không chỉ số nào nhắm vào xưng hô trong hội thoại. |
+| **3. Trí nhớ và mạch truyện** | Nhân vật quên tên, lời hứa, sự kiện và tính cách qua các phiên dài, kể cả khi có context dài hay truy xuất, và thái độ không đổi dù người chơi làm gì. | Maharana và cộng sự (2024). |
 
 Gộp lại, các vấn đề này khiến nhập vai giống một chuỗi cuộc chat rời rạc hơn là một câu chuyện đang tiếp diễn.
 
@@ -572,7 +564,7 @@ Cùng các vấn đề trên, nhìn từ phía người dùng: họ "thuê" Lyri
 | Quan hệ đứng yên | Sáu chỉ số cảm xúc tăng giảm theo việc người chơi làm | Quan hệ có phản ứng và thay đổi |
 | Thế giới không nhất quán | Sổ thế giới riêng cho từng nhân vật, mỗi mục ghi "ai biết" | Thế giới nhất quán, tiết lộ có kiểm soát |
 
-**Tài liệu tham khảo:** danh sách ở [phần tiếng Anh](#the-problem) (Perez 2025; Li và cộng sự 2024; Truong và cộng sự 2024; Maharana và cộng sự 2024; Wang & Guo 2024 và Araujo và cộng sự 2025: *TODO nhóm: chép đầy đủ từ danh mục tham khảo ENG201*).
+**Tài liệu tham khảo:** xem [References](#references) ở cuối README.
 
 ### Người dùng mục tiêu
 
@@ -903,11 +895,19 @@ Ngay lượt chạy đầu, bot đã tìm ra một lỗi thật. Trình sửa nh
 
 ### Nhóm
 
-> **Nhóm sẽ điền / to be filled by the team** trước khi nộp: mọi thành viên, vai trò và phần đóng góp.
+| Tên | MSSV | Vai trò | Đóng góp |
+|---|---|---|---|
+| **Lê Thu Hằng** | 240116 | Product owner, người làm chính | Tầm nhìn và mọi quyết định sản phẩm; xây app cùng Claude Code (wiki làm nguồn sự thật, harness, chấm tự động); dùng thử và báo lỗi; video demo |
+| Nguyễn Ngọc Anh Thư | 240065 | Nghiên cứu, kiểm thử | Phát biểu vấn đề, số liệu thị trường và nghiên cứu, Jobs to be done, chân dung khách hàng; dùng thử app và báo lỗi |
+| Nguyễn Thị Hải An | 240032 | Nội dung và thiết kế, kiểm thử | Nhân vật mẫu và thế giới, ảnh nhân vật, góp ý giao diện; dùng thử app và báo lỗi |
+| Nguyễn Anh Hồng | 240169 | Kinh doanh | Mô hình doanh thu và giá coin, kênh ra mắt |
+| Huỳnh Quốc Tới | 240193 | Số liệu và kiểm thử | Kế hoạch tracking, rà soát quyền riêng tư và điều khoản, kiểm thử app |
 
-| Tên | Vai trò | Đóng góp |
-|---|---|---|
-| *(Nhóm sẽ điền)* | *(vd. Product owner)* | *(vd. tầm nhìn, DESIGN.md, thế giới nhân vật, quyết định sản phẩm)* |
-| *(Nhóm sẽ điền)* | | |
-| *(Nhóm sẽ điền)* | | |
-| *(Nhóm sẽ điền)* | | |
+---
+
+## References
+
+- Perez, S. (2025, August). AI companion apps on track to pull in $120M in 2025. *TechCrunch* (Appfigures data).
+- Li, K., et al. (2024). Measuring and controlling instruction (in)stability in language model dialogs. *Conference on Language Modeling (COLM 2024)*. arXiv:2402.10962.
+- Truong, S. T., et al. (2024). Crossing linguistic horizons: Finetuning and comprehensive evaluation of Vietnamese large language models. *Findings of NAACL 2024*.
+- Maharana, A., et al. (2024). Evaluating very long-term conversational memory of LLM agents. *ACL 2024*.
