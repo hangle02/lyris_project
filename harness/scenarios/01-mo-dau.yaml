@@ -1,0 +1,17 @@
+# Mở đầu đơn giản: người chơi đáp lại lời mở đầu của card bằng lời nói + hành động của chính mình.
+id: 01-mo-dau
+title: Mở đầu đơn giản
+note: >-
+  Lượt bình thường ngay sau lời mở đầu. Kiểm tra format (2-4 Thought lồng giữa truyện), xưng hô trong
+  dẫn truyện, độ dài, và việc tiếp nối đúng câu hỏi của người chơi.
+mode: story
+# Không có `history`: dùng lời mở đầu của card (lượt 0) làm lịch sử.
+input: "*Tớ dụi mắt ngồi dậy, chiếc áo khoác trên vai trượt xuống.* Ưm... tớ ngủ quên mất à? Sao cậu không gọi tớ dậy sớm hơn?"
+checks:
+  min_thoughts: 2
+  max_thoughts: 4
+  no_adjacent_thoughts: true
+  narration_forbidden: [tớ, cậu, tôi]
+  min_words: 80
+  max_words: 250
+  forbidden_phrases: ["bầu không khí"]

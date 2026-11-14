@@ -1,0 +1,19 @@
+# Dữ liệu cục bộ (DB, dataset, adapter)
+data/
+
+# Môi trường Python
+.venv*
+__pycache__/
+*.pyc
+
+# Frontend
+node_modules/
+frontend/dist/
+
+# Kết quả harness
+harness/results/
+
+# macOS
+.DS_Store
+
+.taste-skill/

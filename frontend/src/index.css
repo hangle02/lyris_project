@@ -1,0 +1,473 @@
+@import "tailwindcss";
+
+/*
+ * Lyris design tokens (DESIGN.md §3, docs/design-impl.md §2 and §11).
+ * Dark "Velvet Nocturne" is the default set; html[data-theme="light"] swaps in "Rosewater Parchment".
+ * Every text token reaches 4.5:1 on bg, surface, surface-2, glass and the Thought tint in both themes
+ * (faint is never placed on surface-3). The table of measured ratios lives in docs/design-impl.md §11.
+ */
+@theme static {
+  --color-bg: #130d14;
+  --color-surface: #1f1521;
+  --color-surface-2: #2a1d2c;
+  --color-surface-3: #352536;
+  --color-glass: rgb(31 21 33 / 0.78);
+  --color-line: #382635;
+  --color-line-strong: #4b3448;
+  /* Card edge: none in dark (the tone step separates), a hairline in light. */
+  --color-edge: transparent;
+
+  --color-fg: #faf2eb;
+  --color-prose: #e9dde0;
+  --color-muted: #c2aab8;
+  --color-faint: #9c8797;
+  --color-dialogue: #faf2eb;
+  --color-thought: #ebc9cf;
+
+  --color-accent: #e5989b;
+  --color-accent-strong: #f0b3b5;
+  --color-accent-2: #f3c68f;
+  --color-on-accent: #1a1018;
+  --color-on-orb: #1a1018;
+
+  --color-user: #291928;
+  --color-user-from: #3d2638;
+  --color-user-to: #291928;
+  --color-user-border: rgb(229 152 155 / 0.35);
+  --color-user-fg: #faf2eb;
+
+  --color-danger: #f08a8a;
+  --color-ok: #7fd1a2;
+  --color-warn: #f3c68f;
+
+  --color-emo-affection: #d86c86;
+  --color-emo-trust: #c58b52;
+  --color-emo-attraction: #a864a8;
+  --color-emo-obsession: #d15b5b;
+  --color-emo-fear: #6e7bb8;
+  --color-emo-aversion: #9e8881;
+
+  --color-scrim: rgb(8 5 9 / 0.62);
+
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-brand: "Cormorant Garamond", "Palatino Linotype", Palatino, Georgia, serif;
+  /* Legacy alias: older components use font-serif for story text; it is the story face now. */
+  --font-serif: "Be Vietnam Pro", "Plus Jakarta Sans", -apple-system, sans-serif;
+
+  --radius-card: 20px;
+  --radius-control: 14px;
+}
+
+:root {
+  --font-story: "Be Vietnam Pro", "Plus Jakarta Sans", -apple-system, sans-serif;
+
+  /* Brand graphics only (logo, favicon): never used for text. */
+  --brand-rose: #e5989b;
+  --brand-gold: #f3c68f;
+  --grad-wordmark: linear-gradient(100deg, #f3c68f 0%, #e5989b 55%, #faf2eb 100%); /* taste-skill-ignore: DESIGN.md §2.2 wordmark L */
+  --grad-orb: linear-gradient(135deg, #c86d7e 0%, #d98a6c 52%, #f3c68f 100%); /* taste-skill-ignore: DESIGN.md §5.2 centre orb + send */
+  --grad-user: linear-gradient(160deg, var(--color-user-from), var(--color-user-to)); /* taste-skill-ignore: DESIGN.md §3 player bubble */
+
+  --shadow-float: 0 16px 40px rgb(6 3 7 / 0.5), 0 2px 6px rgb(6 3 7 / 0.35);
+  --shadow-orb: 0 8px 22px rgb(200 109 126 / 0.38);
+  /* Side drawer: cast sideways onto the page beside it (the scrim does the rest), not downwards. */
+  --shadow-drawer: -12px 0 32px rgb(6 3 7 / 0.4), -1px 0 4px rgb(6 3 7 / 0.3);
+
+  /* Floating tab bar: 64px pill, 16px above the safe area. Pages pad their bottom by this much. */
+  --tabbar-height: 64px;
+  --space-tabbar: calc(var(--tabbar-height) + 16px + env(safe-area-inset-bottom) + 16px);
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --color-bg: #faf5ee;
+  --color-surface: #fffdf9;
+  --color-surface-2: #f4ece4;
+  --color-surface-3: #ede2d8;
+  --color-glass: rgb(255 252 249 / 0.85);
+  --color-line: #e8d7ce;
+  --color-line-strong: #d8c2b7;
+  --color-edge: #e8d7ce;
+
+  --color-fg: #2d1e24;
+  --color-prose: #3a2a31;
+  --color-muted: #6b535d;
+  --color-faint: #7b626b;
+  --color-dialogue: #2d1e24;
+  --color-thought: #8e4a5a;
+
+  --color-accent: #a14a5b;
+  --color-accent-strong: #8a3a4d;
+  --color-accent-2: #875a2b;
+  --color-on-accent: #fffdf9;
+
+  --color-user: #9e4a5c;
+  --color-user-from: #b45a6c;
+  --color-user-to: #9e4a5c;
+  --color-user-border: transparent;
+  --color-user-fg: #ffffff;
+
+  --color-danger: #ab3e49;
+  --color-ok: #306f4b;
+  --color-warn: #845b22;
+
+  --color-scrim: rgb(45 30 36 / 0.36);
+
+  --brand-rose: #c86d7e;
+  --brand-gold: #c58b52;
+  --grad-wordmark: linear-gradient(100deg, #9e475b 0%, #c86d7e 55%, #b87d4b 100%); /* taste-skill-ignore: DESIGN.md §2.2 wordmark L */
+
+  --shadow-float: 0 16px 40px rgb(84 44 58 / 0.16), 0 2px 6px rgb(84 44 58 / 0.08);
+  --shadow-orb: 0 8px 22px rgb(176 87 104 / 0.3);
+  --shadow-drawer: -12px 0 32px rgb(84 44 58 / 0.1), -1px 0 4px rgb(84 44 58 / 0.06);
+
+  color-scheme: light;
+}
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
+/* ---------- Utilities the foundation adds (documented in docs/design-impl.md §11) ---------- */
+
+/* Story face: Be Vietnam Pro at 1.65 (DESIGN.md §4). Put leading-* after it only when a block must differ. */
+@utility font-story {
+  font-family: var(--font-story);
+  line-height: 1.65;
+}
+
+/* Glass: only the hub header, the floating tab bar and the chat header (design-impl §10). */
+@utility glass {
+  background-color: var(--color-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2); /* taste-skill-ignore: DESIGN.md §5 glass header/tab bar */
+  backdrop-filter: blur(16px) saturate(1.2); /* taste-skill-ignore: DESIGN.md §5 glass header/tab bar */
+}
+
+@utility glass-strong {
+  background-color: var(--color-glass);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2); /* taste-skill-ignore: DESIGN.md §5.2 glass tab bar */
+  backdrop-filter: blur(20px) saturate(1.2); /* taste-skill-ignore: DESIGN.md §5.2 glass tab bar */
+}
+
+/* Gradients: only the centre orb, the send button, the player's bubble and the wordmark's L. */
+@utility bg-grad-orb {
+  background-image: var(--grad-orb);
+}
+
+@utility bg-user-gradient {
+  background-image: var(--grad-user);
+}
+
+@utility text-grad-wordmark {
+  background-image: var(--grad-wordmark);
+  -webkit-background-clip: text; /* taste-skill-ignore: DESIGN.md §2.2 wordmark L only */
+  background-clip: text; /* taste-skill-ignore: DESIGN.md §2.2 wordmark L only */
+  color: transparent;
+}
+
+/* Shadows: only on what floats (tab bar, orb, modal, drawer, menu). */
+@utility shadow-float {
+  box-shadow: var(--shadow-float);
+}
+
+@utility shadow-orb {
+  box-shadow: var(--shadow-orb);
+}
+
+/* Right-hand drawer (the heart drawer): it floats over a scrim. */
+@utility shadow-drawer {
+  box-shadow: var(--shadow-drawer); /* taste-skill-ignore: floating drawer over a scrim */
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pb-tabbar {
+  padding-bottom: var(--space-tabbar);
+}
+
+@utility animate-breathe {
+  animation: lyris-breathe 3.2s ease-in-out infinite;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+    transition:
+      background-color 500ms ease,
+      color 500ms ease;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 32%, transparent);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-faint);
+    opacity: 1;
+  }
+}
+
+/* Theme switch: colours ease for 500ms like a lamp dimming (DESIGN.md §7). Only colour properties,
+   and only while ThemeProvider holds the class, so hovers elsewhere stay instant. */
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition-property: background-color, border-color, color, fill, stroke, outline-color !important;
+  transition-duration: 500ms !important;
+  transition-timing-function: ease !important;
+}
+
+@layer components {
+  .prose-story {
+    font-family: var(--font-story);
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--color-prose);
+    overflow-wrap: anywhere;
+  }
+
+  .prose-story p + p {
+    margin-top: 0.8em;
+  }
+
+  /* A character's inner thought, woven into the prose: 3px accent edge on a flat accent tint. */
+  .prose-story .thought-line {
+    margin-block: 0.4em;
+    padding: 0.55em 0.9em;
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--radius-control) var(--radius-control) 0;
+    background: color-mix(in oklab, var(--color-accent) 8%, var(--color-surface));
+    font-style: italic;
+    color: var(--color-thought);
+  }
+
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-surface-3) transparent;
+  }
+}
+
+@keyframes lyris-blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+@keyframes lyris-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.88);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes lyris-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes lyris-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes lyris-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes lyris-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes lyris-slide-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 0.36em;
+  height: 0.36em;
+  margin: 0 0.12em;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: lyris-blink 1.3s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+/* Bouncing three dots: the character is writing (Phase 3b). Static under reduced motion. */
+.typing-bounce {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin: 0 0.14em;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: lyris-bounce 1.2s infinite ease-in-out;
+}
+
+.typing-bounce:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.typing-bounce:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes lyris-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-0.4em);
+    opacity: 1;
+  }
+}
+
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 0.15em;
+  vertical-align: -0.12em;
+  background: var(--color-accent);
+  opacity: 0.7;
+  animation: lyris-blink 1s infinite steps(1, end);
+}
+
+/* Overlay motion (Modal, Drawer). Feedback only; removed under reduced motion. */
+.lyris-scrim-in {
+  animation: lyris-fade-in 180ms ease-out both;
+}
+
+.lyris-sheet-in {
+  animation: lyris-rise-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.lyris-drawer-right-in {
+  animation: lyris-slide-in-right 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.lyris-drawer-left-in {
+  animation: lyris-slide-in-left 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.lyris-drawer-bottom-in {
+  animation: lyris-slide-in-bottom 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Wordmark star: a slow, small twinkle (DESIGN.md §2.2). */
+.lyris-twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lyris-breathe 3.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing-dot,
+  .typing-bounce,
+  .caret::after,
+  .animate-breathe,
+  .lyris-twinkle,
+  .lyris-scrim-in,
+  .lyris-sheet-in,
+  .lyris-drawer-right-in,
+  .lyris-drawer-left-in,
+  .lyris-drawer-bottom-in {
+    animation: none;
+  }
+
+  /* Still dots read as "waiting" without motion; keep them all fully visible. */
+  .typing-bounce {
+    opacity: 0.8;
+  }
+
+  body {
+    transition: none;
+  }
+
+  html.theme-switching,
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after {
+    transition: none !important;
+  }
+}
+
+/* A turn reached from the "Sự kiện" timeline: a soft outline for a moment (Phase 3b). */
+.turn-highlight {
+  border-radius: 20px;
+  outline: 2px solid color-mix(in oklab, var(--color-accent) 70%, transparent);
+  outline-offset: 6px;
+  transition: outline-color 300ms ease;
+}

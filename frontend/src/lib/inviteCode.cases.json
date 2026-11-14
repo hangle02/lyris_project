@@ -1,0 +1,22 @@
+{
+  "_comment": "Phase 4b (docs/auth.md §1.3, §8.2): invite/setup code normalisation cases shared by backend/tests/test_auth_codes.py and the frontend lib/inviteCode test. Input -> normalised 12-char Crockford code, or null when invalid.",
+  "cases": [
+    { "input": "LYR-7KQ2-M9XD-4TPA", "expected": "7KQ2M9XD4TPA" },
+    { "input": "lyr-7kq2-m9xd-4tpa", "expected": "7KQ2M9XD4TPA" },
+    { "input": "7KQ2M9XD4TPA", "expected": "7KQ2M9XD4TPA" },
+    { "input": "7kq2 m9xd 4tpa", "expected": "7KQ2M9XD4TPA" },
+    { "input": "  LYR 7KQ2 M9XD 4TPA  ", "expected": "7KQ2M9XD4TPA" },
+    { "input": "LYR7KQ2M9XD4TPA", "expected": "7KQ2M9XD4TPA" },
+    { "input": "7KQ2-M9XD-4TPA", "expected": "7KQ2M9XD4TPA" },
+    { "input": "OOOO-IIII-LLLL", "expected": "000011111111" },
+    { "input": "LYR-oooo-iiii-llll", "expected": "000011111111" },
+    { "input": "lyr-0000-1111-2222", "expected": "000011112222" },
+    { "input": "7KQ2-M9XD-4TP", "expected": null },
+    { "input": "7KQ2-M9XD-4TPAX", "expected": null },
+    { "input": "7KQ2-M9XD-4TPU", "expected": null },
+    { "input": "LYR-", "expected": null },
+    { "input": "", "expected": null },
+    { "input": "7KQ2-M9XD-4TP!", "expected": null },
+    { "input": "Ă7Q2-M9XD-4TPA", "expected": null }
+  ]
+}

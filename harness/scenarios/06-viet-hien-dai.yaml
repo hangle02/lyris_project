@@ -1,0 +1,21 @@
+# Card Việt Nam hiện đại (harness/cards/viet_hien_dai.json): Trần Minh Khang và Ngọc Anh, xưng anh/em.
+id: 06-viet-hien-dai
+title: Việt Nam hiện đại, xưng anh/em
+note: >-
+  Card viet_hien_dai, story tiếng Việt. Người chơi xưng "em", gọi "anh" và hỏi chuyện bị đồn.
+  Khang phải đáp bằng lời thoại xưng anh/em; dẫn truyện gọi anh là "anh", Ngọc Anh là "cô" hoặc
+  bằng tên, không dùng "em"; văn Việt tự nhiên, không lẫn tiếng Anh, không giọng truyện dịch Trung.
+mode: story
+card: viet_hien_dai.json
+input: "*Em nhìn bộ áo mưa rồi nhìn cái điện thoại tắt ngúm trong tay, hơi ngại ngùng.* Dạ... vậy phiền anh quá. Mà anh chở em về thật hả? Lỡ mấy anh chị trong công ty thấy rồi đồn bậy thì sao anh?"
+checks:
+  language: vi
+  min_thoughts: 2
+  max_thoughts: 4
+  no_adjacent_thoughts: true
+  narration_forbidden: [em, tớ, cậu, tôi]
+  dialogue_required_any: [anh, em]
+  dialogue_forbidden: [tớ, cậu, tôi, tao, mày]
+  min_words: 80
+  max_words: 250
+  forbidden_phrases: ["bầu không khí", "khóe môi", "khoé môi", "đáy mắt", "nhàn nhạt", "sủng nịch"]

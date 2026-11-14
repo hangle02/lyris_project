@@ -1,0 +1,20 @@
+# DM Mode: tin nhắn ngắn, không dẫn truyện, không Thought.
+id: 05-dm
+title: DM Mode nhắn tin đêm khuya
+note: >-
+  Chế độ nhắn tin. Trả lời 1-3 câu ngắn đúng vào tin vừa gửi; không mô tả hành động
+  (không *...*), không dẫn truyện, không [Thought: ...], không viết tin nhắn thay Lâm Vãn.
+mode: dm
+# Lịch sử riêng (thay cho lời mở đầu của card): một đoạn nhắn tin trước đó.
+history:
+  - role: assistant
+    content: "Về đến ký túc xá chưa?"
+  - role: user
+    content: "về rồi nè, tớ vừa tắm xong 🥰"
+  - role: assistant
+    content: "Ừ. Sấy khô tóc rồi hẵng ngủ."
+input: "tớ không ngủ được, cậu còn thức không 🥺"
+checks:
+  thought_count: 0
+  max_words: 60
+  forbidden_phrases: ["*"]

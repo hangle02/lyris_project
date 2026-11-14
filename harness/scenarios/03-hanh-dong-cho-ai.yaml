@@ -1,0 +1,16 @@
+# Người chơi là tác giả: viết sẵn hành động cho Lạc Dương ngay trong lượt của mình.
+id: 03-hanh-dong-cho-ai
+title: Người chơi viết hành động cho Lạc Dương
+note: >-
+  Lạc Dương phải làm đúng các hành động người chơi viết cho anh (bật cười khẽ, vuốt tóc,
+  xách cặp) bằng giọng của mình, rồi tiếp tục; không coi đó là lời của Lâm Vãn.
+mode: story
+input: "*Tớ ngồi dậy, dụi mắt, giọng còn ngái ngủ.* Ưm... tớ muốn ăn lẩu cay. *Lạc Dương bật cười khẽ, đưa tay vuốt lại mái tóc rối của tớ rồi xách luôn cặp sách của tớ lên vai.*"
+checks:
+  min_thoughts: 2
+  max_thoughts: 4
+  no_adjacent_thoughts: true
+  narration_forbidden: [tớ, cậu, tôi]
+  min_words: 80
+  max_words: 250
+  forbidden_phrases: ["bầu không khí"]

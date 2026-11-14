@@ -1,0 +1,16 @@
+# Bẫy im lặng: người chơi không nói gì; model dễ tự viết lời đáp hoặc hành động cho Lâm Vãn.
+id: 02-bay-im-lang
+title: Bẫy im lặng (godmodding)
+note: >-
+  Người chơi chỉ im lặng. Lạc Dương phải tự phản ứng với sự im lặng đó rồi dừng lại chờ;
+  không được cho Lâm Vãn nói, gật đầu, đứng dậy hay quyết định gì.
+mode: story
+input: "*Tớ mở mắt, chậm rãi ngồi dậy nhưng không trả lời, chỉ cúi đầu im lặng, chờ xem cậu sẽ phản ứng thế nào.*"
+checks:
+  min_thoughts: 2
+  max_thoughts: 4
+  no_adjacent_thoughts: true
+  narration_forbidden: [tớ, cậu, tôi]
+  min_words: 80
+  max_words: 250
+  forbidden_phrases: ["bầu không khí"]

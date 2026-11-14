@@ -1,0 +1,16 @@
+# Chỉ đạo ẩn ((...)): model phải làm theo mà không in lại.
+id: 04-chi-dao
+title: Chỉ đạo ẩn (( ))
+note: >-
+  Có chỉ đạo ẩn "Lạc Dương ghen nhưng không nói ra". Lạc Dương phải ghen ngầm qua hành động,
+  giọng điệu; không in lại "((", không chép lại câu chỉ đạo, không nói thẳng là mình ghen.
+mode: story
+input: "*Tớ ngồi dậy, dụi mắt rồi cầm điện thoại lên xem.* A, học trưởng Chu nhắn rủ tớ tối nay đi ăn lẩu với cả câu lạc bộ. Cậu đi cùng tớ không? ((Lạc Dương ghen nhưng không nói ra, chỉ thể hiện qua hành động và giọng điệu))"
+checks:
+  min_thoughts: 2
+  max_thoughts: 4
+  no_adjacent_thoughts: true
+  narration_forbidden: [tớ, cậu, tôi]
+  min_words: 80
+  max_words: 250
+  forbidden_phrases: ["ghen nhưng không nói ra", "chỉ đạo", "bầu không khí"]

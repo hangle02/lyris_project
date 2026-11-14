@@ -1,0 +1,21 @@
+# Card cổ trang tiên hiệp (harness/cards/trung_co_dai.json): Tạ Vân Lan và Lục Trần, xưng ta, gọi sư đệ.
+id: 07-co-trang
+title: Cổ trang tiên hiệp, xưng ta/sư đệ
+note: >-
+  Card trung_co_dai, story tiếng Việt. Người chơi xưng "đệ", gọi "sư tỷ" và tự lo mình làm mất mặt nàng.
+  Tạ Vân Lan phải giữ xưng hô cổ trang (ta, sư đệ, đệ), không dùng anh/em/tớ/cậu/tôi; dẫn truyện gọi
+  nàng là "nàng", Lục Trần là "hắn" hoặc bằng tên; không có đồ vật hiện đại.
+mode: story
+card: trung_co_dai.json
+input: "*Đệ thu kiếm, thở dốc, đưa tay áo lau mồ hôi trên trán rồi nhìn bình sứ trong tay sư tỷ.* Sư tỷ... tỷ đứng đó từ bao giờ vậy? Đệ chỉ còn thiếu một chút nữa là thông được thức thứ bảy. Ngày mai nếu đệ thua, chẳng phải sẽ làm tỷ mất mặt sao?"
+checks:
+  language: vi
+  min_thoughts: 2
+  max_thoughts: 4
+  no_adjacent_thoughts: true
+  narration_forbidden: [ngươi, sư đệ, sư tỷ, tớ, cậu, tôi, em]
+  dialogue_required_any: [ta, đệ, sư đệ, ngươi]
+  dialogue_forbidden: [anh, em, tớ, cậu, tôi, tao, mày]
+  min_words: 80
+  max_words: 250
+  forbidden_phrases: ["bầu không khí", "điện thoại", "đồng hồ"]

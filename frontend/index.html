@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="vi" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="theme-color" content="#130D14" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="description" content="Lyris: nơi những tâm hồn trang sách bước ra sưởi ấm thực tại." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Lyris" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>Lyris</title>
+    <script>
+      // Theme before first paint (no flash). Mirrors src/theme/theme.ts resolveTheme():
+      // ?theme= override, then localStorage "lyris.theme", then the system setting, else dark.
+      (function () {
+        var t = null;
+        try {
+          t = new URLSearchParams(location.search).get("theme");
+        } catch (e) {}
+        if (t !== "dark" && t !== "light") {
+          try {
+            t = localStorage.getItem("lyris.theme");
+          } catch (e) {
+            t = null;
+          }
+        }
+        if (t !== "dark" && t !== "light") {
+          t = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute("content", t === "light" ? "#FAF5EE" : "#130D14");
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

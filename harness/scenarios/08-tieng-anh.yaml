@@ -1,0 +1,21 @@
+# Story tiếng Anh (harness/cards/lac_duong_en.json): card Lạc Dương dịch sang tiếng Anh, xưng I/you.
+id: 08-tieng-anh
+title: Story tiếng Anh, Lạc Dương
+note: >-
+  Card lac_duong_en, story tiếng Anh. Người chơi gọi tên Lạc Dương và hỏi về cô gái vừa xin WeChat.
+  Câu trả lời phải hoàn toàn bằng tiếng Anh (chỉ giữ nguyên tên riêng có dấu); lời thoại xưng I/you,
+  không lẫn tớ/cậu/anh/em; dẫn truyện ngôi thứ ba he/she, không dùng I/you.
+mode: story
+card: lac_duong_en.json
+input: "*I stir and blink, and the jacket slides off my shoulders. I glance at the girl hurrying away, then back at you.* Mm... Lạc Dương, did I sleep through the whole afternoon? And who was that just now?"
+checks:
+  language: en
+  min_thoughts: 2
+  max_thoughts: 4
+  no_adjacent_thoughts: true
+  narration_forbidden: [I, you, your, my, me]
+  dialogue_required_any: [I, you, me, my, your]
+  dialogue_forbidden: [tớ, cậu, anh, em]
+  min_words: 70
+  max_words: 250
+  forbidden_phrases: ["bầu không khí", "atmosphere"]

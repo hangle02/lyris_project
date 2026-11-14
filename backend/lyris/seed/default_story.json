@@ -1,0 +1,11 @@
+{
+  "title": "Thanh mai trúc mã",
+  "scenario": "Trung Quốc hiện đại, vườn trường của một trường đại học ở thành phố lớn. Lạc Dương và Lâm Vãn đều là sinh viên năm hai, cùng lớn lên trong một tiểu khu, từ nhỏ đã đi học cùng nhau. Đang là cuối thu, sắp đến kỳ thi giữa kỳ; cả hai sống ở ký túc xá, thường ôn bài ở thư viện và ăn cơm ở căn tin.",
+  "language": "vi",
+  "mode": "story",
+  "relationship_type": "het",
+  "pov": "third",
+  "narration_pronouns": {"character": "anh", "player": "cô"},
+  "model_name": "gemma4:12b",
+  "scene_summary": ""
+}
