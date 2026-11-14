@@ -182,6 +182,27 @@ const EVENT_LABELS: Readonly<Record<string, string>> = {
   account_deleted: "Xoá tài khoản",
   data_exported: "Tải dữ liệu",
   analytics_opt_out: "Tắt chia sẻ dữ liệu",
+  // F42: coin
+  coins_spent: "Tiêu coin cho câu trả lời",
+  coins_released: "Câu trả lời không có chữ, không tốn coin",
+  coins_insufficient: "Hết coin khi gửi",
+  coins_granted: "Nhận coin",
+  wallet_viewed: "Mở Ví coin",
+  // F43: nạp coin (chế độ thử)
+  coins_adjusted: "Người quản lý cộng/trừ coin",
+  topup_viewed: "Mở Nạp coin",
+  topup_pack_selected: "Xem một gói giá dự kiến",
+  topup_code_redeemed: "Nạp coin bằng mã",
+  topup_code_failed: "Nhập mã nạp sai",
+  topup_code_created: "Tạo mã nạp",
+  // F45: nhiệm vụ ngày, quảng cáo mẫu
+  missions_viewed: "Mở Nhiệm vụ hôm nay",
+  ad_started: "Xem quảng cáo mẫu",
+  mission_claimed: "Nhận thưởng nhiệm vụ",
+  // F44, F46, F47: bảng xếp hạng Nhân vật hot, thưởng theo bậc, tìm nhân vật
+  creator_rank_reached: "Nhân vật công khai vào bảng Nhân vật hot",
+  hot_board_viewed: "Xem bảng Nhân vật hot",
+  explore_searched: "Tìm nhân vật ở Khám phá",
 };
 
 export function eventLabel(name: string): string {

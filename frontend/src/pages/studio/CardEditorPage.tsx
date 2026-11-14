@@ -17,6 +17,11 @@ import { characterRoute, navigate, routeHref } from "../../lib/router";
 import type { CardOut, CharacterCard, PersonaOut, StorySettings, StyleProfileInfo, TemplateInfo, Visibility } from "../../types";
 import { creatorLine, installedTemplateIds, isInstalledTemplate, isTemplateCard } from "../explore/logic";
 import { canShare, isPublic, shareDescription, unshareNote, visibilityBadge } from "./shareLogic";
+import { creatorBlock } from "./creatorLogic";
+import type { CreatorProgress } from "./creatorLogic";
+import { useWallet } from "../../hooks/useWallet";
+import { showsCoins } from "../../lib/coins";
+import { COIN_COPY } from "../../lib/coinCopy";
 import { PublicPreviewDialog } from "../character/PublicPreview";
 import { IconDownload, IconMessageCircle } from "../../components/icons";
 import { Button, Skeleton, Toggle, cx } from "../../components/ui";
@@ -47,6 +52,8 @@ interface Meta {
   card_id: number | null;
   creator_handle: string | null;
   extensions: Record<string, unknown> | null;
+  /** F44: players line under "Công khai" (only for a saved public character of this account). */
+  creator: CreatorProgress | null;
 }
 
 function metaOf(out: CardOut): Meta {
@@ -58,6 +65,7 @@ function metaOf(out: CardOut): Meta {
     card_id: out.id,
     creator_handle: out.creator_handle,
     extensions: out.extensions ?? null,
+    creator: out.creator ?? null,
   };
 }
 
@@ -234,6 +242,10 @@ function CardEditor({ initialId, onAdopt }: { initialId: number | null; onAdopt:
   const shareOn = isPublic(card.visibility);
   const savedPublic = isPublic(meta?.visibility);
   const [previewOpen, setPreviewOpen] = useState(false);
+  // F44 (làm lại): "12 người chơi · Hạng 7 Nhân vật hot" and the next reward tier once saved as public. No coins for
+  // this account (managing account, coins off): the block promises no reward.
+  const { wallet } = useWallet();
+  const players = savedPublic ? creatorBlock(meta?.creator, { rewards: wallet ? showsCoins(wallet) : undefined }) : null;
 
   const settingsJson = useMemo(() => {
     if (!persona) return null;
@@ -549,6 +561,15 @@ function CardEditor({ initialId, onAdopt }: { initialId: number | null; onAdopt:
                         />
                         {unshareNote(card.name, { checked: shareOn, savedPublic }) && (
                           <p className="text-[13px] leading-snug text-warn">{unshareNote(card.name, { checked: shareOn, savedPublic })}</p>
+                        )}
+                        {shareOn && players && (
+                          <div className="flex flex-col gap-0.5 border-t border-line pt-2" data-creator-rank>
+                            <p className="text-[13px] font-semibold leading-snug text-fg">{players.head}</p>
+                            {players.reward && <p className="text-[13px] leading-snug text-accent-2">{players.reward}</p>}
+                            {players.rule && <p className="text-[13px] leading-snug text-prose">{players.rule}</p>}
+                            {players.waiting && <p className="text-[13px] leading-snug text-prose">{players.waiting}</p>}
+                            <p className="text-[12px] leading-snug text-muted">{COIN_COPY.creatorHint}</p>
+                          </div>
                         )}
                         {shareOn && savedPublic && savedId !== null && (
                           <div className="-ml-3">

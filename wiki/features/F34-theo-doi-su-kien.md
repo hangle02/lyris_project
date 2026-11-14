@@ -10,7 +10,7 @@ Lyris ghi lại các thao tác quan trọng (mở app, bắt đầu story, gửi
 
 ## Hoạt động thế nào
 
-- 40 sự kiện, chia theo vòng đời: thu hút, kích hoạt, tương tác và chất lượng AI, giữ chân, sáng tạo, an toàn, tài khoản. Chỉ số North Star: số story "sống" mỗi tuần.
+- 55 sự kiện (40 lúc ra mắt, thêm 15 của coin F42–F45; số chính xác nằm ở dòng "**N events.**" của tracking-plan.md và test giữ hai bên khớp nhau), chia theo vòng đời: thu hút, kích hoạt, tương tác và chất lượng AI, giữ chân, sáng tạo, an toàn, tài khoản, coin. Chỉ số North Star: số story "sống" mỗi tuần.
 - Phần lớn do server ghi đúng lúc thao tác thành công. Giao diện chỉ gửi những gì chỉ giao diện biết (mở Khám phá, chạm thẻ suy nghĩ, mở ngăn trái tim...).
 - Thuộc tính chỉ là mã cố định, true/false hoặc số trong khoảng; độ dài tin nhắn, số ngày vắng được chia khoảng. Không IP.
 - Lưu trong DB của app 180 ngày. Có `LYRIS_POSTHOG_KEY` thì gửi thêm sang PostHog (chạy nền, thử lại khi lỗi).

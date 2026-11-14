@@ -7,7 +7,8 @@ import { turnDomId } from "../pages/chat/eventsLogic";
 import { PlayerAvatarContext } from "../pages/chat/playerAvatar";
 import { buildStoryBlocks, onlyHiddenThoughts } from "../lib/storyBlocks";
 import { MAX_CONTENT_CHARS, splitSegments } from "../lib/text";
-import { messageLockReason } from "../lib/actionLock";
+import { messageLockReason, regenerateLockReason } from "../lib/actionLock";
+import { RegenerateCoinLockContext } from "./regenerateLock";
 import { ShowThoughtsContext } from "./showThoughts";
 import {
   IconChevronLeft,
@@ -199,6 +200,8 @@ export function ActionRow({
 }: ActionRowProps) {
   const isUser = message.role === "user";
   const locked = lockReason !== null;
+  // F42: a member under 6 usable coins cannot ask for another version (the button says why).
+  const coinReason = useContext(RegenerateCoinLockContext);
   // A locked button says why (F06): its tooltip is the reason, its name stays the action.
   const tip = (label: string) => lockReason ?? label;
   return (
@@ -234,9 +237,9 @@ export function ActionRow({
         <IconButton
           size="sm"
           label="Tạo lại câu trả lời"
-          title={tip("Tạo lại câu trả lời")}
+          title={regenerateLockReason(lockReason, { locked: coinReason !== null }) ?? "Tạo lại câu trả lời"}
           icon={<IconRefreshCw />}
-          disabled={locked}
+          disabled={locked || coinReason !== null}
           onClick={() => onRegenerate(message)}
         />
       )}

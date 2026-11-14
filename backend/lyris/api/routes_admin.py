@@ -32,6 +32,8 @@ class AdminAccount(BaseModel):
     last_login_at: str | None = None
     invited_by_handle: str | None = None
     session_count: int
+    # F43 (docs/coins.md §7): số coin của thành viên; chủ máy: null.
+    coin_balance: int | None = None
 
 
 class ResetPasswordOut(BaseModel):
@@ -81,6 +83,7 @@ def admin_account(row: store.AdminRow) -> AdminAccount:
         last_login_at=row.last_login_at,
         invited_by_handle=row.invited_by_handle,
         session_count=row.session_count,
+        coin_balance=row.coin_balance,
     )
 
 
@@ -116,7 +119,8 @@ def disable_account(request: Request, account_id: int, actor: OwnerAccount) -> A
 
 @router.post("/accounts/{account_id}/enable", response_model=AdminAccount)
 def enable_account(request: Request, account_id: int, actor: OwnerAccount) -> AdminAccount:
-    return admin_account(service.set_disabled(request, actor, account_id, False))
+    row = service.set_disabled(request, actor, account_id, False)
+    return admin_account(row)
 
 
 @router.get("/invites", response_model=list[InviteOut])

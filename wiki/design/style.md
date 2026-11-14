@@ -107,7 +107,7 @@ Lấy từ `components/ui`, không tự viết lại: `Button`, `IconButton`, `C
 
 ## 9. Ảnh
 
-- Thẻ Khám phá: ảnh 4:3. Thẻ nổi bật: 3:1 trên điện thoại. Hồ sơ nhân vật: 4:5 (dính bên trái từ 768px).
+- Thẻ Khám phá: ảnh 4:3 (không còn thẻ nổi bật từ F46). Hàng bảng "Nhân vật hot": ảnh tròn 44px. Hồ sơ nhân vật: 4:5 (dính bên trái từ 768px).
 - Thứ tự ảnh: avatar của nhân vật → ảnh bối cảnh của nhân vật mẫu → chữ cái đầu trên nền phẳng.
 
 ## 10. Chỗ lệch DESIGN.md (có chủ đích)

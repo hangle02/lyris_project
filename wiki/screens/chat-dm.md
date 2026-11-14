@@ -32,6 +32,7 @@ Từ 640px: header một hàng. Cột tin rộng tối đa 720px.
 - **Lượt chỉ có suy nghĩ khi đang ẩn suy nghĩ:** "Lượt này chỉ có suy nghĩ của <tên>."
 - **Lỗi:** banner trên ô nhập, có "Chi tiết" và "Thử lại".
 - **Lượt chưa trả lời nằm bên Story:** banner "Lượt của bạn bên Story chưa có câu trả lời." + "Mở Story".
+- **Hết coin** (Kế hoạch, [F42](../features/F42-vi-coin.md)): giống hệt [chế độ Story](chat-story.md): ô "Nhắn tin…" khoá, khối "Bạn đã hết coin" với "Nạp coin" và "Nhiệm vụ". Mỗi tin nhân vật trả lời trong DM cũng tốn 6 coin (tạm chọn).
 
 ## Tính năng
 

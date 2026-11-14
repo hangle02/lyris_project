@@ -30,7 +30,8 @@ Kỹ thuật:
 - [ ] Unit: 'Quên' xoá một ký ức và ngăn cảm xúc bỏ đúng dòng đó; 'Đọc lại story' xếp việc trích các lượt chưa đọc.
 - [ ] Unit: header chat hiện 'nơi chốn · thời gian' khi có (`headerSubtitle`, `sceneLine`).
 - [ ] Bot: sau một lượt (LLM giả trả ký ức và cảnh), ngăn 'Cảm xúc & ký ức' liệt kê ký ức có nhãn 'Sự kiện' hoặc 'Điều đã biết', mỗi ký ức có nút 'Quên: …'; header chat hiện 'nơi chốn · thời gian'.
-- [ ] Model thật: sau vài lượt trên gemma4:12b, ký ức và điều đã biết được trích đúng ý lượt chơi; story dài có '<details> Tóm tắt những lượt cũ' với tóm tắt đúng nội dung.
+- [ ] Bot: story dài có `<details>` 'Tóm tắt những lượt cũ': story dựng qua HTTP API của app trên LLM giả (6 lượt người chơi dài, lịch sử dài hơn cả `num_ctx` 8192 nên cửa sổ lịch sử chắc chắn đã dịch); việc nền viết tóm tắt; mở `#/chat/<id>`, ngăn 'Cảm xúc & ký ức' có `<details>` 'Tóm tắt những lượt cũ' gập sẵn, mở ra thì hiện đúng tóm tắt server đã lưu.
+- [ ] Model thật: sau vài lượt trên gemma4:12b, ký ức và điều đã biết được trích đúng ý lượt chơi (kịch bản `f10-ky-uc`); tóm tắt những lượt cũ của story dài đúng nội dung (kịch bản `f10-tom-tat`).
 - [ ] Model thật: trên gemma4:12b, việc trích xuất thật ghi ký ức và điều đã biết có đúng chi tiết người chơi hoặc nhân vật vừa kể, điều đã biết nói về đúng người (kịch bản `f10-ky-uc`); tóm tắt thật của một đoạn story dài giữ đủ lời hứa, nơi chốn, tên người và bí mật đã có (kịch bản `f10-tom-tat`).
 
 ## Tests
@@ -50,13 +51,13 @@ Kỹ thuật:
 - frontend/src/pages/chat/chatLogic.test.ts
 - frontend/src/pages/chat/extrasPoller.test.ts
 - bot: ngăn trái tim có ký ức và nút Quên, header có cảnh
+- bot: story dài (cửa sổ đã dịch) có Tóm tắt những lượt cũ trong ngăn trái tim
 - model: f10-ky-uc
 - model: f10-tom-tat
 
-## Chờ PO
+## Ghi chú
 
-- Dòng Model thật thứ nhất (lời gốc): phần "story dài có '<details> Tóm tắt những lượt cũ'" là giao diện của một story đủ dài để cửa sổ dịch; bot trên LLM giả chưa có story như vậy (cần seed sẵn một story dài có tóm tắt trong `environment/fake-server.py`). Dòng này giữ đúng lời gốc trong Done when nhưng **chưa có kịch bản chứng minh** nên tính năng ở 🟡, không ✅ được, tới khi PO trả lời (`memory/po-questions.md`).
-- Dòng Model thật thứ hai (kịch bản `f10-ky-uc`, `f10-tom-tat`) là phần máy chấm được, thêm ngày 2026-11-14. Xem [kich-ban-model-that](../decisions/kich-ban-model-that.md).
+- Dòng gốc "story dài có '<details> Tóm tắt những lượt cũ' với tóm tắt đúng nội dung" được chứng minh bằng hai dòng (PO đồng ý 2026-11-14, [raw](../raw/2026-11-14-po-quyet-harness.md)): phần giao diện (story đủ dài để cửa sổ dịch thì hiện `<details>` với đúng tóm tắt đã lưu) là dòng Bot; phần nội dung (tóm tắt đúng ý) là dòng Model thật với kịch bản `f10-tom-tat`. Bot không cần sửa `environment/fake-server.py`: LLM giả đã trả tóm tắt cho lời gọi tóm tắt. Xem [kich-ban-model-that](../decisions/kich-ban-model-that.md).
 
 ## Liên quan
 

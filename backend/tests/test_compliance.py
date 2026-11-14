@@ -485,8 +485,8 @@ def test_migration_0010_on_a_v9_db(tmp_path: Path) -> None:
         assert migrate(conn, target=9) == 9
         conn.execute("INSERT INTO accounts (uid, handle, display_name, role) VALUES ('u1', 'mai', 'Mai', 'member')")
         before = conn.execute("SELECT COUNT(*) FROM accounts").fetchone()[0]
-        assert migrate(conn) == 11
-        assert migrate(conn) == 11  # chạy lại không làm gì
+        assert migrate(conn) == 14
+        assert migrate(conn) == 14  # chạy lại không làm gì
         assert conn.execute("SELECT COUNT(*) FROM accounts").fetchone()[0] == before
         terms = [tuple(r) for r in conn.execute("SELECT terms_accepted_at, privacy_version FROM accounts")]
         assert terms == [(None, None)] * before

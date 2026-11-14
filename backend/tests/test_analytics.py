@@ -65,9 +65,12 @@ def rows(repo: Repo, sql: str = "SELECT * FROM analytics_events ORDER BY id", *p
 
 def test_catalog_is_focused_snake_case_and_documented() -> None:
     names = set(events.EVENTS)
-    assert 30 <= len(names) <= 40, len(names)
     assert all(re.fullmatch(r"[a-z][a-z0-9_]*", n) for n in names)
     doc = DOC.read_text(encoding="utf-8")
+    # Bảng gọn: đúng số sự kiện mà tracking-plan.md §4 công bố ("**N events.**"; 40 lúc ra mắt, +5 của coin F42).
+    stated = re.search(r"^\*\*(\d+) events\.\*\*", doc, flags=re.M)
+    assert stated is not None and len(names) == int(stated.group(1)), (len(names), stated)
+    assert 30 <= len(names) <= 60, len(names)
     # Dòng của bảng sự kiện: | `tên` | S/C/S, C | ...
     documented = set(re.findall(r"^\|\s*`([a-z0-9_]+)`\s*\|\s*(?:S|C|S, C)\s*\|", doc, flags=re.M))
     assert names == documented, (sorted(names - documented), sorted(documented - names))

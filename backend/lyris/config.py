@@ -47,6 +47,12 @@ class Settings:
     # LYRIS_CONTACT: email (hoặc địa chỉ https://) của người vận hành. Trang đăng nhập dùng cho "Xin mã mời" và
     # "Quên mật khẩu"; văn bản pháp lý điền vào chỗ [ĐIỀN EMAIL LIÊN HỆ]. Không đặt thì trang nói chung chung.
     contact: str | None = None
+    # Coin (docs/coins.md §1): LYRIS_COINS=0 tắt hẳn coin (không ai bị trừ, giao diện không có chip, ví, nhiệm vụ).
+    # Mặc định bật. Tên cũ NORA_COINS cũng có tác dụng khi LYRIS_COINS chưa đặt (như mọi biến LYRIS_*).
+    coins_enabled: bool = True
+    # F45 (docs/coins.md §6.2): thời lượng quảng cáo mẫu, kiểm theo đồng hồ server. KHÔNG có biến môi trường nào đổi
+    # được (get_settings luôn để 15); chỉ server giả của bot dựng Settings(ad_seconds=2) để bot không phải chờ.
+    ad_seconds: int = 15
 
 
 def _env(name: str) -> str | None:
@@ -155,6 +161,13 @@ def _contact() -> str | None:
     return raw
 
 
+def _coins_enabled() -> bool:
+    raw = _env("LYRIS_COINS")
+    if raw is None:
+        return True
+    return raw.strip().lower() not in ("0", "false", "no", "off")
+
+
 def get_settings() -> Settings:
     """Đọc cấu hình từ biến môi trường (mỗi lần gọi đọc lại, tiện cho test)."""
     db_path = _db_path()
@@ -173,4 +186,5 @@ def get_settings() -> Settings:
         posthog_key=_env("LYRIS_POSTHOG_KEY"),
         posthog_host=_posthog_host(),
         contact=_contact(),
+        coins_enabled=_coins_enabled(),
     )

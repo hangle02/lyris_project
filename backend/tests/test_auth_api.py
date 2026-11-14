@@ -882,7 +882,9 @@ async def test_admin_accounts_disable_enable(app: FastAPI, fake_clock: FakeClock
         assert set(mai) == {
             "id", "handle", "display_name", "avatar_url", "role", "status", "must_change_password",
             "created_at", "last_login_at", "invited_by_handle", "session_count",
+            "coin_balance",  # F43 (docs/coins.md §7): số coin của thành viên; chủ máy null
         }
+        assert isinstance(mai["coin_balance"], int) and listing[0]["coin_balance"] is None
         assert (mai["role"], mai["status"], mai["session_count"]) == ("member", "active", 2)
         assert mai["last_login_at"] == clock.iso(fake_clock.t)
         assert (await owner.post(f"/api/admin/accounts/{oid}/disable")).json()["detail"] == "Không tạm khoá được tài khoản chủ máy."

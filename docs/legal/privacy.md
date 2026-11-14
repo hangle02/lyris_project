@@ -1,6 +1,6 @@
 # Chính sách quyền riêng tư của Lyris
 
-Phiên bản: 2026-11-15
+Phiên bản: 2026-11-16
 
 Lyris là ứng dụng nhập vai bằng chữ: bạn cùng các nhân vật AI viết nên những story. Trang này nói rõ Lyris lưu gì về bạn, dùng vào việc gì, giữ trong bao lâu và bạn kiểm soát nó thế nào. Chúng tôi viết đúng với những gì ứng dụng đang làm, không hơn.
 
@@ -25,6 +25,8 @@ Lyris là ứng dụng nhập vai bằng chữ: bạn cùng các nhân vật AI 
 **Nhật ký máy chủ.** Mỗi lần đăng nhập (đúng hay sai), tạo tài khoản, đổi mật khẩu hay xoá tài khoản, máy chủ ghi một dòng nhật ký gồm @handle, địa chỉ IP và tên thiết bị rút gọn, để người vận hành điều tra khi có người đoán mật khẩu hay lạm dụng. Nhật ký này nằm ở máy chủ (không ở trong ứng dụng), chỉ người vận hành đọc được, và tự xoá sau tối đa 30 ngày.
 
 **Báo cáo nội dung.** Khi bạn báo cáo một câu trả lời của AI: lý do, ghi chú (nếu bạn viết), và **chỉ khi bạn bật "Gửi kèm câu trả lời này"** thì mới lưu một bản chụp của câu trả lời đó để người quản lý xem xét. Khi bạn báo cáo một nhân vật công khai: lý do, ghi chú và nhân vật bị báo cáo. Người quản lý không thấy bạn là ai, không mở được story của bạn, và số liệu sử dụng của lần báo cáo không gắn với tài khoản hay trình duyệt của bạn.
+
+**Ví coin.** Số dư coin và **sổ coin**: mỗi lần coin của bạn đổi (số coin, thời điểm, loại như quà, câu trả lời, nhiệm vụ, mã nạp; với câu trả lời thì thuộc story nào), không có nội dung tin nhắn. Sổ coin có trong "Tải dữ liệu của tôi". Quảng cáo mẫu trong nhiệm vụ không gửi dữ liệu cho bên thứ ba nào.
 
 **Dữ liệu sử dụng.** Xem mục 4.
 
@@ -61,6 +63,7 @@ Lyris chỉ dùng cookie của chính mình, không có cookie quảng cáo hay 
 ## 6. Giữ trong bao lâu
 
 - Nội dung và tài khoản: tới khi bạn xoá chúng hoặc xoá tài khoản.
+- Ví và sổ coin: tới khi bạn xoá tài khoản.
 - Dữ liệu sử dụng: 180 ngày.
 - Lần thử đăng nhập: 30 ngày. Phiên đăng nhập: tới khi hết hạn hoặc bạn đăng xuất.
 - Nhật ký máy chủ (mục 2): tối đa 30 ngày.
@@ -90,7 +93,7 @@ Khi chính sách này thay đổi đáng kể, chúng tôi đổi số phiên b�
 
 ## English
 
-Version: 2026-11-15
+Version: 2026-11-16
 
 Lyris is a text roleplay app: you write stories together with AI characters. This page explains what Lyris stores about you, why, for how long, and how you control it. It describes what the app actually does.
 
@@ -115,6 +118,8 @@ Lyris is a text roleplay app: you write stories together with AI characters. Thi
 **Server logs.** Each sign-in (successful or not), account creation, password change or account deletion writes one server log line with the handle, IP address and short device label, so the operator can investigate password guessing or abuse. This log lives on the server (not in the app), only the operator can read it, and it is deleted automatically after at most 30 days.
 
 **Content reports.** When you report an AI reply: the reason, your note (if any), and **only if you turn on "Send this reply with the report"** a copy of that reply for the administrator to review. When you report a public character: the reason, your note and the character reported. The administrator does not see who you are and cannot open your story, and the usage event of a report is not linked to your account or browser.
+
+**Coin wallet.** Your coin balance and the **coin ledger**: each change to your coins (amount, time, type such as a gift, a reply, a mission or a top-up code; for a reply, which story), never message content. The coin ledger is included in "Download my data". The sample ad in missions sends no data to any third party.
 
 **Usage data.** See section 4.
 
@@ -151,6 +156,7 @@ The app also keeps a few things in your browser's local storage, only on your de
 ### 6. How long we keep data
 
 - Content and account: until you delete them or delete your account.
+- Coin wallet and coin ledger: until you delete your account.
 - Usage data: 180 days.
 - Sign-in attempts: 30 days. Sessions: until they expire or you sign out.
 - Server logs (section 2): at most 30 days.

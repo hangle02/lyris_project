@@ -17,20 +17,20 @@ type Pkg = keyof typeof FAMILIES;
 /** Each `import "@fontsource/<pkg>/<file>.css"` in main.tsx. */
 function fontImports(): { pkg: Pkg; file: string }[] {
   const main = readFileSync(join(SRC, "main.tsx"), "utf8");
-  return [...main.matchAll(/import\s+"@fontsource\/([a-z-]+)\/([\w-]+\.css)";/g)].map((m) => ({ pkg: m[1] as Pkg, file: m[2] }));
+  return [...main.matchAll(/import\s+"@fontsource\/([a-z-]+)\/([\w-]+\.css)";/g)].map((m) => ({ pkg: m[1] as Pkg, file: m[2] ?? "" }));
 }
 
 /** The `@font-face` blocks of one fontsource CSS file. */
 function faces(css: string): string[] {
-  return [...css.matchAll(/@font-face\s*{([^}]*)}/g)].map((m) => m[1]);
+  return [...css.matchAll(/@font-face\s*{([^}]*)}/g)].map((m) => m[1] ?? "");
 }
 
 /** U+XXXX or U+XXXX-YYYY pieces of a unicode-range, as [from, to]. */
 function ranges(block: string): [number, number][] {
   const value = block.match(/unicode-range:\s*([^;]+);/)?.[1] ?? "";
   return value.split(",").map((part) => {
-    const [a, b] = part.trim().replace(/^U\+/i, "").split("-");
-    return [parseInt(a, 16), parseInt(b ?? a, 16)] as [number, number];
+    const [a = "", b = a] = part.trim().replace(/^U\+/i, "").split("-");
+    return [parseInt(a, 16), parseInt(b, 16)] as [number, number];
   });
 }
 

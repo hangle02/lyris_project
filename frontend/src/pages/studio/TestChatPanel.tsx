@@ -2,6 +2,10 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { KeyboardEvent } from "react";
 import { friendlyOf, isAbortError, streamTestChat } from "../../api/client";
 import { useAdvancedTools } from "../../hooks/useAdvancedTools";
+import { refreshWallet, useWallet } from "../../hooks/useWallet";
+import { LOCK_NO_COINS_REGEN } from "../../lib/actionLock";
+import { composerCoinLock } from "../../lib/coins";
+import { CoinsOutBlock } from "../../components/CoinsOutBlock";
 import { friendlyError } from "../../lib/friendlyError";
 import type { FriendlyError } from "../../lib/friendlyError";
 import { AutoTextarea } from "../../components/AutoTextarea";
@@ -164,6 +168,9 @@ export function TestChatPanel({
   const shown = turns ?? greetingTurns;
   const ready = !!persona && persona.id !== null && !!settings && blockers.length === 0;
   const busy = streaming !== null;
+  // F42 (docs/coins.md §3.1, §10.3): each test reply costs a member 6 coins like the real chat; under 6
+  // usable coins the test composer locks with the same "Bạn đã hết coin" block. The owner never locks.
+  const coinLocked = composerCoinLock(useWallet().wallet).locked;
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
@@ -228,6 +235,7 @@ export function TestChatPanel({
           abortRef.current = null;
           setStreaming(null);
         }
+        refreshWallet();
       }
     },
     [card, persona, settings],
@@ -235,7 +243,7 @@ export function TestChatPanel({
 
   const send = () => {
     const content = text.trim();
-    if (!content || busy || !ready) return;
+    if (!content || busy || !ready || coinLocked) return;
     if (content.length > MAX_CONTENT_CHARS) {
       setError({ text: "Tin nhắn quá dài (tối đa 20.000 ký tự).", technical: null });
       return;
@@ -253,7 +261,7 @@ export function TestChatPanel({
 
   const last = shown[shown.length - 1];
   const hasUserTurn = shown.some((t) => t.role === "user");
-  const canRegenerate = !busy && ready && hasUserTurn && last?.role === "assistant";
+  const canRegenerate = !busy && ready && !coinLocked && hasUserTurn && last?.role === "assistant";
   const canRetry = !busy && ready && last?.role === "user";
 
   const regenerate = () => {
@@ -348,8 +356,17 @@ export function TestChatPanel({
       </div>
 
       <div className="shrink-0 border-t border-line pt-2">
+        {coinLocked && !busy && <CoinsOutBlock className="pb-2" />}
         <div className="mb-2 flex items-center gap-1">
-          <Button variant="ghost" size="sm" icon={<IconRefreshCw />} onClick={regenerate} disabled={!canRegenerate} className="-ml-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<IconRefreshCw />}
+            onClick={regenerate}
+            disabled={!canRegenerate}
+            title={coinLocked ? LOCK_NO_COINS_REGEN : undefined}
+            className="-ml-2"
+          >
             Làm lại
           </Button>
           <Button variant="ghost" size="sm" icon={<IconTrash />} onClick={reset} disabled={turns === null && !busy && !error}>
@@ -363,7 +380,7 @@ export function TestChatPanel({
             onChange={(e) => setText(e.target.value)}
             onKeyDown={onKeyDown}
             maxHeight={180}
-            disabled={!ready}
+            disabled={!ready || coinLocked}
             aria-label="Tin nhắn chat thử"
             placeholder={
               !persona
@@ -377,7 +394,7 @@ export function TestChatPanel({
           {busy ? (
             <IconButton label="Dừng" icon={<IconStop />} variant="secondary" onClick={stop} />
           ) : (
-            <IconButton label="Gửi (Enter)" icon={<IconSend />} variant="orb" onClick={send} disabled={!ready || !text.trim()} />
+            <IconButton label="Gửi (Enter)" icon={<IconSend />} variant="orb" onClick={send} disabled={!ready || coinLocked || !text.trim()} />
           )}
         </div>
       </div>

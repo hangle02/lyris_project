@@ -71,6 +71,7 @@
       "Unit: story tiếng Anh dùng prompt tiếng Anh đã kiểm; story tiếng Việt dùng prompt tiếng Việt đã kiểm.",
       "Unit: thành viên không đổi được model của story và không thấy danh sách model; chỉ chủ máy đổi được.",
       "Bot: ở `#/chat/<id>`, bấm 'Thiết lập story' mở panel có ô tiêu đề, bối cảnh, ngôn ngữ, kiểu quan hệ, ngôi kể, kiểu suy nghĩ và công tắc 'Đọc suy nghĩ của nhân vật'; bấm 'Xoá story…' thì hiện hộp 'Xác nhận xoá story' có nút 'Xoá vĩnh viễn' trước khi xoá (bấm 'Huỷ' thì story vẫn còn).",
+      "Bot: chọn model của story chỉ có trong 'Nâng cao' và chỉ chủ máy thấy: sheet bắt đầu (cả khi mở 'Tuỳ chỉnh story') không có chữ hay ô model; 'Thiết lập story' của chủ máy có 'Nâng cao' đang gập, chỉ khi mở ra mới có ô 'Model trả lời' (có danh sách model); sheet bắt đầu và 'Thiết lập story' của thành viên không có 'Nâng cao' hay model.",
       "Model thật: card `trung_co_dai` không dùng 'anh/em' hay 'tớ/cậu' (harness `run_eval.py`, kịch bản `07-co-trang`).",
       "Model thật: dẫn truyện ngôi thứ ba không có 'tôi' và không dùng đại từ xưng hô của lời thoại (harness `run_eval.py`, kịch bản `01-mo-dau`, `06-viet-hien-dai`, `07-co-trang`: `narration_forbidden`).",
       "Model thật: story tiếng Anh trả lời bằng tiếng Anh (harness kịch bản `08-tieng-anh`)."
@@ -85,13 +86,14 @@
       "backend/tests/test_auth_routes.py::test_member_cannot_change_story_model_and_health_hides_models",
       "frontend/src/lib/storyOptions.test.ts",
       "bot: Thiết lập story có đủ ô, Xoá story hỏi lại",
+      "bot: chọn model của story chỉ có trong Nâng cao của Thiết lập story, chỉ chủ máy thấy",
       "model: 01-mo-dau",
       "model: 06-viet-hien-dai",
       "model: 07-co-trang",
       "model: 08-tieng-anh"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T09:38:15.162Z"
+    "verified_at": "2026-11-14T15:07:11.451Z"
   },
   {
     "id": "F04",
@@ -142,7 +144,8 @@
       "bot: chỉ đạo ((...)) hiện thành chip",
       "model: f05-chi-dao"
     ],
-    "state": "claimed"
+    "state": "passing",
+    "verified_at": "2026-11-14T15:07:11.525Z"
   },
   {
     "id": "F06",
@@ -295,7 +298,8 @@
       "Unit: 'Quên' xoá một ký ức và ngăn cảm xúc bỏ đúng dòng đó; 'Đọc lại story' xếp việc trích các lượt chưa đọc.",
       "Unit: header chat hiện 'nơi chốn · thời gian' khi có (`headerSubtitle`, `sceneLine`).",
       "Bot: sau một lượt (LLM giả trả ký ức và cảnh), ngăn 'Cảm xúc & ký ức' liệt kê ký ức có nhãn 'Sự kiện' hoặc 'Điều đã biết', mỗi ký ức có nút 'Quên: …'; header chat hiện 'nơi chốn · thời gian'.",
-      "Model thật: sau vài lượt trên gemma4:12b, ký ức và điều đã biết được trích đúng ý lượt chơi; story dài có '<details> Tóm tắt những lượt cũ' với tóm tắt đúng nội dung.",
+      "Bot: story dài có `<details>` 'Tóm tắt những lượt cũ': story dựng qua HTTP API của app trên LLM giả (6 lượt người chơi dài, lịch sử dài hơn cả `num_ctx` 8192 nên cửa sổ lịch sử chắc chắn đã dịch); việc nền viết tóm tắt; mở `#/chat/<id>`, ngăn 'Cảm xúc & ký ức' có `<details>` 'Tóm tắt những lượt cũ' gập sẵn, mở ra thì hiện đúng tóm tắt server đã lưu.",
+      "Model thật: sau vài lượt trên gemma4:12b, ký ức và điều đã biết được trích đúng ý lượt chơi (kịch bản `f10-ky-uc`); tóm tắt những lượt cũ của story dài đúng nội dung (kịch bản `f10-tom-tat`).",
       "Model thật: trên gemma4:12b, việc trích xuất thật ghi ký ức và điều đã biết có đúng chi tiết người chơi hoặc nhân vật vừa kể, điều đã biết nói về đúng người (kịch bản `f10-ky-uc`); tóm tắt thật của một đoạn story dài giữ đủ lời hứa, nơi chốn, tên người và bí mật đã có (kịch bản `f10-tom-tat`)."
     ],
     "tests": [
@@ -314,10 +318,12 @@
       "frontend/src/pages/chat/chatLogic.test.ts",
       "frontend/src/pages/chat/extrasPoller.test.ts",
       "bot: ngăn trái tim có ký ức và nút Quên, header có cảnh",
+      "bot: story dài (cửa sổ đã dịch) có Tóm tắt những lượt cũ trong ngăn trái tim",
       "model: f10-ky-uc",
       "model: f10-tom-tat"
     ],
-    "state": "claimed"
+    "state": "passing",
+    "verified_at": "2026-11-14T15:07:11.595Z"
   },
   {
     "id": "F11",
@@ -437,7 +443,8 @@
       "bot: chờ gợi ý có Huỷ gợi ý, chạm thẻ là gửi",
       "model: f15-goi-y"
     ],
-    "state": "claimed"
+    "state": "passing",
+    "verified_at": "2026-11-14T15:07:11.659Z"
   },
   {
     "id": "F16",
@@ -517,6 +524,8 @@
       "Bot: nhập 4 dòng vào 'Lời nói đặc trưng (tuỳ chọn)' rồi bấm Lưu thì không lưu được và hiện 'Chưa lưu được:' (Tối đa 3 lời nói đặc trưng); tải lại thì dòng thứ 4 không có.",
       "Bot: trong 'Xem trước và chat thử', gửi một tin thì có ba chấm khi chờ rồi có câu trả lời.",
       "Bot: 'Công cụ nâng cao' tắt thì trình sửa không có tab 'Xem trước' và không có chữ 'token'.",
+      "Bot: tải avatar lên ở trình sửa Studio (chọn file) thì chính ảnh đó (`/api/cards/<id>/avatar`, tải được) hiện ở danh sách Studio, lưới Khám phá, hồ sơ nhân vật và màn chat của story với nhân vật đó.",
+      "Bot: chat thử chạy với persona mặc định của tài khoản: 'Thiết lập thử' ghi tên persona mặc định và request chat thử gửi đúng `persona_id` đó (persona mặc định được đặt khác persona đầu tiên và persona mới nhất).",
       "Bot: ở `#/studio/<id>` sửa 'Tên nhân vật' mà chưa lưu rồi bấm 'Về Studio' thì trình duyệt hỏi lại ('Bạn có thay đổi chưa lưu…'); bấm Huỷ thì ở lại và chữ đang sửa còn nguyên, bấm OK thì về `#/studio` và tên đã lưu không đổi."
     ],
     "tests": [
@@ -541,10 +550,12 @@
       "bot: lời nói đặc trưng quá 3 dòng bị chặn",
       "bot: chat thử có ba chấm rồi trả lời",
       "bot: tắt công cụ nâng cao thì trình sửa không có Xem trước",
-      "bot: rời trình sửa còn thay đổi chưa lưu thì hỏi lại"
+      "bot: rời trình sửa còn thay đổi chưa lưu thì hỏi lại",
+      "bot: avatar tải lên ở Studio hiện ở Studio, Khám phá, hồ sơ và chat",
+      "bot: chat thử ở Studio dùng persona mặc định"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T07:23:43.966Z"
+    "verified_at": "2026-11-14T14:54:12.443Z"
   },
   {
     "id": "F19",
@@ -645,28 +656,25 @@
     "phase": "Phase 2b, 4b",
     "stage": "built",
     "done": [
-      "Unit: danh sách: card của người dùng trước, mẫu đã cài gộp vào; nhân vật nổi bật (mặc định Hạ Vy) không lặp lại trong lưới trừ khi đang lọc.",
+      "Unit: danh sách: card của người dùng trước, mẫu đã cài gộp vào (`buildItems`); mỗi nhân vật đúng một ô, kể cả Hạ Vy (không còn nhân vật nổi bật bị tách khỏi lưới).",
       "Unit: lọc theo vibe so sánh sau chuẩn hoá: không phân biệt hoa thường, giữ dấu.",
       "Unit: dòng tác giả: 'Mẫu của Lyris' cho mẫu, 'bởi @handle' cho card người dùng; không có dòng nguồn ảnh.",
       "Unit: Khám phá liệt kê nhân vật công khai của tài khoản khác.",
-      "Bot: ở 390px `#/explore` có khung nổi bật và lưới nhân vật; các thẻ rộng bằng nhau, thẻ cùng hàng cao bằng nhau; không cuộn ngang.",
-      "Bot: khi không lọc, nhân vật trong khung nổi bật không xuất hiện lại trong lưới.",
+      "Bot: ở 390px `#/explore` có lưới nhân vật `section[aria-labelledby=explore-all]`; các thẻ rộng bằng nhau, thẻ cùng hàng cao bằng nhau; không cuộn ngang.",
       "Bot: lưới có 2 cột ở 390px, 3 cột ở 800px, 5 cột ở 1280px; hàng cuối thiếu ô thì không kéo giãn.",
       "Bot: bấm một chip trong nhóm 'Lọc theo cảm xúc' thì chip có `aria-pressed=\"true\"`, bộ đếm thành 'x / tổng' (x > 0), lưới còn đúng x thẻ và chỉ còn nhân vật có tag đó (đủ mọi nhân vật có tag, đối chiếu tag từ `/api/cards`, `/api/templates`); bấm lại thì bộ đếm về tổng và lưới về như cũ (cùng các thẻ, cùng thứ tự)."
     ],
     "tests": [
       "frontend/src/pages/explore/logic.test.ts",
       "backend/tests/test_public_cards.py::test_explore_lists_other_accounts_public_cards",
-      "backend/tests/test_lyris_design.py::test_featured_template_is_ha_vy",
       "backend/tests/test_lyris_design.py::test_templates_list",
       "backend/tests/test_lyris_design.py::test_template_install_idempotent",
       "bot: Khám phá tải xong, thẻ đều nhau, không tràn ngang 390px",
-      "bot: nhân vật nổi bật không lặp trong lưới",
       "bot: lưới Khám phá 2/3/5 cột",
       "bot: chip cảm xúc chỉ giữ nhân vật có tag đó, bấm lại thì lưới như cũ"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T09:16:26.254Z"
+    "verified_at": "2026-11-14T16:52:40.134Z"
   },
   {
     "id": "F23",
@@ -679,7 +687,7 @@
       "Unit: tab 'Giới thiệu' chỉ có trường cho người đọc, `{{user}}` thành 'bạn', không bao giờ có trường bí mật; tab 'Thiết lập' có xưng hô, giọng kể, cảm xúc ban đầu.",
       "Unit: 'Lời nói đặc trưng' có 2-3 câu, tự chọn từ ví dụ thoại khi card không có.",
       "Unit: hồ sơ nhân vật công khai chỉ trả các trường trong whitelist.",
-      "Bot: bấm nhân vật nổi bật ở `#/explore` thì URL thành `#/character/...` (không mở story); hồ sơ có nút 'Bước vào câu chuyện', nhóm tab 'Thông tin nhân vật', và không có ô nhập nào.",
+      "Bot: bấm thẻ 'Hạ Vy' trong lưới 'Nhân vật' ở `#/explore` (khung nổi bật đã bỏ, [F46](F46-bang-xep-hang-nhan-vat-hot.md)) thì URL thành `#/character/...` (không mở story); hồ sơ có nút 'Bước vào câu chuyện', nhóm tab 'Thông tin nhân vật', và không có ô nhập nào.",
       "Bot: hồ sơ nhân vật mẫu không có nút 'Sửa nhân vật'; ở 390px có thanh dính sát đáy màn hình chứa nút 'Bước vào câu chuyện', và khi đã có story với nhân vật đó thì thanh có thêm 'Tiếp tục story' (bấm thì mở lại story `#/chat/<id>`).",
       "Bot: `#/character/999999` hiện 'Không tìm thấy nhân vật này' và nút 'Về Khám phá'."
     ],
@@ -695,7 +703,7 @@
       "bot: nhân vật không có thì báo không tìm thấy"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T09:16:26.318Z"
+    "verified_at": "2026-11-14T16:52:40.204Z"
   },
   {
     "id": "F24",
@@ -710,7 +718,9 @@
       "Bot: bấm 'Bước vào câu chuyện' ở hồ sơ mở sheet 'Chọn persona'; chọn persona rồi bấm 'Bước vào câu chuyện' trong sheet thì sang `#/chat/<id>` và có lời chào của nhân vật.",
       "Bot: sheet mở với persona đang dùng (đã đổi ở sheet Tài khoản, không phải persona mới thêm gần nhất) được chọn sẵn và 'Tuỳ chỉnh story' đang gập.",
       "Bot: mở `#/new-story?card=<id>` (link cũ) thì về hồ sơ `#/character/<id>` với sheet 'Chọn persona' đang mở.",
-      "Bot: tài khoản thứ hai bắt đầu story với nhân vật công khai của người khác thì sheet có dòng '@{handle} sửa nhân vật sau này thì story của bạn không đổi.'"
+      "Bot: tài khoản thứ hai bắt đầu story với nhân vật công khai của người khác thì sheet có dòng '@{handle} sửa nhân vật sau này thì story của bạn không đổi.'",
+      "Bot: danh sách persona trong sheet 'Chọn persona' là radio thật (mỗi dòng là `input type=radio`, cùng một `name`; phím mũi tên đổi lựa chọn như radio của trình duyệt), có đủ mọi persona của tài khoản, mỗi dòng có avatar cạnh tên (ảnh, hoặc chữ cái đầu khi persona chưa có ảnh).",
+      "Bot: tài khoản chưa có persona nào mở sheet thì form 'Tạo persona mới' tự mở (không phải bấm nút, không có danh sách persona); tạo persona trong form thì persona đó được chọn và bấm 'Bước vào câu chuyện' thì vào `#/chat/<id>`."
     ],
     "tests": [
       "frontend/src/pages/character/startLogic.test.ts",
@@ -723,10 +733,12 @@
       "bot: bắt đầu story qua sheet và persona, story mở với lời chào",
       "bot: sheet bắt đầu chọn sẵn persona mặc định, Tuỳ chỉnh gập",
       "bot: link new-story cũ chuyển sang hồ sơ",
-      "bot: nhân vật công khai có dòng bản sao"
+      "bot: nhân vật công khai có dòng bản sao",
+      "bot: danh sách persona trong sheet bắt đầu là radio thật, mỗi persona có avatar",
+      "bot: chưa có persona thì sheet bắt đầu tự mở form Tạo persona mới"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T06:28:07.551Z"
+    "verified_at": "2026-11-14T14:54:12.561Z"
   },
   {
     "id": "F25",
@@ -771,9 +783,12 @@
       "Bot: thanh 'Điều hướng chính' có 3 tab (Khám phá, Tương tác, Studio) ở `#/`, `#/explore`, `#/studio`; không có ở `#/chat/<id>`, `#/studio/<id>`, `#/personas`, `#/character/<id>`.",
       "Bot: ở 390px, `#/`, `#/studio`, `#/chat/<id>` không cuộn ngang và mọi nút trên header (cả 'Suy nghĩ' và hai nút Story/DM ở `#/chat/<id>`), mọi tab của thanh 'Điều hướng chính' rộng và cao ≥ 44px.",
       "Bot: ở 390px, mọi nút dưới lượt cuối của nhân vật trong story (hàng thao tác: Tạo lại, Thích, Chê, Sửa, Xoá từ đây…) và nút 'Huỷ', 'Xoá' của hộp 'Xác nhận xoá' rộng và cao ≥ 44px.",
-      "Bot: suốt lượt chạy của bot (mọi trang) không có request nào ra ngoài máy (font, icon, ảnh đều tự host)."
+      "Bot: suốt lượt chạy của bot (mọi trang) không có request nào ra ngoài máy (font, icon, ảnh đều tự host).",
+      "Unit: dấu tiếng Việt có trong cả ba font tự host: mọi file font mà `main.tsx` nhập (Plus Jakarta Sans, Be Vietnam Pro, Cormorant Garamond) có `@font-face` phủ U+1EA0–1EF9, Đ đ, Ơ ơ, Ư ư, lấy từ file `.woff2` tiếng Việt cục bộ; token `--font-sans`, `--font-story`, `--font-brand` đặt đúng font đó đầu tiên.",
+      "Bot: dấu tiếng Việt hiển thị đúng ở cả ba font: với mọi kiểu chữ app dùng (10 cặp độ đậm/nghiêng), từng chữ 'Ặ ặ Ỡ ỡ Ừ ừ Ữ ữ Ấ ấ Ộ ộ Ệ ệ Ơ ơ Ư ư Ă ă Đ đ' được vẽ bằng chính font đó, không rơi về font dự phòng (đo canvas sau `document.fonts.load`: cùng độ rộng dù font dự phòng là monospace hay serif), và bộ chữ tiếng Việt (U+1EA0–1EF9) của font đã tải."
     ],
     "tests": [
+      "frontend/src/theme/fonts.test.ts",
       "frontend/src/theme/theme.test.ts",
       "frontend/src/lib/router.test.ts",
       "frontend/src/components/ui/logic.test.ts",
@@ -785,10 +800,11 @@
       "bot: thanh tab 3 tab, ẩn ở màn con",
       "bot: 390px không tràn ngang, nút header và thanh tab ≥ 44px ở #/, #/studio, #/chat",
       "bot: 390px nút dưới lượt chat và nút hộp Xác nhận xoá ≥ 44px",
-      "bot: không có request ra ngoài"
+      "bot: không có request ra ngoài",
+      "bot: chữ tiếng Việt có dấu vẽ bằng đúng ba font tự host, không rơi về font dự phòng"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T09:16:26.381Z"
+    "verified_at": "2026-11-14T14:54:12.621Z"
   },
   {
     "id": "F27",
@@ -836,7 +852,8 @@
       "Unit: đổi tên profile thì trạng thái đăng nhập nhận tên mới ngay, không cần tải lại.",
       "Bot: `#/me` có số liệu và hai tab 'Nhân vật', 'Persona'.",
       "Bot: bấm 'Sửa profile', đổi tên hiển thị, lưu thì nút tài khoản trên header có tên mới (aria-label 'Tài khoản: {tên}. …') mà không tải lại trang; gõ handle có khoảng trắng hoặc ký tự lạ (vd `chu may!`) thì ô có `aria-invalid=\"true\"` và câu lỗi ngay dưới ô.",
-      "Bot: `#/u/<handle của mình>` hiện profile; `#/u/khong_ton_tai_xyz` hiện 'Không có tài khoản @khong_ton_tai_xyz trên Lyris.'"
+      "Bot: `#/u/<handle của mình>` hiện profile; `#/u/khong_ton_tai_xyz` hiện 'Không có tài khoản @khong_ton_tai_xyz trên Lyris.'",
+      "Bot: 'Sửa profile' đổi cả giới thiệu, ảnh đại diện, ảnh bìa: chọn ảnh (như hộp chọn file) thì ảnh được lưu và nút thành 'Đổi ảnh đại diện' / 'Đổi ảnh bìa'; sửa 'Giới thiệu', bấm Lưu, tải lại `#/me` thì trang hiện giới thiệu mới, ảnh đại diện và ảnh bìa (ảnh tải được)."
     ],
     "tests": [
       "backend/tests/test_accounts.py",
@@ -845,10 +862,11 @@
       "frontend/src/lib/auth.test.ts",
       "bot: #/me có số liệu và hai tab",
       "bot: Sửa profile đổi tên ngay, handle sai báo dưới ô",
-      "bot: profile công khai theo handle"
+      "bot: profile công khai theo handle",
+      "bot: Sửa profile đổi giới thiệu, ảnh đại diện, ảnh bìa và #/me hiện đủ"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T06:28:07.772Z"
+    "verified_at": "2026-11-14T14:54:12.684Z"
   },
   {
     "id": "F29",
@@ -1081,7 +1099,8 @@
       "model: f36-bakeoff",
       "model: f36-chay-long"
     ],
-    "state": "claimed"
+    "state": "passing",
+    "verified_at": "2026-11-14T15:07:11.724Z"
   },
   {
     "id": "F37",
@@ -1159,6 +1178,646 @@
       "Model thật: harness: `lyris-v1` bằng hoặc hơn base ở godmodding, format, xưng hô."
     ],
     "tests": [],
+    "state": "pending"
+  },
+  {
+    "id": "F42",
+    "title": "Ví coin và tiêu coin khi chat",
+    "page": "wiki/features/F42-vi-coin.md",
+    "phase": "Ra mắt (coin)",
+    "stage": "built",
+    "done": [
+      "Unit: migration `0012_coins.sql` tạo `coin_wallets`, `coin_ledger`, `coin_holds`; `UPDATE` cột `delta` hay `actor_id = 5` trên `coin_ledger` bị trigger chặn; sau 200 thao tác ngẫu nhiên `coin_wallets.balance` bằng tổng `delta` trong sổ và không bao giờ < 0; ghi lại cùng `idem_key` cùng nội dung không cộng lần hai, khác `delta` thì `IdemConflict`.",
+      "Unit: tạo tài khoản bằng mã mời (`POST /api/auth/signup`) và gọi thẳng `auth/store.insert_member` đều cho đúng một dòng `coin_wallets` và một dòng `signup:<id>` +300, kể cả khi `LYRIS_COINS=0`; `post()` cho tài khoản chưa có ví tự tạo ví 0 thay vì lỗi; migration cho mỗi thành viên có từ trước +300 (`backfill_grant`); chủ máy không có dòng nào trong `coin_ledger`.",
+      "Unit: `POST /api/coins/checkin` cộng 60 coin một lần mỗi ngày giờ Việt Nam (UTC+7): gọi lúc 16:59Z rồi 17:00Z cùng ngày UTC là hai ngày coin (2 lần +60); gọi lại cùng ngày coin trả `granted: false`; `POST /api/auth/login` cùng ngày không cộng thêm; thành viên vừa tạo gọi checkin cùng ngày có số dư 360.",
+      "Unit: gửi lượt, `POST /api/stories/{id}/reply` và `POST /api/messages/{id}/regenerate` ở cả `mode` story và dm, và `POST /api/cards/test-chat`, mỗi câu trả lời có chữ trừ đúng 6 coin (một dòng `kind = 'chat'`, `idem_key = chat:<hold_id>`; chat thử có giữ chỗ `mode = 'test'`, `story_id` NULL).",
+      "Unit: lỗi model, câu trả lời rỗng, lưu lỗi, chờ quá 120 giây, đóng kết nối trước sự kiện `delta` đầu tiên, `InvalidOperation` khi chuẩn bị → giữ chỗ `released` đúng lý do, số dư không đổi, không có dòng sổ; đóng kết nối sau khi đã có `delta` → trừ 6.",
+      "Unit: dừng khi người chơi chưa nhận `delta` có chữ nào (mẩu \"[Thought…\" còn nằm trong parser) → giữ chỗ `released` lý do `cancelled`, số dư không đổi, không có dòng sổ.",
+      "Unit: giữ chỗ bị kẹt `held` (nhả lỗi \"database is locked\"; hay transaction lưu câu trả lời bị cuộn lại sau khi `charge` đã đánh dấu trong bộ nhớ) không chặn lượt sau: \"Trả lời\" và gửi tiếp chạy được ngay, không cần khởi động lại app; giữ chỗ kẹt thành `released` (`error` / `save_failed`), không có dòng sổ thừa, số dư đúng.",
+      "Unit: `DELETE` trực tiếp trên `coin_ledger` bị trigger chặn (migration `0013_coin_ledger_no_delete.sql`), số dư vẫn bằng tổng sổ; xoá tài khoản vẫn xoá mọi dòng sổ của tài khoản đó (cascade).",
+      "Unit: lịch sử ví và \"Tải dữ liệu của tôi\" chỉ lấy tên nhân vật từ story/card của CHÍNH tài khoản đó: id story hay card đã xoá được dùng lại cho nhân vật riêng tư của thành viên khác thì nhãn ghi \"nhân vật\", không bao giờ hiện tên của người khác.",
+      "Unit: giữ chỗ còn `held` được nhả với lý do `restart` khi `lifespan` của app khởi động (sự kiện `coins_released` phát qua `emit_detached`); mở DB bằng `migrate()` hay `lyris.auth.cli` không nhả giữ chỗ nào.",
+      "Unit: `charge` của một giữ chỗ `held` luôn ghi được dòng sổ và câu trả lời luôn được lưu, kể cả khi trong lúc sinh số dư bị trừ tay xuống mức thấp nhất cho phép; `ChatService` dựng không có `coins` (`None`) thì không tạo giữ chỗ nào.",
+      "Unit: thành viên còn dưới 6 coin dùng được: bốn route gửi/trả lời/tạo lại/chat thử trả HTTP 402 `{code: \"coins_required\", detail: \"Bạn đã hết coin. Mỗi câu trả lời cần 6 coin.\"}` trước byte SSE đầu tiên, lượt người chơi không được lưu (`active_messages` không đổi).",
+      "Unit: thành viên còn đúng 6 coin, hai request gửi cùng lúc ở hai story: một request chạy, request kia 409 hoặc 402; số dư cuối là 0, không âm.",
+      "Unit: chủ máy gửi 10 lượt và 10 câu chat thử thì không có `coin_holds` nào, số dư không đổi, `GET /api/coins/wallet` trả `unlimited: true`; với `LYRIS_COINS=0` thành viên gửi lượt cũng không bị trừ và wallet trả `enabled: false`; `NORA_COINS=0` khi chưa đặt `LYRIS_COINS` cũng tắt coin.",
+      "Unit: `POST /api/stories/{id}/suggestions` và `POST /api/cards/draft` không tạo giữ chỗ hay dòng sổ.",
+      "Unit: `GET /api/coins/history` chỉ trả dòng của tài khoản đang đăng nhập, 30 dòng mỗi trang, có `label` tiếng Việt theo bảng chữ của [docs/coins.md §10.5](../../docs/coins.md) (chat thử: \"Chat thử ở Studio\"); `groupHistory()` ở frontend gộp các dòng `chat` liền nhau cùng story cùng ngày thành \"{k} câu trả lời của {tên}\"; `formatCoins(1200)` = \"1.200 coin\".",
+      "Unit: `coins.test.ts`: `composerCoinLock({available: 4})` khoá ô nhập và `actionLock` của \"Tạo lại câu trả lời\" trả lý do \"Cần 6 coin để tạo lại.\"; kho ví làm mới thành `available: 6` thì `composerCoinLock` mở, không cần tải lại trang; chủ máy (`unlimited: true`) không bao giờ bị khoá; mọi chuỗi trong `lib/coinCopy.ts` không có \"chủ máy\", \"token\", \"credits\", \"model\", \"Ollama\".",
+      "Unit: sự kiện `coins_spent`, `coins_released`, `coins_insufficient`, `coins_granted`, `wallet_viewed` có trong `events.py`, `track.ts` và `tracking-plan.md` §4, chỉ có thuộc tính enum/bool/số, `coins_granted.source` không có `backfill`; \"Tải dữ liệu của tôi\" có `coins.balance` và `coins.ledger`; xoá tài khoản không còn dòng nào của tài khoản đó trong mọi bảng coin; xoá một tài khoản đang là `actor_id` của dòng sổ người khác thì xoá được và dòng đó còn, `actor_id` thành NULL.",
+      "Unit: `docs/legal/terms.md` có mục \"Coin\" ở cả phần tiếng Việt và \"## English\" (không đổi ra tiền, không chuyển nhượng, mất khi xoá tài khoản, chế độ thử không bán coin, mã nạp được tặng không bán, coin chế độ thử khi ra mắt); `docs/legal/privacy.md` nhắc sổ coin ở cả hai ngôn ngữ; `LEGAL_VERSION` đổi nên tài khoản cũ (kể cả chủ máy) thấy màn đồng ý một lần.",
+      "Bot: thành viên ở `#/` thấy nút có aria-label dạng 'Coin: <số>. Mở ví coin' trên header; bấm thì sang `#/coins` có tiêu đề 'Ví coin', cùng số dư, nút 'Nạp coin', 'Nhiệm vụ' và mục 'Lịch sử' có dòng 'Quà tạo tài khoản'; 390px không cuộn ngang.",
+      "Bot: thành viên `@coinmoi` (server giả, chưa checkin) đăng nhập và mở `#/` lần đầu thấy thông báo '+60 coin cho hôm nay'; số dư ở `#/coins` là 360.",
+      "Bot: thành viên gửi một lượt ở `#/chat/<id>` (LLM giả) thì số dư ở `#/coins` giảm đúng 6.",
+      "Bot: tài khoản `@hetcoin` (0 coin, server giả) mở story chế độ Story ở `#/chat/<id>`: ô nhập có `disabled`, có chữ 'Bạn đã hết coin', nút 'Nạp coin' mở `#/coins/top-up`, nút 'Nhiệm vụ' mở `#/missions`; 390px không cuộn ngang.",
+      "Bot: `@hetcoin` mở story DM ở `#/chat/<id>`: ô có aria-label của DM có `disabled`, có chữ 'Bạn đã hết coin' và hai nút 'Nạp coin', 'Nhiệm vụ'; 390px không cuộn ngang.",
+      "Bot: sheet Tài khoản của thành viên có hàng 'Coin' với số dư và nút 'Mở ví coin'; của chủ máy có 'Tài khoản quản lý không tốn coin.' và header của chủ máy không có nút 'Coin: …'."
+    ],
+    "tests": [
+      "backend/tests/test_coins_wallet.py::test_migration_0012_ledger_append_only_and_balance_matches_sum",
+      "backend/tests/test_coins_wallet.py::test_idem_key_never_posts_twice_conflict_on_other_payload",
+      "backend/tests/test_coins_wallet.py::test_every_member_creation_path_opens_wallet_with_300",
+      "backend/tests/test_coins_wallet.py::test_missing_wallet_is_created_not_error",
+      "backend/tests/test_coins_wallet.py::test_signup_grants_300_once_owner_gets_nothing",
+      "backend/tests/test_coins_wallet.py::test_existing_members_get_backfill_grant",
+      "backend/tests/test_coins_wallet.py::test_daily_checkin_once_per_vietnam_day",
+      "backend/tests/test_coins_wallet.py::test_first_day_is_300_plus_60",
+      "backend/tests/test_coins_wallet.py::test_owner_unlimited_and_coins_off_flag",
+      "backend/tests/test_coins_chat.py::test_each_saved_reply_costs_6_story_dm_retry_regenerate_test_chat",
+      "backend/tests/test_coins_chat.py::test_no_text_releases_hold",
+      "backend/tests/test_coins_chat.py::test_stop_after_first_delta_charges",
+      "backend/tests/test_coins_chat.py::test_stop_before_visible_text_releases_hold",
+      "backend/tests/test_coins_chat.py::test_stuck_hold_never_blocks_next_turn",
+      "backend/tests/test_coins_wallet.py::test_ledger_rows_cannot_be_deleted_only_cascade_with_account",
+      "backend/tests/test_coins_api.py::test_history_label_never_shows_other_accounts_card_name",
+      "backend/tests/test_coins_chat.py::test_open_holds_released_only_in_app_lifespan",
+      "backend/tests/test_coins_chat.py::test_charge_of_held_hold_never_loses_reply",
+      "backend/tests/test_coins_chat.py::test_chat_service_without_coins_never_holds",
+      "backend/tests/test_coins_chat.py::test_out_of_coins_402_before_user_turn_saved",
+      "backend/tests/test_coins_chat.py::test_two_tabs_cannot_overspend",
+      "backend/tests/test_coins_chat.py::test_suggestions_and_draft_are_free",
+      "backend/tests/test_coins_api.py::test_history_is_own_paged_and_labelled",
+      "backend/tests/test_coins_api.py::test_coin_events_follow_the_strict_schema",
+      "backend/tests/test_coins_api.py::test_export_has_coins_and_delete_removes_coin_rows",
+      "backend/tests/test_coins_api.py::test_terms_have_coin_section_and_version_bumped",
+      "frontend/src/lib/coins.test.ts",
+      "bot: chip coin trên header mở Ví coin",
+      "bot: mở app lần đầu trong ngày được +60 coin",
+      "bot: gửi một lượt thì ví giảm đúng 6 coin",
+      "bot: hết coin thì ô nhập khoá, có Nạp coin và Nhiệm vụ",
+      "bot: hết coin thì ô nhập DM cũng khoá",
+      "bot: sheet Tài khoản có số coin, chủ máy không tốn coin"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T14:54:12.746Z"
+  },
+  {
+    "id": "F43",
+    "title": "Nạp coin (chế độ thử, mã nạp)",
+    "page": "wiki/features/F43-nap-coin.md",
+    "phase": "Ra mắt (coin)",
+    "stage": "built",
+    "done": [
+      "Unit: `GET /api/coins/packs` trả `test_mode: true` và đúng 4 gói `p100`, `p550`, `p1200`, `p2500` với `coins` 100/550/1200/2500 và `price_vnd` 10000/50000/100000/200000; tập route của app có đường dẫn bắt đầu bằng `/api/coins/` hay `/api/admin/coins/` (cộng `POST /api/admin/accounts/{id}/coins`) đúng bằng danh sách ở [docs/coins.md §7](../../docs/coins.md), không thừa route nào.",
+      "Unit: `POST /api/admin/coins/codes` (chủ máy) tạo mã 12 ký tự, DB chỉ có `code_hash` và `code_hint`; `GET /api/admin/coins/codes` không bao giờ trả mã đầy đủ; thành viên gọi route `/api/admin/coins/*` nhận 403 `owner_only`; khi đã có 50 mã còn hiệu lực, tạo mã thứ 51 trả 422 `topup_code_limit`, huỷ một mã thì tạo lại được.",
+      "Unit: `POST /api/coins/redeem` với mã đúng cộng đúng `amount` một lần (`topup:<code_id>`); dùng lại, hết hạn, đã huỷ, không có thật → cùng 422 `topup_code_invalid` \"Mã nạp không đúng hoặc đã hết hạn.\"; mã được chuẩn hoá (viết thường, gạch ngang của iPhone, khoảng trắng); hai tài khoản nhập cùng mã cùng lúc chỉ một tài khoản được cộng.",
+      "Unit: 10 lần nhập sai trong 60 phút thì lần thứ 11 trả 429 `rate_limited`, kể cả khi mã đúng; dòng `coin_code_attempts` cũ hơn 30 ngày bị xoá khi ghi lần thử mới; chủ máy nhập một mã còn hiệu lực trả 422 `topup_code_owner` và mã vẫn còn hiệu lực.",
+      "Unit: `POST /api/admin/accounts/{id}/coins` cần `reason` 3–120 ký tự (thiếu thì 422); trừ quá số coin dùng được trả 422 `adjust_too_large` \"Không trừ được quá số coin dùng được ({n} coin).\"; cùng `request_id` gửi hai lần cùng `delta` chỉ ghi một dòng, khác `delta` trả 409 `idem_conflict`; dòng sổ có `actor_id` của chủ máy; áp dụng cho chủ máy trả 422.",
+      "Unit: thành viên có 10 coin đang chờ một câu trả lời (6 coin giữ chỗ, dùng được 4): chủ máy trừ 5 trả 422 `adjust_too_large` với `n = 4`, trừ 4 thì được; câu trả lời sau đó vẫn được lưu và trừ 6, số dư cuối là 0.",
+      "Unit: `GET /api/admin/coins/log` có 50 dòng mới nhất của `topup_code`, `admin_adjust` và `creator_milestone` (test ghi một dòng `creator_milestone` bằng `post()`) và ba tổng 30 ngày; không có `story_id`, tên nhân vật hay nội dung tin nhắn; sự kiện `topup_code_redeemed`, `topup_code_failed`, `topup_code_created`, `coins_adjusted` đúng luật `events.py`.",
+      "Unit: `topupLogic.ts`: `formatVnd(50000)` = \"50.000đ\"; chuẩn hoá mã giống `inviteCode.ts`; `adminCoinLogic.ts` kiểm số coin 1–10.000 và lý do 3–120 ký tự trước khi gửi.",
+      "Bot: thành viên mở `#/coins/top-up` thấy tiêu đề 'Nạp coin', câu có 'Chế độ thử' và 'chưa bán coin', 4 thẻ gói có 'coin', 'đ' và 'Giá dự kiến', ô có aria-label 'Mã nạp' và nút 'Dùng mã'; chạm thẻ '100 coin' mở hộp có 'Giá dự kiến khi Lyris ra mắt' và chỉ có nút 'Đóng' (không có nút thanh toán hay 'Liên hệ'); 390px không cuộn ngang.",
+      "Bot: chủ máy mở `#/admin`, chọn 'Coin', bấm 'Tạo mã nạp', chọn gói 100 coin, bấm 'Tạo mã' thì hộp 'Mã nạp mới' hiện mã kèm 'Sao chép mã'; thành viên nhập mã đó ở `#/coins/top-up`, bấm 'Dùng mã' thì thấy 'Đã nạp 100 coin.' và số dư ở `#/coins` tăng đúng 100.",
+      "Bot: chủ máy ở `#/admin` mở '…' của một thành viên, chọn 'Cộng/trừ coin', nhập 20 và lý do 'thử bot', bấm 'Lưu' thì hàng thành viên đó có số coin tăng 20 và 'Nhật ký' có dòng 'thử bot'."
+    ],
+    "tests": [
+      "backend/tests/test_coins_topup.py::test_packs_are_test_mode_with_vnd_prices",
+      "backend/tests/test_coins_topup.py::test_coin_routes_are_exactly_the_documented_list",
+      "backend/tests/test_coins_topup.py::test_owner_creates_code_shown_once_hash_stored",
+      "backend/tests/test_coins_topup.py::test_at_most_50_active_codes",
+      "backend/tests/test_coins_topup.py::test_member_gets_403_on_admin_coin_routes",
+      "backend/tests/test_coins_topup.py::test_redeem_once_same_error_for_used_expired_revoked_unknown",
+      "backend/tests/test_coins_topup.py::test_concurrent_redeem_credits_one_account",
+      "backend/tests/test_coins_topup.py::test_redeem_rate_limited_after_10_failures",
+      "backend/tests/test_coins_topup.py::test_owner_cannot_redeem_code",
+      "backend/tests/test_coins_topup.py::test_owner_adjust_requires_reason_and_never_negative",
+      "backend/tests/test_coins_topup.py::test_adjust_during_open_hold_keeps_reply_and_charge",
+      "backend/tests/test_coins_topup.py::test_admin_coin_log_has_no_story_content",
+      "frontend/src/pages/coins/topupLogic.test.ts",
+      "frontend/src/pages/admin/adminCoinLogic.test.ts",
+      "bot: Nạp coin có gói giá chế độ thử và ô mã nạp",
+      "bot: chủ máy tạo mã nạp, thành viên dùng mã thì ví tăng",
+      "bot: chủ máy cộng coin cho thành viên có lý do"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T14:54:12.810Z"
+  },
+  {
+    "id": "F44",
+    "title": "Thưởng sáng tác theo bảng xếp hạng Nhân vật hot",
+    "page": "wiki/features/F44-thuong-sang-tac.md",
+    "phase": "Ra mắt (coin)",
+    "stage": "built",
+    "done": [
+      "Unit: một thành viên khác có 2 câu trả lời đã trả coin với bản sao của X thì chưa được tính; câu thứ 3 cùng ngày coin vẫn chưa; một câu ở ngày coin sau (đồng hồ giả +1 ngày) thì có đúng một dòng `creator_players (X, người đó)`; 3 câu chia ở hai story bản sao khác nhau của X cũng được cộng dồn.",
+      "Unit: người tạo X chơi bản sao của chính X và chủ máy chơi X không bao giờ có dòng trong `creator_players`; câu trả lời bị nhả (lỗi, rỗng) không được đếm.",
+      "Unit: `note_charged` không còn ghi dòng sổ nào: người chơi thứ 10, 50, 100 của X đủ điều kiện thì `coin_ledger` không có dòng `idem_key LIKE 'milestone:%'` mới; dòng `milestone:<X>:10` cũ (ghi bằng `post()`) vẫn hiện trong `GET /api/coins/history` với nhãn \"{tên} đạt 10 người chơi\".",
+      "Unit: bảng có 100 nhân vật được xếp hạng của 100 người tạo khác nhau, X lên hạng 7 trong một lần tính → người tạo nhận đúng ba dòng sổ `rank:<X>:100` +100, `rank:<X>:50` +200, `rank:<X>:10` +300 (tổng 600); gọi `settle_rewards` thêm 3 lần, hay tính bảng lại sau 61 phút với X vẫn hạng 7, vẫn chỉ ba dòng; X rớt hạng 120 rồi lên lại hạng 5 không có dòng mới.",
+      "Unit: bậc top N đếm **người tạo khác nhau**: một người tạo có 12 nhân vật công khai, mỗi nhân vật 1 người chơi (cùng một người chơi) → 12 nhân vật hạng 1–12, `creators = 1`, không có dòng `rank:` và không có `creator_rank_tiers` nào; 21 nhân vật của 9 người tạo, X hạng 1 → không có dòng `rank:` nào; nhân vật của 60 người tạo, X hạng 7 → chỉ có `rank:<X>:50` và `rank:<X>:10` (+500), không có `rank:<X>:100`; khi bảng lên 100 người tạo mà X vẫn hạng ≤ 100 thì `rank:<X>:100` +100 được trả ở lần tính đó, còn 12 nhân vật tự lấp bảng (hạng > 100) vẫn không có bậc nào.",
+      "Unit: trần 600 coin/7 ngày coin theo người tạo: nhân vật thứ hai của cùng người tạo lên top 10 trong cùng tuần (bảng 100 người tạo) → `creator_rank_tiers` của nó có 3 dòng `outcome = 'waiting'`, không có dòng sổ; đồng hồ giả +7 ngày coin rồi tính bảng → trả đủ 600; thưởng mốc cũ `milestone:` không tính vào trần.",
+      "Unit: người tạo là chủ máy → nhân vật vẫn có hạng, `creator_rank_tiers.outcome = 'owner'`, không có dòng sổ và không có `first_public`; coin tắt (`LYRIS_COINS=0`) lúc đạt bậc → bậc của thành viên `waiting`, không có dòng sổ; sau đó bật coin lại mà người tạo đang bị tạm khoá, hay X đã về Riêng tư → bậc vẫn `waiting` (người tạo khác thì được trả); mở khoá / công khai lại → trả đủ ở lần tính đầu tiên sau đó (nhân vật riêng tư hay người tạo bị khoá không có trên bảng nên không đạt bậc mới).",
+      "Unit: thưởng công khai lần đầu: X công khai 23 giờ 59 phút có 1 người chơi → không có `first_public:<người tạo>`; đủ 24 giờ → đúng một dòng +50; nhân vật công khai thứ hai của cùng người tạo không có thêm dòng nào; X về Riêng tư rồi công khai lại thì `card_public_since.since` đổi sang lúc bật lại (24 giờ đếm lại); nhân vật công khai đủ 24 giờ mà 0 người chơi → không trả.",
+      "Unit: xoá X thì `creator_rank_tiers`, `hot_board`, `card_public_since` của X bị xoá, dòng sổ đã ghi vẫn còn; id X bị dùng lại cho nhân vật mới thì khoá là `rank:<X>:<N>:<uid>` (không `IdemConflict`); trả thưởng lỗi (lỗi DB, `IdemConflict`) lúc tính bảng thì `GET /api/explore/hot` và `POST /api/coins/checkin` vẫn trả 200, không bao giờ 500, và bậc vẫn được ghi `waiting` (trả ở lần tính sau).",
+      "Unit: một dòng thưởng lỗi không chặn dòng khác: ghi sổ lỗi cho mọi dòng thưởng của người tạo A (bậc và +50) thì trong cùng lần tính người tạo B vẫn được trả đủ 600 và +50, bậc của A được ghi `waiting`, A không có dòng sổ; hết lỗi thì lần tính sau trả đủ 600 và +50 cho A.",
+      "Unit: `GET /api/cards/{id}` của chủ nhân vật công khai có `creator: {players, rank, next_tier, next_reward, waiting_coins, board_creators}` (X hạng 1 trên bảng chỉ có nhân vật của 1 người tạo → `next_tier: 10`, `next_reward: 300`, `board_creators: 1`, chưa có bậc nào; X hạng 60 trên bảng 100 người tạo, đã nhận top 100 → `next_tier: 50`, `next_reward: 200`, `board_creators: 100`; đạt đủ → `next_tier: null`; chủ máy → `next_reward: null`); người khác gọi không có khoá `creator`; `GET /api/coins/history` có nhãn \"{tên} vào top 10 Nhân vật hot\" và \"Thưởng công khai nhân vật lần đầu\"; `GET /api/admin/coins/log` có \"Thưởng xếp hạng top 10\" và \"Thưởng công khai lần đầu\"; sự kiện `creator_rank_reached` có `tier` 100/50/10 và `paid`.",
+      "Unit: `creatorLogic.ts` dựng đúng chữ \"{n} người chơi · Hạng {r} Nhân vật hot\", \"{n} người chơi · Chưa có trên bảng Nhân vật hot\", \"Bậc thưởng tiếp theo: top {N} (+{c} coin)\", \"Bậc tiếp theo: top {N}\" (không có coin), \"Đã nhận đủ thưởng xếp hạng\", \"Thưởng đang chờ: +{w} coin (tối đa 600 coin mỗi 7 ngày)\", và \"Thưởng top {N} chỉ có khi bảng có nhân vật của ít nhất {N} người tạo khác nhau (hiện có {k}).\" chỉ khi có coin, còn bậc chưa đạt và `board_creators < N`; không còn chữ \"Mốc tiếp theo\".",
+      "Bot: người tạo mở trình sửa `#/studio/<id>` của nhân vật công khai có sẵn 12 người chơi (server giả, `environment/seed-creator-players.py`; script tính lại bảng ngay sau khi dựng người chơi, như lần tính mỗi giờ, vì app đã tính bảng lúc bot mở app) thấy trong phần 'Cơ bản' dòng có '12 người chơi' và 'Hạng 1 Nhân vật hot', dòng 'Bậc thưởng tiếp theo: top 10 (+300 coin)' và 'Thưởng top 10 chỉ có khi bảng có nhân vật của ít nhất 10 người tạo khác nhau (hiện có 1).' (bảng của bot chỉ có nhân vật của 1 người tạo); không có chữ 'Mốc tiếp theo'; nhân vật riêng tư không có dòng này."
+    ],
+    "tests": [
+      "backend/tests/test_coins_creator.py::test_player_counts_after_3_charged_replies",
+      "backend/tests/test_coins_creator.py::test_creator_owner_and_released_replies_never_count",
+      "backend/tests/test_creator_rank.py::test_milestones_no_longer_paid_old_rows_keep_label",
+      "backend/tests/test_creator_rank.py::test_rank_tiers_pay_100_200_300_once_cumulative",
+      "backend/tests/test_creator_rank.py::test_tier_needs_board_of_at_least_n_creators",
+      "backend/tests/test_creator_rank.py::test_rank_rewards_capped_600_per_7_days_wait_not_lost",
+      "backend/tests/test_creator_rank.py::test_owner_coins_off_disabled_private_tiers_wait",
+      "backend/tests/test_creator_rank.py::test_first_public_bonus_50_after_24h_with_player_once",
+      "backend/tests/test_creator_rank.py::test_deleted_or_reused_card_and_settle_failure_never_500",
+      "backend/tests/test_creator_rank.py::test_one_failed_reward_never_blocks_other_rewards",
+      "backend/tests/test_creator_rank.py::test_card_api_history_admin_log_and_event_labels",
+      "frontend/src/pages/studio/creatorLogic.test.ts",
+      "bot: trình sửa nhân vật công khai có số người chơi, hạng Nhân vật hot và điều kiện bậc thưởng"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T16:52:40.272Z"
+  },
+  {
+    "id": "F45",
+    "title": "Nhiệm vụ ngày và quảng cáo mẫu",
+    "page": "wiki/features/F45-nhiem-vu-ngay.md",
+    "phase": "Ra mắt (coin)",
+    "stage": "built",
+    "done": [
+      "Unit: `GET /api/coins/missions` của thành viên trả 3 nhiệm vụ `ad` (target 3, reward 5), `characters` (target 3, reward 10), `turns` (target 20, reward 5), `cap: 30`; của chủ máy trả `missions: []`; tiến độ về 0 lúc 17:00Z (0:00 giờ Việt Nam).",
+      "Unit: `POST /api/coins/ads/{id}/claim` gọi 14 giây sau `ads/start` (đồng hồ server giả) trả 409 `ad_not_finished` và không cộng; gọi lúc ≥ 15 giây cộng 5 một lần; claim lại cùng `ad_id` không cộng thêm; `ad_id` của tài khoản khác trả 404; claim sau `POST /api/coins/ads/{id}/cancel` (dù đã đủ 15 giây), sau 10 phút, hay sau 0:00 giờ Việt Nam so với lúc bắt đầu đều trả 409 `ad_expired` và không cộng; gọi `cancel` hai lần không lỗi; `ads/start` lần hai huỷ lượt xem dở trước đó.",
+      "Unit: sau 3 lần nhận quảng cáo trong ngày coin, `POST /api/coins/ads/start` trả 409 `ad_limit` \"Hôm nay bạn đã xem đủ 3 quảng cáo.\"; qua ngày coin mới lại xem được.",
+      "Unit: `characters` đếm `char_key` khác nhau của giữ chỗ `charged` trong ngày coin: hai story cùng một nhân vật là 1, hai bản sao của cùng nhân vật công khai là 1, câu trả lời bị nhả không đếm; `turns` đếm 20 câu trả lời `send`/`retry` đã trừ, không đếm `regenerate`; câu trả lời chat thử (`mode = 'test'`) không đếm cho cả hai; claim khi chưa đủ trả 409 `mission_not_done`.",
+      "Unit: nhận cùng một nhiệm vụ hai lần (hai tab cùng lúc, hai luồng gọi `post_mission` song song) chỉ có một dòng sổ; hai claim quảng cáo song song của hai lượt xem khác nhau khi đã nhận 2 lần chỉ một claim thành công (không bao giờ có lần thứ 4); tổng `delta` các dòng `kind = 'mission'` trong một ngày coin không bao giờ vượt 30 (kể cả khi thử thêm một nhiệm vụ giả +10 trong test, vượt thì 409 `mission_cap`); sự kiện `ad_started`, `mission_claimed`, `missions_viewed` đúng luật `events.py`.",
+      "Unit: `missionsLogic.ts`: trạng thái hộp quảng cáo đi đúng thứ tự đang đếm → nhận được → đã nhận, nút 'Nhận 5 coin' khoá khi còn > 0 giây, đóng khi chưa nhận trả hành động `cancel`; dòng nhiệm vụ hiện \"x/y\", \"Nhận\" khi `claimable`, \"Đã nhận\" khi `claimed`.",
+      "Bot: thành viên mở `#/missions` thấy tiêu đề 'Nhiệm vụ hôm nay', chữ 'Đã nhận' với '/30 coin hôm nay', ba dòng 'Xem quảng cáo', 'Trò chuyện với 3 nhân vật khác nhau', 'Gửi 20 lượt'; 390px không cuộn ngang.",
+      "Bot: bấm 'Xem' ở 'Xem quảng cáo' mở hộp 'Quảng cáo mẫu' có câu 'chưa phải quảng cáo thật' và nút 'Nhận 5 coin' đang khoá; hết đếm ngược (15 giây theo đồng hồ server như app thật; server giả không rút ngắn) bấm 'Nhận 5 coin' thì dòng nhiệm vụ thành '1/3' và số dư ở `#/coins` tăng đúng 5."
+    ],
+    "tests": [
+      "backend/tests/test_coins_missions.py::test_missions_list_and_reset_at_vietnam_midnight",
+      "backend/tests/test_coins_missions.py::test_ad_claim_needs_15_server_seconds",
+      "backend/tests/test_coins_missions.py::test_cancelled_or_expired_ad_cannot_be_claimed",
+      "backend/tests/test_coins_missions.py::test_ad_limit_3_per_day",
+      "backend/tests/test_coins_missions.py::test_characters_and_turns_progress_rules",
+      "backend/tests/test_coins_missions.py::test_claim_once_and_daily_cap_30",
+      "frontend/src/pages/coins/missionsLogic.test.ts",
+      "bot: Nhiệm vụ hôm nay có ba nhiệm vụ và trần 30 coin",
+      "bot: quảng cáo mẫu đếm ngược rồi nhận 5 coin"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T14:54:12.960Z"
+  },
+  {
+    "id": "F46",
+    "title": "Bảng xếp hạng Nhân vật hot",
+    "page": "wiki/features/F46-bang-xep-hang-nhan-vat-hot.md",
+    "phase": "Ra mắt (coin)",
+    "stage": "built",
+    "done": [
+      "Unit: `rank_cards` xếp theo số dòng `creator_players` giảm dần; hai nhân vật cùng 5 người chơi thì nhân vật có `MAX(qualified_at)` nhỏ hơn đứng trước; vẫn bằng thì `card_id` nhỏ hơn đứng trước; hạng là 1, 2, 3… không trùng.",
+      "Unit: không có trên bảng: nhân vật riêng tư, bản sao (`story_copy = 1`), nhân vật 0 người chơi, nhân vật của người tạo bị tạm khoá, nhân vật mẫu chưa công khai; có 130 nhân vật đủ điều kiện thì `hot_board` có đúng 100 dòng (hạng 1–100) và `hot_board_runs.ranked = 130`.",
+      "Unit: `refresh_if_stale` tính lần đầu; gọi lại sau 59 phút (đồng hồ giả) không tính lại (`computed_at` giữ nguyên); sau 61 phút thì tính lại và chỉ còn một dòng `hot_board_runs`; hai lời gọi trong cùng lúc chỉ tạo một lần tính.",
+      "Unit: đọc bảng còn mới không giữ khoá ghi: `CoinService.hot_board` và `refresh_hot` lúc bảng mới 59 phút không chạy câu `BEGIN`, `SAVEPOINT`, `INSERT`, `UPDATE`, `DELETE` nào (bắt bằng `set_trace_callback`); lúc chưa có bảng hay đã cũ 61 phút thì có `BEGIN` và tính lại.",
+      "Unit: người chơi bị tạm khoá không được đếm: X có 5 người chơi, chủ máy khoá 2 → `hot_board` có X với 3 người chơi, `progress(X).players = 3`; Y chỉ có 1 người chơi (bị khoá) → không có trên bảng, người tạo Y không có `first_public:` dù Y đã công khai đủ 24 giờ (người tạo X thì có); mở khoá → lần tính sau X có 5, Y có 1 và người tạo Y nhận +50.",
+      "Unit: `GET /api/explore/hot` trả `{updated_at, ranked, items}`, `limit=3` trả 3 hàng đầu, `limit=0` và `limit=101` trả 422; mỗi hàng chỉ có `rank, card_id, name, avatar_url, creator_handle, players` (không có `account_id`, mô tả, trường bí mật); nhân vật về Riêng tư sau lần tính không còn trong `items`, hạng của nhân vật khác giữ nguyên; chưa đăng nhập thì 401; `test_isolation_sweep.py` phân loại route mới.",
+      "Unit: migration `0014_hot_board.sql` chỉ có `CREATE TABLE`, `CREATE INDEX` và `INSERT INTO card_public_since` (không `ALTER`, `DROP`, `UPDATE`, `DELETE`); áp lên DB tạm có dữ liệu của 0013 thì số dòng và số dư của `coin_wallets`, `coin_ledger`, `character_cards` không đổi.",
+      "Unit: `parseRoute(\"#/explore/hot\")` là `{ name: \"hot\" }` và `routeHref` dựng lại `#/explore/hot` (tab Khám phá vẫn sáng: `tabOf` là `explore`); `hotLogic.ts` dựng \"Cập nhật lúc 14:05\" từ `updated_at` (giờ máy), \"1.200 người chơi\" (dấu chấm hàng nghìn), aria-label hàng \"Hạng {r}: {tên}, {n} người chơi\"; `logic.ts` không còn `featuredTemplate`, `withoutHero`, `heroImageUrl`.",
+      "Unit: sự kiện `hot_board_viewed` có `from: explore/link`, nằm trong `events.py`, `track.ts` và `tracking-plan.md` (test `test_catalog_is_focused_snake_case_and_documented` của F34 xanh với số sự kiện mới).",
+      "Bot: ở 390px `#/explore` không có phần tử `section[aria-labelledby=explore-featured]` và không có nút 'Bước vào câu chuyện'; có `section[aria-labelledby=explore-hot]` tiêu đề 'Nhân vật hot' với 1–3 hàng (server giả có nhân vật công khai 12 người chơi) đứng trên mục 'Nhân vật'; thẻ 'Hạ Vy' có trong lưới 'Nhân vật'; bấm 'Xem bảng xếp hạng' thì URL thành `#/explore/hot`.",
+      "Bot: `#/explore/hot` có tiêu đề 'Nhân vật hot', dòng 'Cập nhật lúc', danh sách `ol[aria-label=\"Bảng xếp hạng Nhân vật hot\"]` có hàng hạng 1 với ảnh đã tải (`img.naturalWidth > 0`), tên nhân vật và chữ '12 người chơi'; bấm hàng đó thì URL thành `#/character/<id>` của đúng nhân vật; nút 'Về Khám phá' đưa về `#/explore`.",
+      "Unit: `hotLogic.ts` `hotView({items: []})` cho trạng thái rỗng với đúng chữ 'Chưa có nhân vật nào trên bảng xếp hạng.', 'Công khai nhân vật của bạn trong Studio để người khác cùng chơi.' và nút 'Mở Studio' (→ `#/studio`); `hotStripItems` trả 3 hàng đầu (`[]` khi bảng rỗng, chưa tải được hay ô tìm có chữ); `hotStripView` chỉ trả `null` (dải ẩn) khi ô tìm có chữ, bảng rỗng thì `{rows: [], empty: 'Chưa có nhân vật nào trên bảng xếp hạng.'}`, chưa tải được thì `{rows: [], empty: null}` (dải vẫn có tiêu đề và nút); câu thưởng 'Nhân vật của bạn vào top 100, top 50, top 10 thì bạn được thưởng 100, 200, 300 coin. Thưởng top N chỉ có khi bảng có nhân vật của ít nhất N người tạo khác nhau.' chỉ có với thành viên khi coin bật (không có với chủ máy, `LYRIS_COINS=0`).",
+      "Bot: trước khi có người chơi nào (bảng của bot rỗng, `GET /api/explore/hot` không có hàng), `#/explore` vẫn có `section[aria-labelledby=explore-hot]` tiêu đề 'Nhân vật hot' với dòng 'Chưa có nhân vật nào trên bảng xếp hạng.' và không có hàng; bấm 'Xem bảng xếp hạng' thì URL thành `#/explore/hot`, trang có câu bảng rỗng và nút 'Mở Studio'; bấm 'Mở Studio' thì URL thành `#/studio`.",
+      "Bot: ở 390px, cả hai theme, `#/explore/hot` và `#/explore` không cuộn ngang (`scrollWidth ≤ innerWidth`); mỗi hàng của bảng và của dải 'Nhân vật hot' cao ít nhất 44px; nút 'Xem bảng xếp hạng' và 'Về Khám phá' có vùng chạm ít nhất 44 × 44px."
+    ],
+    "tests": [
+      "backend/tests/test_hot_board.py::test_rank_orders_by_players_then_reach_time_then_id",
+      "backend/tests/test_hot_board.py::test_board_only_public_active_with_player_top_100",
+      "backend/tests/test_hot_board.py::test_refresh_if_stale_once_per_hour",
+      "backend/tests/test_hot_board.py::test_fresh_board_read_takes_no_write_lock",
+      "backend/tests/test_hot_board.py::test_disabled_players_never_count_on_board_or_bonus",
+      "backend/tests/test_hot_board.py::test_hot_api_shape_limit_and_hides_private",
+      "backend/tests/test_hot_board.py::test_migration_0014_is_additive",
+      "backend/tests/test_isolation_sweep.py::test_sweep_covers_every_route",
+      "backend/tests/test_analytics.py::test_catalog_is_focused_snake_case_and_documented",
+      "frontend/src/lib/router.test.ts",
+      "frontend/src/pages/explore/hotLogic.test.ts",
+      "frontend/src/pages/explore/logic.test.ts",
+      "bot: bảng Nhân vật hot rỗng thì Khám phá vẫn có dải và nút Xem bảng xếp hạng, bảng mời Mở Studio",
+      "bot: Khám phá không còn khung nổi bật, có dải Nhân vật hot mở bảng xếp hạng",
+      "bot: bảng Nhân vật hot có hạng, ảnh, tên, số người chơi và mở hồ sơ",
+      "bot: bảng Nhân vật hot và dải ở Khám phá không tràn ngang 390px, hàng và nút chạm được 44px"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T16:52:40.340Z"
+  },
+  {
+    "id": "F47",
+    "title": "Tìm nhân vật ở Khám phá",
+    "page": "wiki/features/F47-tim-nhan-vat.md",
+    "phase": "Ra mắt (coin)",
+    "stage": "built",
+    "done": [
+      "Unit: `foldVietnamese(\"Hạ Vy ĐÀ LẠT  ở  Huế\")` là `\"ha vy da lat o hue\"`; `matchesQuery` của mẫu Hạ Vy đúng với \"ha vy\", \"HẠ VY\", \"vy\", \"tiem sach\", \"da lat\" (giới thiệu có \"tiệm sách\", \"Đà Lạt\") và sai với \"vy khang\"; nhiều từ phải khớp mọi từ (\"vy da lat\" ra Hạ Vy, \"vy morwenna\" không ra nhân vật nào); mỗi từ khớp phần đầu một từ: \"ha\" khớp \"Hải Đăng\" nhưng không khớp nhân vật chỉ có \"thành\", \"nhà\" (\"thanh\", \"nha\", \"lao th\" thì khớp), \"a\" không khớp Hạ Vy; dấu câu tách từ (\"da-lat\", \"vy,\" vẫn ra Hạ Vy).",
+      "Unit: `filterItems` tìm trong tên, vai trò, tag và giới thiệu của cả ba loại thẻ (`card`, `template`, `shared`); kết hợp với vibe là phép \"và\"; chuỗi rỗng hay chỉ khoảng trắng trả đúng danh sách cũ (cùng thứ tự); thứ tự kết quả giữ nguyên thứ tự lưới.",
+      "Unit: `useDebounced` (đồng hồ giả của `node:test` `mock.timers`) chỉ đổi giá trị sau 250 ms kể từ lần đổi cuối: gõ 5 ký tự cách nhau 100 ms thì chỉ lọc một lần.",
+      "Unit: sự kiện `explore_searched` chỉ có `has_results: bool` (không có chữ đã gõ), nằm trong `track.ts` và `tracking-plan.md`; phát tối đa một lần cho mỗi chuỗi tìm khác nhau sau debounce.",
+      "Bot: ở 390px `#/explore` có ô `input[type=search]` placeholder 'Tìm nhân vật', aria-label 'Tìm nhân vật theo tên, tag hoặc giới thiệu', đứng trên dải 'Nhân vật hot' và mục 'Nhân vật'; gõ 'ha vy' (không dấu) thì sau ≤ 1 giây lưới 'Nhân vật' chỉ còn thẻ có tên chứa 'Hạ Vy', bộ đếm là '1 / tổng', dải 'Nhân vật hot' ẩn; bấm nút 'Xoá tìm kiếm' thì ô rỗng, bộ đếm về tổng và lưới về như cũ (cùng các thẻ, cùng thứ tự).",
+      "Bot: gõ 'zzqxy' thì hiện 'Không tìm thấy nhân vật nào cho “zzqxy”.' và nút 'Xoá tìm kiếm', không còn thẻ nào trong hai lưới; bấm nút thì lưới về như cũ; tìm 'ha vy' khi đang bật một chip cảm xúc mà Hạ Vy không có thì cũng ra trạng thái không có kết quả.",
+      "Bot: ở 390px, cả hai theme, ô tìm vừa một dòng (placeholder không bị cắt: `scrollWidth ≤ clientWidth` của input), cao ít nhất 44px, nút 'Xoá tìm kiếm' trong ô chạm được 44 × 44px; trang không cuộn ngang."
+    ],
+    "tests": [
+      "frontend/src/pages/explore/search.test.ts",
+      "frontend/src/lib/track.test.ts",
+      "backend/tests/test_analytics.py::test_catalog_is_focused_snake_case_and_documented",
+      "bot: tìm 'ha vy' không dấu ra thẻ Hạ Vy, xoá tìm thì lưới như cũ",
+      "bot: tìm không có kết quả thì báo và có nút Xoá tìm kiếm",
+      "bot: ô Tìm nhân vật vừa một dòng 390px, cao 44px, không tràn ngang"
+    ],
+    "state": "passing",
+    "verified_at": "2026-11-14T16:52:40.410Z"
+  },
+  {
+    "id": "F50",
+    "title": "Postgres và chuyển lớp Repo",
+    "page": "wiki/features/F50-postgres.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: `migrate()` trên Postgres áp `db/migrations_pg/` từ 0 và `schema_migrations` có cùng số version cao nhất với `PRAGMA user_version` của SQLite (`test_pg_and_sqlite_migrations_in_lockstep`).",
+      "Unit: `UPDATE coin_ledger SET delta = 1` và `DELETE FROM coin_ledger` bằng vai trò `lyris_app` đều lỗi; xoá tài khoản vẫn xoá dòng sổ của nó theo cascade (`test_pg_ledger_append_only`).",
+      "Unit: 50 luồng gọi `open_hold` cùng lúc cho một tài khoản có 12 coin → đúng 1 giữ chỗ `held`, số dư không âm (`test_pg_concurrent_holds_one_open`).",
+      "Unit: 20 luồng gọi `post()` cùng `idem_key` → 1 dòng sổ, ví cộng đúng 1 lần (`test_pg_post_idempotent_under_race`).",
+      "Unit: `search_memories_fts` trên Postgres trả tập 5 id đầu trùng ít nhất 4/5 id với FTS5 cho mỗi truy vấn trong 10 truy vấn tiếng Việt có dấu (so tập, không so thứ tự, vì `bm25` và `ts_rank` xếp khác nhau) (`test_pg_memory_search_parity`).",
+      "Unit: `hold_sweeper` nhả giữ chỗ có `lease_until` đã qua với lý do `restart` và không đụng giữ chỗ còn hạn (`test_hold_sweeper_releases_only_expired`).",
+      "Unit: giữ chỗ hết lease bị sweeper nhả trước khi lưu câu trả lời → câu trả lời vẫn được lưu và ví bị trừ đúng 6 coin bằng 1 dòng `chat:{hold_id}`; ví chỉ còn 3 coin → câu trả lời vẫn lưu, 0 dòng sổ, bộ đếm `lyris_hold_lost_total` tăng 1 (`test_expired_lease_reply_still_charged`).",
+      "Unit: sweeper chạy đúng lúc một transaction đang trừ giữ chỗ (đã khoá dòng) → sweeper bỏ qua dòng đó, giữ chỗ thành `charged`, không có dòng `released` (`test_sweeper_skips_hold_being_charged`).",
+      "Unit: trên Postgres, 8 request chạy song song trong một tiến trình dùng 8 kết nối khác nhau của pool và xong trong thời gian < 2 lần một request (`pg_sleep(0.5)` mỗi request) (`test_pg_pool_runs_requests_in_parallel`).",
+      "Unit: `INSERT INTO coin_kinds VALUES ('purchase')` là migration hợp lệ; ghi dòng sổ có kind không có trong `coin_kinds` → lỗi khoá ngoại; trên SQLite `KINDS` không có `purchase` (`test_pg_kind_lookup_tables`).",
+      "Unit: `Repo.find_account_by_handle(\"Abc\")` và `auth.store.account_by_handle(…, \"Abc\")` tìm được `@abc` trên Postgres; `created_at` đọc ra là chuỗi ISO có 3 chữ số mili giây giống SQLite; `coin_day` đọc ra là `str` `YYYY-MM-DD` (`test_pg_types_match_sqlite`).",
+      "Unit: bộ test `backend/tests` chạy với `LYRIS_TEST_DB=postgres` (Postgres tạm qua unix socket, không mở cổng TCP) cho 0 lỗi và 0 test bị skip thêm so với SQLite (`test_suite_runs_on_both_backends`).",
+      "Bot: toàn bộ `CHECKS` của `environment/e2e.mjs` xanh khi backend của bot chạy với `LYRIS_DB_URL` trỏ Postgres tạm."
+    ],
+    "tests": [
+      "backend/tests/test_pg_migrations.py::test_pg_and_sqlite_migrations_in_lockstep",
+      "backend/tests/test_pg_ledger.py::test_pg_ledger_append_only",
+      "backend/tests/test_pg_ledger.py::test_pg_concurrent_holds_one_open",
+      "backend/tests/test_pg_ledger.py::test_pg_post_idempotent_under_race",
+      "backend/tests/test_pg_memory.py::test_pg_memory_search_parity",
+      "backend/tests/test_coin_holds_lease.py::test_hold_sweeper_releases_only_expired",
+      "backend/tests/test_coin_holds_lease.py::test_expired_lease_reply_still_charged",
+      "backend/tests/test_coin_holds_lease.py::test_sweeper_skips_hold_being_charged",
+      "backend/tests/test_pg_pool.py::test_pg_pool_runs_requests_in_parallel",
+      "backend/tests/test_pg_migrations.py::test_pg_kind_lookup_tables",
+      "backend/tests/test_pg_migrations.py::test_pg_types_match_sqlite",
+      "backend/tests/test_pg_migrations.py::test_suite_runs_on_both_backends",
+      "bot: chạy cả bộ check trên Postgres"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F51",
+    "title": "Redis và máy chủ API không trạng thái",
+    "page": "wiki/features/F51-redis-api-khong-trang-thai.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: `RedisGate` qua đúng các test của `GenerationGate` hiện có: mỗi tài khoản 1 lượt (409), vào trước ra trước, chờ quá 120 s → `GateTimeout` (`test_redis_gate_matches_memory_gate`).",
+      "Unit: hai `ChatService` (hai \"máy chủ\") chung Redis + Postgres: gửi lượt vào cùng story ở máy B khi máy A đang sinh → 409 `Busy` (`test_two_pods_story_lock`).",
+      "Unit: máy A \"chết\" giữa lượt (huỷ task, không nhả khoá) → sau ≤ 30 s (đồng hồ giả) story mở lại; sau ≤ 40 s giữ chỗ coin nhả lý do `restart`, số dư bằng trước lượt (`test_pod_crash_releases_lock_and_hold`).",
+      "Unit: một pod chết khi đang chờ trong hàng và một pod chết khi đang giữ vé sinh (không nhả, không gia hạn) → sau ≤ 40 s (đồng hồ giả) một tài khoản thứ ba được nhận ngay, không phải chờ 120 s; số vé đang chạy của replica trở về 0 (`test_redis_gate_dead_waiter_and_dead_runner_do_not_leak`).",
+      "Unit: replica R1 có `chat_capacity` 2 đã đủ 2 vé, R2 còn trống → lượt thứ 3 của story dính R1 không vượt 2 vé ở R1 (chờ, hoặc tràn sang R2 sau 5 s) (`test_redis_gate_capacity_per_replica`).",
+      "Unit: khi chờ cổng, stream gửi `: ping` mỗi 15 s trước sự kiện `start`; response SSE có `Cache-Control: no-cache, no-transform` (`test_sse_heartbeat_while_waiting`).",
+      "Unit: client ngắt kết nối sau delta số 5 → câu trả lời vẫn được lưu; `GET /api/stories/{id}/reply/{reply_id}/events` với `Last-Event-ID: 5` trả delta từ số 6 tới `done` (`test_reply_resume_after_disconnect`).",
+      "Unit: pod sinh câu trả lời chết sau delta số 3 (Stream không bao giờ có `done`) → nối lại với `Last-Event-ID: 3` nhận sự kiện `error` có câu dễ hiểu sau khi khoá story hết hạn, không treo; số dư bằng trước lượt (`test_reply_resume_after_origin_pod_died`).",
+      "Unit: `Authorization: Bearer <token>` đăng nhập được như cookie; request Bearer có `Origin: capacitor://localhost` và `Sec-Fetch-Site: cross-site` → 200; request cookie kèm `Sec-Fetch-Site: cross-site` hoặc `Origin` lạ → 403 `csrf`; request có cả Bearer hợp lệ và cookie của tài khoản khác → chạy với tài khoản của Bearer (`test_bearer_token_auth_and_csrf`).",
+      "Unit: đăng xuất xoá `sess:{hash}` ở Redis; request kế tiếp bằng token cũ → 401; staff khoá tài khoản có 3 phiên đang cache → cả 3 token bị 401 ngay ở request kế tiếp (`test_logout_invalidates_session_cache`).",
+      "Unit: `client_ip()` chỉ đọc `CF-Connecting-IP` khi peer thuộc dải trong `LYRIS_TRUSTED_PROXIES` (`test_client_ip_behind_cloudflare_and_lb`).",
+      "Bot: hai tiến trình backend (cổng 8066 và 8068) chung Postgres + Redis tạm, request luân phiên qua proxy ở 8069: gửi lượt chat ở `#/chat/{id}` thấy câu trả lời và chip coin giảm 6."
+    ],
+    "tests": [
+      "backend/tests/test_redis_gate.py::test_redis_gate_matches_memory_gate",
+      "backend/tests/test_multi_pod.py::test_two_pods_story_lock",
+      "backend/tests/test_multi_pod.py::test_pod_crash_releases_lock_and_hold",
+      "backend/tests/test_redis_gate.py::test_redis_gate_dead_waiter_and_dead_runner_do_not_leak",
+      "backend/tests/test_redis_gate.py::test_redis_gate_capacity_per_replica",
+      "backend/tests/test_sse_resume.py::test_sse_heartbeat_while_waiting",
+      "backend/tests/test_sse_resume.py::test_reply_resume_after_disconnect",
+      "backend/tests/test_sse_resume.py::test_reply_resume_after_origin_pod_died",
+      "backend/tests/test_bearer_auth.py::test_bearer_token_auth_and_csrf",
+      "backend/tests/test_bearer_auth.py::test_logout_invalidates_session_cache",
+      "backend/tests/test_client_ip_proxies.py::test_client_ip_behind_cloudflare_and_lb",
+      "bot: chat qua hai backend luân phiên"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F52",
+    "title": "Hàng đợi việc nền trên Postgres",
+    "page": "wiki/features/F52-hang-doi-viec-nen.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: 4 worker chạy song song trên 200 job (không ai chậm) → mỗi job chạy đúng 1 lần (`test_pg_jobs_skip_locked_exactly_once`).",
+      "Unit: worker A lấy job rồi chậm quá hạn lease, worker B lấy lại và hoàn tất; A hoàn tất sau → câu `UPDATE` hoàn tất của A khớp 0 dòng, kết quả của A bị bỏ, job có đúng 1 kết quả (của B) (`test_job_at_least_once_completion_fenced`).",
+      "Unit: xếp job không ghi `run_after` → cột có giá trị `now()` và job được lấy ngay; ghi `NULL` → lỗi `NOT NULL` (`test_job_run_after_defaults_now`).",
+      "Unit: rollback transaction lưu câu trả lời → không còn job trích xuất nào của lượt đó (`test_job_enqueued_in_same_transaction`).",
+      "Unit: worker ngừng gia hạn → job `running` về `queued` sau 90 s (đồng hồ giả), chạy lại, `attempts` = 2 (`test_job_lease_expiry_requeues`).",
+      "Unit: tài khoản A có 100 job chờ, tài khoản B xếp 1 job sau đó → job của B chạy trong 2 job đầu tiên (`test_claim_interleaves_accounts`).",
+      "Unit: tài khoản đã có 50 job `queued` gọi `POST /api/stories/{id}/state/rebuild` → 409 (`test_job_quota_per_account`).",
+      "Unit: 3 worker cùng chạy 60 s (đồng hồ giả) → `posthog_flush` được xếp đúng 6 lần, chỉ bởi 1 worker (`test_scheduler_single_leader`).",
+      "Unit: 3 worker nối Postgres qua một pooler chế độ transaction (PgBouncer tạm trên unix socket) → vẫn đúng 1 leader; leader ngừng gia hạn → worker khác thành leader sau ≤ 30 s, không có khung giờ nào bị xếp hai lần (`test_scheduler_leader_survives_pooler`).",
+      "Unit: các test hiện có trong `backend/tests/test_jobs.py` xanh trên cả hai bản `JobBackend` (`test_jobs_contract_both_backends`).",
+      "Bot: trên Postgres với worker chạy ở tiến trình riêng, sau 2 lượt chat ở `#/chat/{id}`, \"Xem sự kiện\" (menu \"+\") có ít nhất 1 dòng thời gian."
+    ],
+    "tests": [
+      "backend/tests/test_pg_jobs.py::test_pg_jobs_skip_locked_exactly_once",
+      "backend/tests/test_pg_jobs.py::test_job_at_least_once_completion_fenced",
+      "backend/tests/test_pg_jobs.py::test_job_run_after_defaults_now",
+      "backend/tests/test_pg_jobs.py::test_job_enqueued_in_same_transaction",
+      "backend/tests/test_pg_jobs.py::test_job_lease_expiry_requeues",
+      "backend/tests/test_pg_jobs.py::test_claim_interleaves_accounts",
+      "backend/tests/test_pg_jobs.py::test_job_quota_per_account",
+      "backend/tests/test_scheduler.py::test_scheduler_single_leader",
+      "backend/tests/test_scheduler.py::test_scheduler_leader_survives_pooler",
+      "backend/tests/test_pg_jobs.py::test_jobs_contract_both_backends",
+      "bot: ghi nhớ chạy bằng worker riêng"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F53",
+    "title": "Cổng suy luận vLLM trên GPU riêng",
+    "page": "wiki/features/F53-cong-suy-luan-vllm.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: `VllmClient.chat_stream` trên server vLLM giả (giao thức `/v1/completions` stream) trả các `TextDelta` rồi `Done` có `GenStats` (ttft, số token) (`test_vllm_client_stream_and_stats`).",
+      "Unit: prompt gửi vLLM bằng đúng `render_prefix(…)` của lượt trước cộng lượt người chơi mới, khớp từng byte (`test_vllm_prompt_equals_render_prefix_plus_turn`).",
+      "Unit: request gửi vLLM có `prompt` là danh sách token id, chỉ có đúng 1 token BOS ở đầu; đường dự phòng gửi chuỗi có `add_special_tokens: false`; token id của prefill là tiền tố của token id lượt thật (`test_vllm_no_double_bos`).",
+      "Unit: request chat gửi vLLM có đủ `temperature`, `top_p`, `top_k`, `min_p`, `max_tokens`, `stop` đúng bằng bảng hồ sơ Ollama trong code, `repetition_penalty` = 1,0; request trích xuất/gợi ý dùng hồ sơ của chúng (`test_vllm_sampling_params_match_ollama_profile`).",
+      "Unit: mọi lời gọi (chat, `chat_json`, prefill) có `số token prompt + max_tokens` ≤ 8192 tính bằng token thật (prompt 8.000 token → `max_tokens` ≤ 192; còn < 64 token chỗ → builder cắt thêm lịch sử) và không gửi tham số context nào khác (`test_vllm_single_context_8192`).",
+      "Unit: `chat_json` gửi tham số structured output theo đúng tên của bản vLLM đã ghim trong cấu hình; server giả trả JSON hỏng lần đầu → thử lại đúng 1 lần (`test_vllm_structured_output_param`).",
+      "Unit: 10.000 story trên 3 replica, thêm replica thứ 4 → ≤ 30 % story đổi replica; replica có `num_requests_waiting` > 4 → story tràn sang replica ít tải nhất (`test_gateway_sticky_hrw_and_spill`).",
+      "Unit: request gửi vLLM có `priority` 0/1/2/5/9 theo loại (chat, gợi ý, nháp, trích xuất, prefill) (`test_vllm_priorities`).",
+      "Unit: ước lượng chờ > 120 s → stream trả `error` với câu \"Lyris đang bận…\" trước `start`, giữ chỗ coin nhả, số dư không đổi (`test_backpressure_rejects_when_wait_over_120s`).",
+      "Unit: `harness/run_eval.py --backend vllm --base-url http://127.0.0.1:<cổng> --no-judge` chạy được kịch bản `07-co-trang` trên server vLLM giả và ghi kết quả cùng định dạng như khi chạy Ollama (`test_run_eval_backend_vllm_flag`).",
+      "Bot: backend của bot dùng `VllmClient` trỏ server vLLM giả; gửi lượt ở `#/chat/{id}` thấy câu trả lời; màn chat không có chữ `vLLM`, `GPU`, `token`."
+    ],
+    "tests": [
+      "backend/tests/test_vllm_client.py::test_vllm_client_stream_and_stats",
+      "backend/tests/test_vllm_client.py::test_vllm_prompt_equals_render_prefix_plus_turn",
+      "backend/tests/test_vllm_client.py::test_vllm_no_double_bos",
+      "backend/tests/test_vllm_client.py::test_vllm_sampling_params_match_ollama_profile",
+      "backend/tests/test_vllm_client.py::test_vllm_single_context_8192",
+      "backend/tests/test_vllm_client.py::test_vllm_structured_output_param",
+      "backend/tests/test_gateway.py::test_gateway_sticky_hrw_and_spill",
+      "backend/tests/test_gateway.py::test_vllm_priorities",
+      "backend/tests/test_gateway.py::test_backpressure_rejects_when_wait_over_120s",
+      "backend/tests/test_run_eval_backend.py::test_run_eval_backend_vllm_flag",
+      "bot: chat qua cổng vLLM giả"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F54",
+    "title": "Lưu ảnh trên object storage (S3)",
+    "page": "wiki/features/F54-luu-anh-s3.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: `FilesystemBlobStore` và `S3BlobStore` (S3 giả trong bộ nhớ) qua cùng bộ test `put/get/delete/presign` (`test_blobstore_contract`).",
+      "Unit: tải avatar nhân vật → object `avatars/card/{id}-{8 hex}.png` là PNG ≤ 768×768, không còn EXIF (`test_avatar_upload_goes_to_blobstore`).",
+      "Unit: `GET /api/cards/{id}/avatar?v=…` của nhân vật công khai → 302 tới URL CDN; nhân vật riêng của người khác → 404; của mình → 302 tới URL ký hết hạn ≤ 300 s, response có `Cache-Control: private, no-store` (`test_avatar_redirect_public_private`).",
+      "Unit: xoá tài khoản → xếp job `blob_delete` cho mọi ảnh của tài khoản sau commit; transaction rollback → 0 job (`test_account_delete_enqueues_blob_delete`).",
+      "Unit: nhân vật bật Công khai có avatar → job `image_scan` gọi API so hash giả **trước khi** nhân vật vào danh sách công khai; kết quả `flagged` → nhân vật không có trong danh sách nhân vật công khai tới khi staff duyệt; API so hash lỗi/hết giờ → nhân vật cũng chưa công khai (không mở khi chưa quét) (`test_public_avatar_scan_gate`).",
+      "Bot: với `LYRIS_BLOB=s3` trỏ S3 giả, đổi avatar ở `#/studio/{id}` rồi mở `#/explore`: thẻ nhân vật có `<img>` tải được (`naturalWidth > 0`)."
+    ],
+    "tests": [
+      "backend/tests/test_blobstore.py::test_blobstore_contract",
+      "backend/tests/test_blobstore.py::test_avatar_upload_goes_to_blobstore",
+      "backend/tests/test_blobstore.py::test_avatar_redirect_public_private",
+      "backend/tests/test_blobstore.py::test_account_delete_enqueues_blob_delete",
+      "backend/tests/test_image_scan.py::test_public_avatar_scan_gate",
+      "bot: avatar qua kho ảnh S3"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F55",
+    "title": "App iOS và Android (Capacitor)",
+    "page": "wiki/features/F55-app-ios-android.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: `apiBase()` trả `/api` khi build web và `https://api.lyris.example/api` khi `VITE_API_BASE` được đặt (`frontend/src/lib/platform.test.ts`).",
+      "Unit: khi `isNativePlatform()` đúng, `request()` gửi `Authorization: Bearer …` và `X-Lyris: 1`, không dùng `credentials: \"include\"`; trên web giữ cookie như cũ (`frontend/src/api/nativeAuth.test.ts`).",
+      "Unit: `resumeReply(replyId, lastEventId)` gửi header `Last-Event-ID` và không lặp lại delta đã hiện (`frontend/src/lib/replyResume.test.ts`).",
+      "Unit: `needsUpdate(\"1.2.0\", { min_supported_version: \"1.3.0\" })` trả `true`, `needsUpdate(\"1.3.0\", …)` trả `false` (`frontend/src/lib/appVersion.test.ts`).",
+      "Bot: với `window.Capacitor` giả (`isNativePlatform() = true`) ở 390px: đăng nhập, gửi một lượt ở `#/chat/{id}`, câu trả lời hiện; request có header `Authorization`, không có cookie `lyris_session`.",
+      "Bot: `min_supported_version` lớn hơn bản app → chỉ hiện màn có nút `aria-label=\"Cập nhật Lyris\"`, không vào được `#/`.",
+      "Bot: story 300 tin ở `#/chat/{id}` chỉ có ≤ 60 phần tử tin nhắn trong DOM khi cuộn từ đầu tới cuối.",
+      "Unit: `perfMarks` ghi mốc `sse-delta-received` và `sse-delta-painted` cho mỗi delta, tính được khoảng cách và gửi một sự kiện RUM gom theo lượt (không có chữ chat trong sự kiện) (`frontend/src/lib/perfMarks.test.ts`).",
+      "Bot: với `LYRIS_SAMPLE_ADS=off`, `#/missions` không có dòng \"Xem quảng cáo\" (chỉ còn \"Trò chuyện với 3 nhân vật khác nhau\" và \"Gửi 20 lượt\"), không mở được hộp \"Quảng cáo mẫu\", và `POST /api/coins/ads/start` trả 404."
+    ],
+    "tests": [
+      "frontend/src/lib/platform.test.ts",
+      "frontend/src/api/nativeAuth.test.ts",
+      "frontend/src/lib/replyResume.test.ts",
+      "frontend/src/lib/appVersion.test.ts",
+      "frontend/src/lib/perfMarks.test.ts",
+      "bot: vỏ app native đăng nhập bằng token",
+      "bot: buộc cập nhật app cũ",
+      "bot: story dài chỉ dựng tin đang thấy",
+      "bot: bản host không có quảng cáo mẫu"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F56",
+    "title": "Mua coin trong app: Apple IAP và Google Play Billing",
+    "page": "wiki/features/F56-iap-google-play.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: JWS giao dịch Apple hợp lệ (ký bằng chuỗi chứng chỉ test) → 1 biên nhận `credited` và 1 dòng sổ `purchase` với `idem_key = apple:{transactionId}`; gửi lại cùng JWS → 200, số dư không đổi (`test_apple_transaction_credit_idempotent`).",
+      "Unit: JWS sai chữ ký, sai `bundleId`, hoặc sai `productId` → 400, 0 dòng sổ (`test_apple_transaction_rejects_forged`).",
+      "Unit: JWS hợp lệ có `appAccountToken` của tài khoản A gửi từ phiên của tài khoản B → 200, đúng 1 dòng sổ `purchase` trong ví của A, ví B không đổi; JWS không có `appAccountToken` → cộng cho B (`test_apple_credit_goes_to_token_owner`).",
+      "Unit: thông báo `ONE_TIME_CHARGE` (JWS ký bằng chứng chỉ test) cho một giao dịch app chưa gửi → cộng 1 lần; app gửi JWS cùng giao dịch sau đó → 200, vẫn 1 dòng sổ (`test_apple_one_time_charge_notification_credits_once`).",
+      "Unit: thông báo `REFUND` cho gói 100 coin khi số dư còn 50 → dòng sổ `purchase_refund` −50, `debt` = 50, `shortfall` của biên nhận = 50; lần cộng sau +300 → dòng `debt_repay` −50 và số dư 250 (`test_apple_refund_negative_entry_and_debt`).",
+      "Unit: số dư 20 và đang có một giữ chỗ 6 coin mở; `REFUND` 100 coin → dòng sổ `purchase_refund` −14 (không phải −20), `debt` = 86; lượt đang sinh vẫn trừ được 6 coin và lưu được câu trả lời (`test_refund_respects_open_hold`).",
+      "Unit: tài khoản có `debt` > 0 vẫn tạo được đơn mua trên web và mua IAP; khoản mua trả nợ trước (`test_purchase_allowed_while_in_debt`).",
+      "Unit: giao dịch `environment = Sandbox` ở bản production được cộng cho một tài khoản vừa tạo, biên nhận ghi `sandbox`, không vào tổng doanh thu; giao dịch sandbox thứ 4 trong ngày của cùng tài khoản → 429, 0 dòng sổ (`test_apple_sandbox_flagged_and_capped`).",
+      "Unit: `purchases.products.get` giả trả `purchaseState = 0` → cộng 1 lần với `idem_key = google:{sha256(purchaseToken)}` rồi gọi `consume`; RTDN cùng giao dịch đến trước app → vẫn chỉ 1 dòng sổ; giao dịch đổi mã khuyến mãi không có `orderId` vẫn cộng đúng 1 lần (`test_google_purchase_credit_consume_once`).",
+      "Unit: RTDN `voidedPurchaseNotification` cho 1 giao dịch → 1 dòng sổ âm ngay; Voided Purchases poll 3 lần sau đó → vẫn đúng 1 dòng sổ âm (`test_google_voided_refund_once`).",
+      "Unit: sau 100 lần mua/hoàn ngẫu nhiên (có lúc đang có giữ chỗ mở), `ledger_audit` thấy mọi ví có `balance` = tổng `delta` của sổ và `debt` = `Σ shortfall − Σ |debt_repay|` (`test_ledger_audit_after_purchases`).",
+      "Bot: với plugin IAP giả trên vỏ native, `#/coins/top-up` có 4 nút mua mang giá do plugin trả; bấm nút của gói 100 coin → chip coin tăng 100; màn không có chữ `VNPay`, `MoMo` hay link mua ngoài app."
+    ],
+    "tests": [
+      "backend/tests/test_iap_apple.py::test_apple_transaction_credit_idempotent",
+      "backend/tests/test_iap_apple.py::test_apple_transaction_rejects_forged",
+      "backend/tests/test_iap_apple.py::test_apple_credit_goes_to_token_owner",
+      "backend/tests/test_iap_apple.py::test_apple_one_time_charge_notification_credits_once",
+      "backend/tests/test_iap_apple.py::test_apple_refund_negative_entry_and_debt",
+      "backend/tests/test_payments_ledger.py::test_refund_respects_open_hold",
+      "backend/tests/test_payments_ledger.py::test_purchase_allowed_while_in_debt",
+      "backend/tests/test_iap_apple.py::test_apple_sandbox_flagged_and_capped",
+      "backend/tests/test_iap_google.py::test_google_purchase_credit_consume_once",
+      "backend/tests/test_iap_google.py::test_google_voided_refund_once",
+      "backend/tests/test_payments_ledger.py::test_ledger_audit_after_purchases",
+      "bot: mua coin trong app bằng IAP giả"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F57",
+    "title": "Nạp coin trên web bằng VNPay và MoMo",
+    "page": "wiki/features/F57-vnpay-momo.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: `POST /api/payments/web/orders {\"pack_id\": \"p100\", \"provider\": \"vnpay\"}` → đơn `pending` 10.000đ, URL có `vnp_Amount=1000000` (số tiền × 100), `vnp_ReturnUrl` là `https://…/pay/return` (không có `#`), `vnp_SecureHash` HMAC-SHA512 đúng với khoá test, và đơn lưu `vnp_CreateDate` (`test_vnpay_order_url_signed`).",
+      "Unit: IPN đúng chữ ký và số tiền → `RspCode = 00` và 1 dòng sổ `vnpay:{vnp_TxnRef}`; IPN lặp lại → `RspCode = 02`, vẫn 1 dòng sổ (`test_vnpay_ipn_idempotent`).",
+      "Unit: IPN sai chữ ký → `97`, sai số tiền → `04`, không có đơn → `01`; cả ba không ghi sổ (`test_vnpay_ipn_rejects`).",
+      "Unit: IPN đúng chữ ký báo giao dịch thất bại (`vnp_ResponseCode = 24`, người dùng huỷ) → `RspCode = 00`, đơn `failed`, 0 dòng sổ; IPN thành công tới sau cho cùng đơn → `02`, không cộng (`test_vnpay_ipn_failed_payment_acknowledged`).",
+      "Unit: gọi `/pay/return` với tham số \"thành công\" khi chưa có IPN → 302 tới `#/coins/top-up?order=…`, 0 dòng sổ, đơn vẫn `pending` (`test_return_url_never_credits`).",
+      "Unit: IPN MoMo `resultCode = 0` chữ ký HMAC-SHA256 đúng → cộng 1 lần, trả HTTP 204; gửi lại → không cộng (`test_momo_ipn_idempotent`).",
+      "Unit: đơn `pending` quá 15 phút → `querydr` giả (nhận đúng `vnp_TransactionDate` = `vnp_CreateDate` đã lưu) trả thành công → `paid` và cộng; trả thất bại → `expired`, không cộng (`test_pending_order_reconcile`).",
+      "Unit: đơn thứ 6 trong một ngày của cùng tài khoản → 429 (`test_web_purchase_daily_limit`).",
+      "Bot: ở `#/coins/top-up` trên web bấm gói 100 coin → trang cổng VNPay giả → quay về thấy \"+100 coin\" và chip coin tăng 100."
+    ],
+    "tests": [
+      "backend/tests/test_pay_vnpay.py::test_vnpay_order_url_signed",
+      "backend/tests/test_pay_vnpay.py::test_vnpay_ipn_idempotent",
+      "backend/tests/test_pay_vnpay.py::test_vnpay_ipn_rejects",
+      "backend/tests/test_pay_vnpay.py::test_vnpay_ipn_failed_payment_acknowledged",
+      "backend/tests/test_pay_vnpay.py::test_return_url_never_credits",
+      "backend/tests/test_pay_momo.py::test_momo_ipn_idempotent",
+      "backend/tests/test_pay_reconcile.py::test_pending_order_reconcile",
+      "backend/tests/test_pay_reconcile.py::test_web_purchase_daily_limit",
+      "bot: nạp coin qua cổng VNPay giả"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F58",
+    "title": "Quan sát hệ thống và SLO",
+    "page": "wiki/features/F58-quan-sat-slo.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: `/metrics` của API có `lyris_reply_ttft_seconds`, `lyris_reply_first_visible_seconds`, `lyris_reply_tokens_per_second`, `lyris_genq_length`, `lyris_jobs_queued`, `lyris_hold_lost_total` (`test_metrics_exposed`).",
+      "Unit: log JSON của một lượt chat có `request_id` và `story_id`, và không chứa chuỗi nào của tin nhắn đã gửi hay câu trả lời (`test_logs_have_no_chat_text`).",
+      "Unit: sửa tay một ví lệch 6 coin so với tổng sổ → `ledger_audit` phát cảnh báo `ledger_mismatch` với id ví; sửa tay `debt` của một ví lệch 10 so với `Σ shortfall − Σ |debt_repay|` → cảnh báo `debt_mismatch` (`test_ledger_audit_detects_mismatch`).",
+      "Unit: `deploy/alerts.yaml` có đủ 7 luật cảnh báo ở trên với đúng ngưỡng (6 s/10 phút, 20/5 phút, 1 %/5 phút, 0,1 %/1 giờ…) (`test_alert_rules_file`).",
+      "Unit: `/api/healthz` trả 200 không cần đăng nhập và không có tên model hay phiên bản; `/api/readyz` trả 503 khi Redis không trả lời trong 200 ms (`test_health_and_ready`).",
+      "Bot: `#/admin` → \"Số liệu\" → mở \"Nâng cao\": có ô \"Chờ chữ đầu tiên (p95)\" hiện số giây; phần ngoài \"Nâng cao\" không có chữ `token`, `GPU`, `vLLM`."
+    ],
+    "tests": [
+      "backend/tests/test_observability.py::test_metrics_exposed",
+      "backend/tests/test_observability.py::test_logs_have_no_chat_text",
+      "backend/tests/test_observability.py::test_ledger_audit_detects_mismatch",
+      "backend/tests/test_observability.py::test_alert_rules_file",
+      "backend/tests/test_observability.py::test_health_and_ready",
+      "bot: số liệu chờ trả lời cho người quản lý"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F59",
+    "title": "Triển khai, CI/CD và môi trường staging",
+    "page": "wiki/features/F59-trien-khai-ci.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: áp `db/migrations` và `db/migrations_pg` từ 0 rồi áp bản mới lên bản chụp schema: 0 lỗi; migration mới có `DROP`, `RENAME` hay `ALTER … DROP` bị từ chối; migration chỉ có `INSERT INTO coin_kinds …` / `INSERT INTO hold_release_reasons …` (thêm giá trị vào bảng tra) được nhận (`test_migrations_additive_only`).",
+      "Unit: SIGTERM khi đang stream → `/api/readyz` trả 503 ngay, stream đang chạy kết thúc bằng sự kiện `done`, tiến trình thoát trong ≤ 180 s (`test_graceful_shutdown_drains_streams`).",
+      "Unit: `.github/workflows/ci.yml` có bước pytest với `LYRIS_TEST_DB=sqlite` và `LYRIS_TEST_DB=postgres`, `npm test`, `npm run typecheck`, `npm run build` và bot e2e (`test_ci_workflow_runs_both_backends`).",
+      "Unit: `LYRIS_MODE=hosted` thiếu `LYRIS_DB_URL`, `LYRIS_REDIS_URL` hoặc `VLLM_KEY` → backend dừng với thông báo có tên biến và không có giá trị bí mật nào (`test_hosted_config_requires_secrets`).",
+      "Bot: bot e2e chạy với `LYRIS_BOT_BASE_URL` trỏ staging sau mỗi lần triển khai staging: toàn bộ `CHECKS` xanh."
+    ],
+    "tests": [
+      "backend/tests/test_deploy.py::test_migrations_additive_only",
+      "backend/tests/test_deploy.py::test_graceful_shutdown_drains_streams",
+      "backend/tests/test_deploy.py::test_ci_workflow_runs_both_backends",
+      "backend/tests/test_deploy.py::test_hosted_config_requires_secrets",
+      "bot: chạy cả bộ check trên staging"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F60",
+    "title": "Kiểm duyệt nội dung và chặn người tạo (App Store 1.2)",
+    "page": "wiki/features/F60-kiem-duyet-chan.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: bộ phân loại giả trả `unsafe` cho câu trả lời → chữ đó không được lưu, tin lưu là câu lảng trong vai, giữ chỗ coin nhả với lý do `content_filtered` (số dư không đổi), có sự kiện `content_filtered` (`test_output_filter_blocks_and_refunds`).",
+      "Unit: LLM giả sinh 3 câu, bộ phân loại giả gắn `unsafe` cho câu thứ 2 → client nhận đúng câu 1 rồi câu lảng trong vai; không sự kiện SSE nào (kể cả delta trong Redis Stream dùng để nối lại) chứa chữ của câu 2 hay câu 3 (`test_output_filter_never_streams_unsafe_sentence`).",
+      "Unit: từng đoạn đều `safe` nhưng lần chấm cả câu trả lời sau `done` là `unsafe` → client nhận `retract{from_seq}` và câu lảng; câu trả lời lưu là câu lảng, không phải chữ gốc (`test_output_filter_retract_after_done`).",
+      "Unit: `POST /api/blocks {\"handle\": \"x\"}` → nhân vật công khai của @x không còn trong danh sách Khám phá của người chặn; `DELETE /api/blocks/x` → hiện lại (`test_block_creator_hides_cards`).",
+      "Unit: nhân vật bị staff ẩn → người tạo bật Công khai trả 409 cho tới khi staff mở (`test_hidden_card_cannot_republish`).",
+      "Unit: báo cáo `minor_safety` ở trạng thái mở quá 24 giờ (đồng hồ giả) → cảnh báo `report_overdue` (`test_minor_safety_overdue_alert`).",
+      "Bot: ở `#/character/{id}` của nhân vật người khác có nút `aria-label=\"Chặn người tạo\"`; bấm và xác nhận → `#/explore` không còn thẻ của người đó.",
+      "Bot: `#/me` có mục \"Người đã chặn\" liệt kê @handle vừa chặn với nút \"Bỏ chặn\"; bấm → thẻ hiện lại ở `#/explore`."
+    ],
+    "tests": [
+      "backend/tests/test_moderation.py::test_output_filter_blocks_and_refunds",
+      "backend/tests/test_moderation.py::test_output_filter_never_streams_unsafe_sentence",
+      "backend/tests/test_moderation.py::test_output_filter_retract_after_done",
+      "backend/tests/test_moderation.py::test_block_creator_hides_cards",
+      "backend/tests/test_moderation.py::test_hidden_card_cannot_republish",
+      "backend/tests/test_moderation.py::test_minor_safety_overdue_alert",
+      "bot: chặn người tạo ẩn nhân vật",
+      "bot: bỏ chặn người tạo"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F61",
+    "title": "Đăng ký công khai, khôi phục bằng email, đăng nhập Apple/Google",
+    "page": "wiki/features/F61-dang-ky-cong-khai.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: `LYRIS_SIGNUP=open` → `POST /api/auth/signup` không cần mã mời; `LYRIS_SIGNUP=invite` (mặc định) vẫn bắt mã như bây giờ (`test_signup_open_vs_invite`).",
+      "Unit: thêm email → mã 6 số gửi qua bộ gửi email giả; sai 5 lần trong 15 phút → 429; đã xác minh thì `POST /api/auth/recover` gửi liên kết dùng 1 lần, hết hạn 30 phút (`test_email_verify_and_recover`).",
+      "Unit: identity token Apple ký bằng khoá test, `aud` = bundle id, `nonce` khớp → tạo hoặc đăng nhập tài khoản và server đổi `authorization code` lấy `refresh_token` (endpoint giả) rồi lưu ở dạng mã hoá; sai `aud` → 401 (`test_sign_in_with_apple`).",
+      "Unit: tài khoản tạo bằng Apple trên iOS → đăng nhập được trên web bằng identity token có `aud` = Services ID của web; đặt mật khẩu ở `#/me` rồi đăng nhập @handle + mật khẩu được (`test_apple_account_signs_in_on_web`).",
+      "Unit: xoá tài khoản đã liên kết Apple → gọi API thu hồi token giả đúng 1 lần, bằng `refresh_token` đã lưu (`test_delete_account_revokes_apple`).",
+      "Unit: thiết bị iOS có bit DeviceCheck \"đã nhận quà\" (API giả) → tài khoản mới vẫn tạo được nhưng ví 0 coin, kể cả sau khi \"cài lại app\" (khoá App Attest mới); thiết bị chưa có bit → +300 và server đặt bit; tài khoản tạo trên web chỉ nhận +300 sau khi xác minh email hoặc số điện thoại (`test_signup_grant_device_limit`).",
+      "Unit: `LYRIS_PHONE_VERIFY=publish` → bật \"Công khai\" nhân vật khi chưa xác thực số điện thoại trả 403 `phone_required`; sau khi nhập đúng OTP (bộ gửi SMS giả) thì bật được; cờ tắt → như bây giờ (`test_phone_verify_before_publish`).",
+      "Unit: staff vào `/api/admin/*` cần TOTP; mỗi thao tác staff có một dòng `admin_audit` (`test_staff_mfa_and_audit`).",
+      "Bot: với `LYRIS_SIGNUP=open`, `#/signup` không có ô \"Mã mời\"; có nút \"Tiếp tục với Google\" và \"Tiếp tục với Apple\" (trên web và trên vỏ iOS giả), và ô \"Năm sinh\"."
+    ],
+    "tests": [
+      "backend/tests/test_public_signup.py::test_signup_open_vs_invite",
+      "backend/tests/test_public_signup.py::test_email_verify_and_recover",
+      "backend/tests/test_public_signup.py::test_sign_in_with_apple",
+      "backend/tests/test_public_signup.py::test_apple_account_signs_in_on_web",
+      "backend/tests/test_public_signup.py::test_delete_account_revokes_apple",
+      "backend/tests/test_public_signup.py::test_signup_grant_device_limit",
+      "backend/tests/test_public_signup.py::test_phone_verify_before_publish",
+      "backend/tests/test_public_signup.py::test_staff_mfa_and_audit",
+      "bot: đăng ký mở không cần mã mời"
+    ],
+    "state": "pending"
+  },
+  {
+    "id": "F62",
+    "title": "Nhập dữ liệu từ Lyris tự chạy vào bản host (tuỳ chọn)",
+    "page": "wiki/features/F62-nhap-du-lieu-tu-chay.md",
+    "phase": "Máy chủ (sau khi nộp bài)",
+    "stage": "planned",
+    "done": [
+      "Unit: nhập file xuất từ một DB mẫu (3 story, 120 tin, 40 ký ức, 2 persona, 2 nhân vật có sổ thế giới) → tài khoản mới có đúng các con số đó, id mới, nhân vật `visibility = private` (`test_import_export_roundtrip_counts`).",
+      "Unit: file có `version` lạ hoặc JSON hỏng → 422 với câu dễ hiểu và 0 dòng được ghi (`test_import_rejects_bad_file`).",
+      "Unit: nhập không tạo dòng nào trong `coin_ledger`, `sessions`, `analytics_events`, `content_reports` (`test_import_skips_coins_sessions_analytics`).",
+      "Unit: nhập lần 2 cùng file → 0 story mới; lần nhập thứ 4 trong ngày → 429 (`test_import_idempotent_and_limited`).",
+      "Unit: sau khi nhập, mỗi story mới có job tính lại state và mỗi ký ức có job `embed` (`test_import_queues_rebuild`).",
+      "Bot: `#/me` → mở \"Nâng cao\" → \"Nhập dữ liệu từ Lyris tự chạy\" → chọn file mẫu → `#/` có thêm đúng 3 story."
+    ],
+    "tests": [
+      "backend/tests/test_account_import.py::test_import_export_roundtrip_counts",
+      "backend/tests/test_account_import.py::test_import_rejects_bad_file",
+      "backend/tests/test_account_import.py::test_import_skips_coins_sessions_analytics",
+      "backend/tests/test_account_import.py::test_import_idempotent_and_limited",
+      "backend/tests/test_account_import.py::test_import_queues_rebuild",
+      "bot: nhập dữ liệu từ bản tự chạy"
+    ],
     "state": "pending"
   }
 ]

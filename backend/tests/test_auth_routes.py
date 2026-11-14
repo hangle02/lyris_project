@@ -52,6 +52,24 @@ ROUTE_RULES: dict[tuple[str, str], Rule] = {
     ("POST", "/api/admin/accounts/{account_id}/reset-password"): "owner",
     ("POST", "/api/admin/accounts/{account_id}/disable"): "owner",
     ("POST", "/api/admin/accounts/{account_id}/enable"): "owner",
+    # ---- coin (F42, docs/coins.md §7)
+    ("POST", "/api/admin/accounts/{account_id}/coins"): "owner",
+    ("GET", "/api/coins/wallet"): "member",
+    ("POST", "/api/coins/checkin"): "member",
+    ("GET", "/api/coins/history"): "member",
+    # ---- nạp coin (F43, docs/coins.md §7)
+    ("GET", "/api/coins/packs"): "member",
+    ("POST", "/api/coins/redeem"): "member",
+    ("GET", "/api/admin/coins/codes"): "owner",
+    ("POST", "/api/admin/coins/codes"): "owner",
+    ("POST", "/api/admin/coins/codes/{code_id}/revoke"): "owner",
+    ("GET", "/api/admin/coins/log"): "owner",
+    # ---- nhiệm vụ ngày, quảng cáo mẫu (F45, docs/coins.md §6, §7)
+    ("GET", "/api/coins/missions"): "member",
+    ("POST", "/api/coins/missions/{mission}/claim"): "member",
+    ("POST", "/api/coins/ads/start"): "member",
+    ("POST", "/api/coins/ads/{ad_id}/claim"): "member",
+    ("POST", "/api/coins/ads/{ad_id}/cancel"): "member",
     ("GET", "/api/admin/invites"): "owner",
     ("POST", "/api/admin/invites"): "owner",
     ("DELETE", "/api/admin/invites/{invite_id}"): "owner",
@@ -119,6 +137,7 @@ ROUTE_RULES: dict[tuple[str, str], Rule] = {
     ("GET", "/api/cards/{card_id}/export"): "member",
     ("GET", "/api/cards/{card_id}/public"): "public_read",  # Phase 4b §6.4
     ("GET", "/api/public-cards"): "public_read",  # Phase 4b §6.4
+    ("GET", "/api/explore/hot"): "public_read",  # F46: bảng "Nhân vật hot" (chỉ trường công khai)
     ("GET", "/api/cards/{card_id}/lore"): "member",
     ("POST", "/api/cards/{card_id}/lore"): "member",
     ("POST", "/api/cards/{card_id}/lore/import"): "member",
@@ -186,7 +205,8 @@ def test_every_route_is_classified(app: FastAPI) -> None:
     # + event tracking: /api/events, PATCH /api/account, 3 /api/admin/analytics
     # + tuân thủ: /api/legal/{doc}, báo cáo tin nhắn, 2 /api/admin/reports, xoá/xuất tài khoản, đồng ý điều khoản
     # + báo cáo nhân vật công khai, ẩn nhân vật công khai (chủ máy)
-    assert len(routes) == 100
+    # + bảng "Nhân vật hot" (F46)
+    assert len(routes) == 116  # 100 + 4 route coin (F42) + 6 route nạp coin (F43) + 5 route nhiệm vụ (F45) + 1 (F46)
     missing = sorted(routes - ROUTE_RULES.keys())
     stale = sorted(ROUTE_RULES.keys() - routes)
     assert not missing, f"Route chưa xếp loại trong ROUTE_RULES (docs/auth.md §4.1): {missing}"

@@ -32,9 +32,10 @@ test("every client event of the tracking plan is sent from a screen (content_rep
 
 test("tracking calls only pass fixed codes, booleans or numbers (no variable text)", () => {
   // Every props object literal in a track call: values are string literals, booleans, numbers, or
-  // calls of the code helpers (vibeCode, chipPosition, profileFrom, displayMode) / known enum variables.
+  // calls of the code helpers (vibeCode, chipPosition, profileFrom, displayMode, takeWalletFrom, takeTopUpFrom,
+  // takeMissionsFrom, hotFrom (F46: "explore" | "link"), packCode) / known enum variables.
   let checked = 0;
-  const allowed = /^(?:"[a-z_]+"|true|false|\d+|code !== null|fullSignIn|source|vibeCode\(.*\)|chipPosition\(.*\)|profileFrom\(.*\)|displayMode\(.*\)|Math\.min\(3, i \+ 1\))$/;
+  const allowed = /^(?:"[a-z_]+"|true|false|\d+|code !== null|fullSignIn|source|vibeCode\(.*\)|chipPosition\(.*\)|profileFrom\(.*\)|displayMode\(.*\)|takeWalletFrom\(\)|takeTopUpFrom\(\)|takeMissionsFrom\(\)|hotFrom\(previousRouteName\(\)\)|packCode\(.*\)|Math\.min\(3, i \+ 1\))$/;
   for (const f of ALL) {
     for (const m of f.text.matchAll(/\btrack(?:InStory)?\(\s*"[a-z_]+"\s*,\s*\{([^}]*)\}/g)) {
       for (const pair of (m[1] ?? "").split(/,(?![^(]*\))/)) {

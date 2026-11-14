@@ -1,16 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { api } from "./api/client";
 import { AppShell } from "./components/shell";
+import { Toast } from "./components/ui";
 import { useAccount } from "./hooks/useAccount";
+import { refreshWallet, walletStore } from "./hooks/useWallet";
 import { refreshAuth, startAuth, useAuth } from "./hooks/useAuth";
 import { gateOf, isAuthRoute, rememberNext } from "./lib/auth";
+import { dailyToast } from "./lib/coins";
 import type { Gate } from "./lib/auth";
 import { legacyRedirect, replaceRoute, routeHref, useRoute } from "./lib/router";
 import type { Route } from "./lib/router";
 import { AdminPage } from "./pages/admin/AdminPage";
 import { AuthSplash, ForcePasswordPage, LoginPage, SetupPage, SignupPage, TermsPage } from "./pages/auth";
 import { CharacterPage } from "./pages/character/CharacterPage";
+import { MissionsPage } from "./pages/coins/MissionsPage";
+import { TopUpPage } from "./pages/coins/TopUpPage";
+import { WalletPage } from "./pages/coins/WalletPage";
 import { ChatPage } from "./pages/chat/ChatPage";
 import { ExplorePage } from "./pages/explore/ExplorePage";
+import { HotPage } from "./pages/explore/HotPage";
 import { HubPage } from "./pages/hub/HubPage";
 import { LegalPage } from "./pages/legal/LegalPage";
 import { PersonasPage } from "./pages/PersonasPage";
@@ -25,6 +33,8 @@ function titleOf(route: Route): string | null {
       return "Lyris";
     case "explore":
       return "Khám phá · Lyris";
+    case "hot":
+      return "Nhân vật hot · Lyris";
     case "studio":
       return "Studio · Lyris";
     case "card":
@@ -49,6 +59,12 @@ function titleOf(route: Route): string | null {
     case "legal":
       // LegalPage sets its own title.
       return null;
+    case "coins":
+      return "Ví coin · Lyris";
+    case "topUp":
+      return "Nạp coin · Lyris";
+    case "missions":
+      return "Nhiệm vụ hôm nay · Lyris";
   }
 }
 
@@ -151,6 +167,7 @@ export default function App() {
       return (
         <>
           <TrackingConsent />
+          <CoinCheckin accountId={auth.state.account?.id ?? null} />
           <AppRoutes route={route} isOwner={auth.state.account?.role === "owner"} />
         </>
       );
@@ -168,6 +185,67 @@ function TrackingConsent() {
     if (optOut !== null) setTrackingConsent({ optOut });
   }, [optOut]);
   return null;
+}
+
+/** Ask again for the daily gift when the tab comes back after this long (the Vietnam day may have changed). */
+const CHECKIN_AGAIN_MS = 5 * 60_000;
+
+function dailyKey(accountId: number): string {
+  return `lyris.coins.daily.${accountId}`;
+}
+
+/**
+ * F42 (docs/coins.md §3.4, §8): opening the app is the day's sign-in. POST /api/coins/checkin once per
+ * load (and when the tab comes back after a while): the first open of the Vietnam day adds 60 coins and
+ * shows "+60 coin cho hôm nay" once. The answer carries the wallet, so the header chip is fresh at once.
+ */
+function CoinCheckin({ accountId }: { accountId: number | null }) {
+  const [toast, setToast] = useState<string | null>(null);
+  const last = useRef(0);
+  const hideToast = useCallback(() => setToast(null), []);
+
+  useEffect(() => {
+    if (accountId === null) return;
+    let alive = true;
+    const run = () => {
+      last.current = Date.now();
+      api.checkin().then(
+        (res) => {
+          if (!alive) return;
+          walletStore.set(res.wallet);
+          let seen: string | null = null;
+          try {
+            seen = window.localStorage.getItem(dailyKey(accountId));
+          } catch {
+            seen = null;
+          }
+          const text = dailyToast(res, seen);
+          if (text) setToast(text);
+          try {
+            if (res.today > 0) window.localStorage.setItem(dailyKey(accountId), res.coin_day);
+          } catch {
+            // private mode: the notice may show again next time
+          }
+        },
+        () => {
+          if (alive) refreshWallet();
+        },
+      );
+    };
+    run();
+    const onVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      if (Date.now() - last.current > CHECKIN_AGAIN_MS) run();
+      else refreshWallet();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      alive = false;
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [accountId]);
+
+  return <Toast text={toast} onDone={hideToast} duration={4500} />;
 }
 
 /**
@@ -206,6 +284,12 @@ function AppRoutes({ route, isOwner }: { route: Route; isOwner: boolean }) {
       return (
         <AppShell showTabBar>
           <ExplorePage />
+        </AppShell>
+      );
+    case "hot":
+      return (
+        <AppShell showTabBar>
+          <HotPage />
         </AppShell>
       );
     case "studio":
@@ -249,5 +333,11 @@ function AppRoutes({ route, isOwner }: { route: Route; isOwner: boolean }) {
     case "legal":
       // Drawn by App before the gate.
       return null;
+    case "coins":
+      return <WalletPage />;
+    case "topUp":
+      return <TopUpPage />;
+    case "missions":
+      return <MissionsPage />;
   }
 }

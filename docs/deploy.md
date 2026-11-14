@@ -13,6 +13,9 @@ Trạng thái: tài liệu vận hành cho lần ra mắt. `scripts/serve.sh` đ
 Caddy và các file systemd ở dưới **chưa chạy thử trong repo này** (máy phát triển không cài Caddy); làm theo §10 để
 kiểm trước khi mở cho người dùng. Docker: chưa dùng ([quyết định](../wiki/decisions/chua-dung-docker.md)).
 
+Kế hoạch sau khi nộp bài (nhiều máy chủ, Postgres, Redis, vLLM, App Store): [server.md](server.md). Trang này vẫn là cách
+chạy bản tự chạy một máy.
+
 ## 1. Kiến trúc
 
 ```

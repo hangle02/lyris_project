@@ -13,7 +13,13 @@ họ (đó là dữ liệu của họ), chỉ không còn ghi người tạo (`o
 
 `export_account` trả một dict JSON được: hồ sơ, cài đặt, persona, nhân vật (kèm sổ thế giới), nhân vật đang chơi
 bằng bản sao (chỉ phần công khai, như giao diện cho xem), story kèm toàn bộ tin nhắn và ký ức, báo cáo đã gửi,
-thiết bị đăng nhập và sự kiện sử dụng. Ảnh chỉ ghi tên file. Không có hash mật khẩu, token, prompt snapshot.
+thiết bị đăng nhập, sự kiện sử dụng và ví coin (số dư + mọi dòng sổ coin, F42). Ảnh chỉ ghi tên file. Không có hash
+mật khẩu, token, prompt snapshot, hay mã nạp (chỉ có hash).
+
+Mọi bảng coin (migration 0012) có khoá ngoại tới `accounts` với ON DELETE CASCADE (ví, sổ, giữ chỗ, lần thử mã, lượt
+xem quảng cáo, người chơi) hoặc SET NULL (người làm `actor_id`, người tạo/dùng mã nạp, người tạo nhân vật), nên xoá
+tài khoản xoá luôn mọi dòng coin của nó; dòng sổ của người khác mà tài khoản này là `actor_id` vẫn còn, `actor_id`
+thành NULL.
 """
 from __future__ import annotations
 
@@ -284,6 +290,7 @@ def export_account(repo: Repo, account_id: int) -> dict[str, Any]:
         ]
         own_reports = reports.reports_by(conn, account_id)
         events = analytics_store.events_of(conn, account_id)
+        coins = _coins_json(conn, account_id)
     return {
         "format": EXPORT_FORMAT,
         "version": EXPORT_VERSION,
@@ -297,7 +304,28 @@ def export_account(repo: Repo, account_id: int) -> dict[str, Any]:
         "reports": own_reports,
         "sessions": sessions,
         "usage_events": events,
+        "coins": coins,
     }
+
+
+def _coins_json(conn: sqlite3.Connection, account_id: int) -> dict[str, Any]:
+    """Ví coin: số dư và mọi dòng sổ coin (cũ trước), kèm chữ của lịch sử ví (docs/coins.md §7)."""
+    from lyris.coins.wallet import history_item
+
+    try:
+        row = conn.execute("SELECT balance FROM coin_wallets WHERE account_id = ?", (account_id,)).fetchone()
+    except sqlite3.OperationalError:  # DB chưa có migration 0012
+        return {"balance": 0, "ledger": []}
+    ledger_rows = conn.execute(
+        "SELECT id, delta, kind, created_at, balance_after, story_id, card_id, mission, milestone, reason, coin_day,"
+        " idem_key FROM coin_ledger WHERE account_id = ? ORDER BY id",
+        (account_id,),
+    ).fetchall()
+    items = [history_item(conn, r, account_id) for r in ledger_rows]
+    for item, r in zip(items, ledger_rows, strict=True):
+        item.pop("name", None)
+        item["reason"] = r["reason"]
+    return {"balance": 0 if row is None else int(row[0]), "ledger": items}
 
 
 __all__ = [

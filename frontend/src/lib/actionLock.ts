@@ -31,3 +31,15 @@ export function messageLockReason(s: { disabled: boolean; pending: boolean; reas
   if (s.pending) return LOCK_PENDING;
   return null;
 }
+
+/** F42 (docs/coins.md §10.3): a member under 6 usable coins cannot ask for another version. */
+export const LOCK_NO_COINS_REGEN = "Cần 6 coin để tạo lại.";
+
+/**
+ * Reason "Tạo lại câu trả lời" is locked: the page's reason first (a reply streaming can be stopped),
+ * then the coin lock; null when it can run.
+ */
+export function regenerateLockReason(pageReason: string | null, coin: { locked: boolean }): string | null {
+  if (pageReason) return pageReason;
+  return coin.locked ? LOCK_NO_COINS_REGEN : null;
+}

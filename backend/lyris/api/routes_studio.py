@@ -19,17 +19,20 @@ from urllib.parse import quote
 import anyio
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, Response
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SerializerFunctionWrapHandler, model_serializer
 
 from lyris.analytics import track
 from lyris.api.deps import CurrentAccount, account_id_of, current_account
+from lyris.api.routes_coins import coin_service, coin_track
 from lyris.api.sse import EventStreamResponse, event_stream_response
 from lyris.chat.gate import GATE_TIMEOUT_DETAIL, AccountBusy, GateTimeout, GenerationGate, Ticket
 from lyris.chat.service import Busy, ChatEvent, ChatService
 from lyris.config import Settings
 from lyris.db.repo import InUse, NotFound, Repo
 from lyris.llm.base import LLMClient, LLMError
-from lyris.llm.errors import UserFacingError, friendly
+from lyris.coins.errors import HoldBusy
+from lyris.coins.wallet import CoinService, Hold
+from lyris.llm.errors import EMPTY_PREVIEW, UserFacingError, friendly
 from lyris.lore.book import book_of, without_book
 from lyris.models import (
     Account,
@@ -99,6 +102,20 @@ _CARD_TEXT_FIELDS: dict[str, str] = {
 # ---------------------------------------------------------------------------- body / response
 
 
+class CreatorProgress(BaseModel):
+    """F44 làm lại (docs/coins.md §5.7): số người chơi, hạng trên bảng "Nhân vật hot" và bậc thưởng tiếp theo; chỉ chủ
+    nhân vật công khai thấy. `rank` None: chưa có trên bảng. `next_tier`: bậc tiếp theo theo hạng (None: đã đạt cả ba
+    bậc 100, 50, 10). `next_reward` None: không có coin (chủ máy, coin tắt) hoặc đã đạt hết. `waiting_coins`: thưởng
+    đang chờ (trần). `board_creators`: số người tạo có nhân vật trên bảng (bậc top N chỉ trả khi ≥ N)."""
+
+    players: int
+    rank: int | None
+    next_tier: int | None
+    next_reward: int | None
+    waiting_coins: int
+    board_creators: int
+
+
 class CardOut(CharacterCard):
     # Phase 2c: account tạo card (None nếu không xác định được)
     creator_handle: str | None = None
@@ -106,6 +123,17 @@ class CardOut(CharacterCard):
     avatar_url: str | None
     story_count: int
     updated_at: str | None
+    # F44: chỉ khi card công khai và người gọi là người tạo (GET/PUT/POST của chính mình)
+    creator: CreatorProgress | None = None
+
+    @model_serializer(mode="wrap")
+    def _drop_empty_creator(self, handler: SerializerFunctionWrapHandler) -> Any:
+        """Không có `creator` (card riêng tư, bản sao, card của người khác) thì không có khoá này trong JSON: hình
+        dạng CardOut cũ giữ nguyên cho mọi card không công khai."""
+        data = handler(self)
+        if isinstance(data, dict) and data.get("creator") is None:
+            data.pop("creator", None)
+        return data
 
 
 class CardSummary(BaseModel):
@@ -323,9 +351,20 @@ def persona_avatar_url(persona: Persona) -> str | None:
     return f"/api/personas/{persona.id}/avatar?v={quote(persona.avatar, safe='')}"
 
 
-def card_out(repo: Repo, card: CharacterCard, creator: Account | None) -> CardOut:
-    """CardOut; `creator` là account sở hữu card (route đã lọc theo account nên thường là account hiện tại)."""
+def card_out(repo: Repo, card: CharacterCard, creator: Account | None, *, coins: CoinService | None = None) -> CardOut:
+    """CardOut; `creator` là account sở hữu card (route đã lọc theo account nên thường là account hiện tại).
+    F44 (docs/coins.md §5.4): có `coins` và card đang công khai, không phải bản sao, của chính `creator` thì thêm
+    `creator: {players, rank, next_tier, next_reward, waiting_coins}` (dòng người chơi và hạng trong trình sửa)."""
     assert card.id is not None
+    progress: CreatorProgress | None = None
+    if (
+        coins is not None
+        and creator is not None
+        and card.visibility == "public"
+        and repo.card_account_id(card.id) == creator.id
+        and not repo.card_origin(card.id).story_copy
+    ):
+        progress = CreatorProgress(**coins.creator_progress(card.id, owner=creator.role == "owner"))
     return CardOut(
         **card.model_dump(),
         creator_handle=creator.handle if creator else None,
@@ -333,6 +372,7 @@ def card_out(repo: Repo, card: CharacterCard, creator: Account | None) -> CardOu
         avatar_url=avatar_url(card),
         story_count=repo.card_story_count(card.id),
         updated_at=repo.card_updated_at(card.id),
+        creator=progress,
     )
 
 
@@ -727,7 +767,7 @@ async def create_card(
         if name:
             created = repo.set_card_avatar(created.id, name, account_id=account_id)
     _track_card_created(request, created, via, with_avatar=with_avatar)
-    return card_out(repo, created, account)
+    return card_out(repo, created, account, coins=coin_service(request))
 
 
 def _track_card_created(request: Request, card: CharacterCard, via: str, *, with_avatar: bool = False) -> None:
@@ -860,11 +900,16 @@ async def _locked_stream(
     lock: asyncio.Lock,
     events: AsyncIterator[ChatEvent],
     reserve: Callable[[], Ticket] | None = None,
+    coins: tuple[CoinService, Callable[[], Hold | None]] | None = None,
 ) -> AsyncIterator[ChatEvent]:
     """Giữ `lock` suốt lượt stream; bận thì Busy ngay ở lần `__anext__` đầu (trước khi yield gì).
 
     Phase 4b (§5.1): `reserve` lấy vé của cổng sinh chung (tài khoản đang sinh ở chỗ khác -> Busy ngay); hết
-    chỗ thì sự kiện `waiting` trước, chờ theo thứ tự đến, quá 120 giây thì sự kiện `error`."""
+    chỗ thì sự kiện `waiting` trước, chờ theo thứ tự đến, quá 120 giây thì sự kiện `error`.
+
+    F42 (docs/coins.md §3.1, §3.2a): `coins` = (ví, hàm giữ chỗ). Giữ chỗ ngay sau vé cổng sinh, trước khi yield
+    gì (`CoinsRequired` → 402). Có câu trả lời (`done`, hoặc bị ngắt sau khi đã có chữ) thì trừ; không có chữ thì
+    nhả (lỗi, rỗng, chờ quá lâu, dừng trước chữ đầu tiên)."""
     if lock.locked():
         await _aclose(events)
         raise Busy(TEST_CHAT_BUSY_DETAIL)
@@ -873,22 +918,50 @@ async def _locked_stream(
     except BaseException:
         await _aclose(events)
         raise
+    hold: Hold | None = None
+    wallet: CoinService | None = None
+    if coins is not None:
+        wallet = coins[0]
+        try:
+            hold = coins[1]()
+        except BaseException as exc:
+            if ticket is not None:
+                ticket.release()
+            await _aclose(events)
+            if isinstance(exc, HoldBusy):
+                raise Busy(TEST_CHAT_BUSY_DETAIL) from exc
+            raise
     # Khoá rảnh nên acquire() trả về ngay, không nhường event loop: kiểm tra + giữ khoá là nguyên tử.
     await lock.acquire()
+    had_text = False
+    reason = "cancelled"
     try:
         if ticket is not None and not ticket.ready:
             yield ChatEvent("waiting", {})
             try:
                 await ticket.wait()
             except GateTimeout:
+                reason = "queue_timeout"
                 yield ChatEvent("error", {"detail": GATE_TIMEOUT_DETAIL, "technical": None})
                 return
         async for event in events:
+            if event.name == "delta" and str(event.data.get("text", "")).strip():
+                had_text = True
+            elif event.name == "done" and hold is not None and wallet is not None:
+                wallet.charge(hold, None)
+            elif event.name == "error":
+                reason = "empty" if event.data.get("detail") == EMPTY_PREVIEW else "error"
             yield event
     finally:
         try:
             await _aclose(events)
         finally:
+            if hold is not None and wallet is not None and not hold.settled:
+                # Bị ngắt sau khi đã có chữ: người dùng đã đọc được, vẫn trừ (tạm chọn, §3.2).
+                if had_text and reason == "cancelled":
+                    wallet.charge(hold, None)
+                else:
+                    wallet.release(hold, reason)
             if ticket is not None:
                 ticket.release()
             lock.release()
@@ -920,9 +993,19 @@ async def test_chat(request: Request, body: TestChatRequest, account: CurrentAcc
     llm: LLMClient = request.app.state.llm
     # Thử chat xem trước một story mới với card này: dùng đúng model story mới sẽ dùng.
     events = test_chat_stream(llm, effective_chat_model(_repo(request), _settings(request)), built)
+    # F42: chat thử cũng tốn 6 coin mỗi câu trả lời có chữ (PO chốt 2026-11-14); giữ chỗ không có story.
+    wallet = coin_service(request)
+    track = coin_track(request)
+
+    def hold() -> Hold | None:
+        return wallet.hold(account_id, story=None, mode="test", kind="send", track=track)
+
     return await event_stream_response(
         _locked_stream(
-            _lock(request, "test_chat_lock"), events, lambda: reserve_generation(request, account_id)
+            _lock(request, "test_chat_lock"),
+            events,
+            lambda: reserve_generation(request, account_id),
+            (wallet, hold),
         )
     )
 
@@ -965,7 +1048,9 @@ async def list_public_cards(request: Request, account: CurrentAccount) -> list[P
 async def get_card(request: Request, card_id: int, account: CurrentAccount) -> CardOut:
     """Card đầy đủ: chỉ của chính mình, không phải bản sao (người khác dùng `/public`, §4.1)."""
     repo = _repo(request)
-    return card_out(repo, repo.get_card(card_id, account_id=account_id_of(account), copies=False), account)
+    return card_out(
+        repo, repo.get_card(card_id, account_id=account_id_of(account), copies=False), account, coins=coin_service(request)
+    )
 
 
 @router.get("/cards/{card_id}/public", response_model=PublicCardOut)
@@ -1009,7 +1094,7 @@ async def update_card(request: Request, card_id: int, body: CharacterCard, accou
         _save_card_book(request, card_id, extensions)
     if updated.visibility == "public" and current.visibility != "public":
         track(request, "character_published")
-    return card_out(repo, updated, account)
+    return card_out(repo, updated, account, coins=coin_service(request))
 
 
 @router.delete("/cards/{card_id}", response_model=DeletedStories)
@@ -1056,7 +1141,7 @@ async def duplicate_card(request: Request, card_id: int, account: CurrentAccount
         if name:
             created = repo.set_card_avatar(created.id, name, account_id=account_id)
     _track_card_created(request, created, "duplicate")
-    return card_out(repo, created, account)
+    return card_out(repo, created, account, coins=coin_service(request))
 
 
 @router.put("/cards/{card_id}/avatar", response_model=CardOut)
@@ -1074,7 +1159,7 @@ async def upload_avatar(request: Request, card_id: int, account: CurrentAccount)
         raise
     if card.avatar and card.avatar != name:
         avatars.remove_avatar(avatars_dir, card.avatar)
-    return card_out(repo, updated, account)
+    return card_out(repo, updated, account, coins=coin_service(request))
 
 
 @router.delete("/cards/{card_id}/avatar", response_model=CardOut)
@@ -1084,7 +1169,7 @@ async def delete_avatar(request: Request, card_id: int, account: CurrentAccount)
     card = repo.get_card(card_id, account_id=account_id, copies=False)
     updated = repo.set_card_avatar(card_id, None, account_id=account_id)
     avatars.remove_avatar(_avatars_dir(request), card.avatar)
-    return card_out(repo, updated, account)
+    return card_out(repo, updated, account, coins=coin_service(request))
 
 
 @router.get("/cards/{card_id}/avatar")

@@ -10,6 +10,8 @@ Màn hình mở app. Hiện mọi story của tài khoản, story có hoạt đ�
 
 Ở điện thoại 390px, từ trên xuống:
 
+*Kế hoạch ([F42](../features/F42-vi-coin.md)):* header của ba tab chính (Tương tác, Khám phá, Studio) có thêm **chip coin** trước nút đổi theme: icon coin màu `accent-2` và số dư, aria-label "Coin: {n}. Mở ví coin", chạm mở [Ví coin](coin-wallet.md). Chủ máy không có chip. Mở app lần đầu trong ngày (giờ Việt Nam) thì hiện thông báo nhỏ "+60 coin cho hôm nay".
+
 1. **Header kính, dính trên cùng** (`components/shell/HubHeader.tsx`): wordmark Lyris bên trái. Bên phải là nút đổi theme và avatar tài khoản. Chạm avatar mở [sheet Tài khoản](account-sheet.md). Khi máy không trả lời được, avatar có một chấm đỏ nhỏ.
 2. **Câu chào theo giờ**, chữ serif nghiêng, là tiêu đề của màn hình. Ví dụ "Tối rồi, kể nhau nghe chuyện hôm nay?". Câu đổi theo đồng hồ, mỗi phút cập nhật một lần.
 3. **Khối mời đặt profile** (chỉ khi tài khoản chưa đặt profile): "Đặt tên cho tài khoản của bạn" + nút "Đặt tên". Nút mở [sheet Sửa profile](edit-profile-sheet.md). Khối tự biến mất khi đã lưu.

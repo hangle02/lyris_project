@@ -27,7 +27,7 @@ Kỹ thuật:
 - [ ] Unit: tab 'Giới thiệu' chỉ có trường cho người đọc, `{{user}}` thành 'bạn', không bao giờ có trường bí mật; tab 'Thiết lập' có xưng hô, giọng kể, cảm xúc ban đầu.
 - [ ] Unit: 'Lời nói đặc trưng' có 2-3 câu, tự chọn từ ví dụ thoại khi card không có.
 - [ ] Unit: hồ sơ nhân vật công khai chỉ trả các trường trong whitelist.
-- [ ] Bot: bấm nhân vật nổi bật ở `#/explore` thì URL thành `#/character/...` (không mở story); hồ sơ có nút 'Bước vào câu chuyện', nhóm tab 'Thông tin nhân vật', và không có ô nhập nào.
+- [ ] Bot: bấm thẻ 'Hạ Vy' trong lưới 'Nhân vật' ở `#/explore` (khung nổi bật đã bỏ, [F46](F46-bang-xep-hang-nhan-vat-hot.md)) thì URL thành `#/character/...` (không mở story); hồ sơ có nút 'Bước vào câu chuyện', nhóm tab 'Thông tin nhân vật', và không có ô nhập nào.
 - [ ] Bot: hồ sơ nhân vật mẫu không có nút 'Sửa nhân vật'; ở 390px có thanh dính sát đáy màn hình chứa nút 'Bước vào câu chuyện', và khi đã có story với nhân vật đó thì thanh có thêm 'Tiếp tục story' (bấm thì mở lại story `#/chat/<id>`).
 - [ ] Bot: `#/character/999999` hiện 'Không tìm thấy nhân vật này' và nút 'Về Khám phá'.
 

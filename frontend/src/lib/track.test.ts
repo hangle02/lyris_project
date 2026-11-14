@@ -299,3 +299,18 @@ test("vibe codes, chip positions, profile origin, display mode", () => {
   assert.equal(displayMode(false, true), "standalone");
   assert.equal(displayMode(false, false), "browser");
 });
+
+test("F47 explore_searched: only has_results (a bool), never the typed words; F46 hot_board_viewed: from explore/link", () => {
+  assert.deepEqual(buildEvent("explore_searched", { has_results: true }), { name: "explore_searched", props: { has_results: true } });
+  assert.deepEqual(buildEvent("explore_searched", { has_results: false }), { name: "explore_searched", props: { has_results: false } });
+  assert.equal(buildEvent("explore_searched"), null, "has_results is required");
+  assert.equal(buildEvent("explore_searched", { has_results: true, query: "ha vy" }), null, "no typed words");
+  assert.equal(buildEvent("explore_searched", { has_results: "ha vy" }), null);
+  assert.deepEqual(Object.keys(CLIENT_EVENTS.explore_searched.props), ["has_results"]);
+  assert.deepEqual(buildEvent("hot_board_viewed", { from: "explore" }), { name: "hot_board_viewed", props: { from: "explore" } });
+  assert.deepEqual(buildEvent("hot_board_viewed", { from: "link" }), { name: "hot_board_viewed", props: { from: "link" } });
+  assert.equal(buildEvent("hot_board_viewed", { from: "studio" }), null);
+  const plan = readFileSync(new URL("../../../docs/tracking-plan.md", import.meta.url), "utf8");
+  assert.match(plan, /^\| `explore_searched` \| C \|.*`has_results: bool`/m);
+  assert.match(plan, /^\| `hot_board_viewed` \| C \|.*`from: enum\(explore\\\|link\)`/m);
+});

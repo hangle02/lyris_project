@@ -387,7 +387,7 @@ def test_migration_0011_is_additive_and_old_reports_are_message_reports(tmp_path
     assert migrate(conn, target=10) == 10
     conn.execute("INSERT INTO content_reports (created_at, updated_at, reason, note) VALUES ('t', 't', 'other', '')")
     conn.commit()
-    assert migrate(conn) == 11
+    assert migrate(conn) == 14
     assert conn.execute("SELECT target FROM content_reports").fetchall()[0][0] == "message"
     sql = (REPO_ROOT / "backend" / "lyris" / "db" / "migrations" / "0011_card_reports.sql").read_text(encoding="utf-8")
     code = "\n".join(line.split("--")[0] for line in sql.splitlines()).upper()

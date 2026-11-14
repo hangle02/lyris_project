@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import type { CardSummary, CharacterCard, TemplateInfo } from "../../types.ts";
 import {
   buildItems,
@@ -17,11 +18,8 @@ import {
   cardRole,
   teaserOf,
   TEASER_CHARS,
-  featuredTemplate,
   fillForReader,
   filterByVibe,
-  heroImageUrl,
-  withoutHero,
   itemRoute,
   normalizeTag,
   shortText,
@@ -126,10 +124,11 @@ test("filterByVibe: normalized compare, null shows all", () => {
   assert.deepEqual(filterByVibe(items, "tình đầu"), []);
 });
 
-test("featuredTemplate: first featured, else first, else null", () => {
-  assert.equal(featuredTemplate([]), null);
-  assert.equal(featuredTemplate([template("a", "A"), template("b", "B", { featured: true })])?.slug, "b");
-  assert.equal(featuredTemplate([template("a", "A"), template("b", "B")])?.slug, "a");
+test("F22/F46: no featured character any more: logic.ts has no featuredTemplate, withoutHero, heroImageUrl", () => {
+  const src = readFileSync(new URL("./logic.ts", import.meta.url), "utf8");
+  for (const name of ["featuredTemplate", "withoutHero", "heroImageUrl"]) assert.doesNotMatch(src, new RegExp(`\\b${name}\\b`), name);
+  const page = readFileSync(new URL("./ExplorePage.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(page, /explore-featured/);
 });
 
 test("defensive extras: role on card rows, image url and credit on templates", () => {
@@ -300,22 +299,15 @@ test("sharedItems: others' public characters, newest first, never your own", asy
   assert.equal(sharedItems([pc(5, "mai", null)], null).length, 1);
 });
 
-test("hero of an installed template: your character's picture, and not listed again in the grid", () => {
+test("every character has exactly one cell, Hạ Vy too (featured or not, installed or not)", () => {
   const hv = template("ha-vy", "Hạ Vy", { featured: true, installed: 8, extra: { image_url: "/api/templates/ha-vy/image" } });
   const other = template("x", "X");
   const cards = [card(8, "Hạ Vy", [], { avatar_url: "/api/cards/8/avatar?v=a.png" }), card(7, "Tần Dương", [])];
-  assert.equal(heroImageUrl(hv, cards), "/api/cards/8/avatar?v=a.png");
-  // No picture of your own yet: the template's scene picture.
-  assert.equal(heroImageUrl(hv, [card(8, "Hạ Vy", [])]), "/api/templates/ha-vy/image");
-  const items = buildItems(cards, [hv, other]);
-  assert.deepEqual(withoutHero(items, hv, null).map((i) => i.name), ["Tần Dương", "X"]);
-  // A vibe filter is an answer to a question: the hero's character stays in it.
-  assert.equal(withoutHero(items, hv, "chữa lành").length, items.length);
-});
-
-test("hero of a template not installed: the template card is not listed again", () => {
-  const hv = template("ha-vy", "Hạ Vy", { featured: true });
-  const items = buildItems([card(7, "Tần Dương", [])], [hv]);
-  assert.deepEqual(withoutHero(items, hv, null).map((i) => i.name), ["Tần Dương"]);
-  assert.equal(withoutHero(items, null, null).length, items.length);
+  const installed = buildItems(cards, [hv, other]);
+  assert.deepEqual(installed.map((i) => i.name), ["Hạ Vy", "Tần Dương", "X"]);
+  assert.equal(installed.filter((i) => i.name === "Hạ Vy").length, 1);
+  assert.equal(installed[0]?.imageUrl, "/api/cards/8/avatar?v=a.png", "your own picture of the installed template");
+  const fresh = buildItems([card(7, "Tần Dương", [])], [template("ha-vy", "Hạ Vy", { featured: true }), other]);
+  assert.deepEqual(fresh.map((i) => i.name), ["Tần Dương", "Hạ Vy", "X"]);
+  assert.equal(new Set(fresh.map((i) => i.key)).size, fresh.length);
 });

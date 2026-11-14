@@ -33,9 +33,12 @@ Kỹ thuật:
 - [ ] Bot: ở 390px, `#/`, `#/studio`, `#/chat/<id>` không cuộn ngang và mọi nút trên header (cả 'Suy nghĩ' và hai nút Story/DM ở `#/chat/<id>`), mọi tab của thanh 'Điều hướng chính' rộng và cao ≥ 44px.
 - [ ] Bot: ở 390px, mọi nút dưới lượt cuối của nhân vật trong story (hàng thao tác: Tạo lại, Thích, Chê, Sửa, Xoá từ đây…) và nút 'Huỷ', 'Xoá' của hộp 'Xác nhận xoá' rộng và cao ≥ 44px.
 - [ ] Bot: suốt lượt chạy của bot (mọi trang) không có request nào ra ngoài máy (font, icon, ảnh đều tự host).
+- [ ] Unit: dấu tiếng Việt có trong cả ba font tự host: mọi file font mà `main.tsx` nhập (Plus Jakarta Sans, Be Vietnam Pro, Cormorant Garamond) có `@font-face` phủ U+1EA0–1EF9, Đ đ, Ơ ơ, Ư ư, lấy từ file `.woff2` tiếng Việt cục bộ; token `--font-sans`, `--font-story`, `--font-brand` đặt đúng font đó đầu tiên.
+- [ ] Bot: dấu tiếng Việt hiển thị đúng ở cả ba font: với mọi kiểu chữ app dùng (10 cặp độ đậm/nghiêng), từng chữ 'Ặ ặ Ỡ ỡ Ừ ừ Ữ ữ Ấ ấ Ộ ộ Ệ ệ Ơ ơ Ư ư Ă ă Đ đ' được vẽ bằng chính font đó, không rơi về font dự phòng (đo canvas sau `document.fonts.load`: cùng độ rộng dù font dự phòng là monospace hay serif), và bộ chữ tiếng Việt (U+1EA0–1EF9) của font đã tải.
 
 ## Tests
 
+- frontend/src/theme/fonts.test.ts
 - frontend/src/theme/theme.test.ts
 - frontend/src/lib/router.test.ts
 - frontend/src/components/ui/logic.test.ts
@@ -48,6 +51,7 @@ Kỹ thuật:
 - bot: 390px không tràn ngang, nút header và thanh tab ≥ 44px ở #/, #/studio, #/chat
 - bot: 390px nút dưới lượt chat và nút hộp Xác nhận xoá ≥ 44px
 - bot: không có request ra ngoài
+- bot: chữ tiếng Việt có dấu vẽ bằng đúng ba font tự host, không rơi về font dự phòng
 
 ## Ngoài Done when
 

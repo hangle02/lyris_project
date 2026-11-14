@@ -13,6 +13,7 @@ from datetime import datetime
 from typing import Literal
 
 from lyris.auth import clock
+from lyris.coins.hot import sync_public_since
 
 ReportReason = Literal["sexual", "minor_safety", "violent", "hateful", "self_harm", "harassment", "other"]
 ReportStatus = Literal["open", "reviewed", "dismissed"]
@@ -134,6 +135,8 @@ def unpublish_card(conn: sqlite3.Connection, card_id: int, now: datetime) -> boo
         " WHERE id = ? AND visibility = 'public' AND story_copy = 0",
         (clock.iso(now), card_id),
     )
+    # F44 (docs/coins.md §5.5): về Riêng tư thì xoá lúc bật Công khai (công khai lại thì đếm 24 giờ lại).
+    sync_public_since(conn, card_id, now)
     return cur.rowcount == 1
 
 

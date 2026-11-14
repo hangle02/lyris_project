@@ -176,14 +176,24 @@ def set_status(conn: sqlite3.Connection, account_id: int, status: Literal["activ
 def insert_member(
     conn: sqlite3.Connection, *, uid: str, handle: str, display_name: str, invited_by: int | None
 ) -> int:
-    """Thêm thành viên (vai trò `member`, đã đặt profile). Handle trùng -> sqlite3.IntegrityError."""
+    """Thêm thành viên (vai trò `member`, đã đặt profile). Handle trùng -> sqlite3.IntegrityError.
+
+    F42 (docs/coins.md §3.4): mọi đường tạo thành viên (mã mời, server giả của bot, fixture) đi qua đây, nên ví và
+    quà tạo tài khoản +300 (`signup:<id>`) được ghi ngay tại đây, cùng transaction với việc tạo tài khoản."""
+    from lyris.coins import ledger as coin_ledger
+
     cur = conn.execute(
         "INSERT INTO accounts (uid, handle, display_name, profile_completed, role, invited_by)"
         " VALUES (?, ?, ?, 1, 'member', ?)",
         (uid, handle, display_name, invited_by),
     )
     assert cur.lastrowid is not None
-    return int(cur.lastrowid)
+    account_id = int(cur.lastrowid)
+    # DB chưa có migration 0012 (dựng DB cũ trong test, hay code mới tải trước migration): bỏ qua, migration
+    # 0012 sẽ mở ví +300 cho mọi thành viên đã có (`backfill_grant`).
+    if conn.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'coin_wallets'").fetchone():
+        coin_ledger.open_wallet(conn, account_id)
+    return account_id
 
 
 # ---------------------------------------------------------------------------- phiên
@@ -531,6 +541,8 @@ class AdminRow:
     last_login_at: str | None
     invited_by_handle: str | None
     session_count: int
+    # F43 (docs/coins.md §7): số dư ví của thành viên (chưa có ví: 0); chủ máy: None (không tốn coin).
+    coin_balance: int | None = None
 
 
 def admin_accounts(conn: sqlite3.Connection, now: datetime, account_id: int | None = None) -> list[AdminRow]:
@@ -543,7 +555,8 @@ def admin_accounts(conn: sqlite3.Connection, now: datetime, account_id: int | No
         "SELECT a.id, a.handle, a.display_name, a.avatar, a.role, a.status, a.must_change_password,"
         " a.password_hash IS NOT NULL AS has_password, a.created_at, a.last_login_at, i.handle AS invited_by_handle,"
         " (SELECT COUNT(*) FROM sessions s WHERE s.account_id = a.id AND s.expires_at > ? AND s.created_at > ?)"
-        "   AS session_count"
+        "   AS session_count,"
+        " (SELECT w.balance FROM coin_wallets w WHERE w.account_id = a.id) AS coin_balance"
         f" FROM accounts a LEFT JOIN accounts i ON i.id = a.invited_by{where}"
         " ORDER BY a.role = 'owner' DESC, a.created_at, a.id",
         params,
@@ -562,6 +575,7 @@ def admin_accounts(conn: sqlite3.Connection, now: datetime, account_id: int | No
             last_login_at=r["last_login_at"],
             invited_by_handle=r["invited_by_handle"],
             session_count=int(r["session_count"]),
+            coin_balance=None if str(r["role"]) == "owner" else int(r["coin_balance"] or 0),
         )
         for r in rows
     ]

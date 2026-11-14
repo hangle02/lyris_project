@@ -18,7 +18,7 @@ from typing import Literal
 from lyris.auth import clock
 from lyris.config import REPO_ROOT
 
-LEGAL_VERSION = "2026-11-15"
+LEGAL_VERSION = "2026-11-16"  # F42: thêm mục Coin (docs/coins.md §12)
 LEGAL_DIR: Path = REPO_ROOT / "docs" / "legal"
 
 LegalDoc = Literal["terms", "privacy"]

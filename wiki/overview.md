@@ -32,7 +32,7 @@ Mọi story và chat chỉ nằm trên máy Mac. Không gửi gì ra ngoài.
 
 ## Trải nghiệm chính
 
-1. **[Khám phá](screens/explore.md)** (tab trái): thẻ nhân vật nổi bật, lọc theo cảm xúc ("Chữa lành", "Dịu dàng", "Bí ẩn nội tâm", "Tình đầu"), lưới thẻ nhân vật bằng nhau, phần "Nhân vật được chia sẻ" từ tài khoản khác.
+1. **[Khám phá](screens/explore.md)** (tab trái): ô "Tìm nhân vật" và dải "Nhân vật hot" thay thẻ nhân vật nổi bật ([F46](features/F46-bang-xep-hang-nhan-vat-hot.md), [F47](features/F47-tim-nhan-vat.md); bảng đầy đủ ở [`#/explore/hot`](screens/hot-ranking.md)), lọc theo cảm xúc ("Chữa lành", "Dịu dàng", "Bí ẩn nội tâm", "Tình đầu"), lưới thẻ nhân vật bằng nhau, phần "Nhân vật được chia sẻ" từ tài khoản khác.
 2. **[Hồ sơ nhân vật](screens/character-profile.md)**: ảnh lớn, tên, vai trò, tag, "Lời nói đặc trưng", tab "Giới thiệu" và "Thiết lập" (chỉ xem, không sửa). Không bao giờ hiện bí mật của nhân vật.
 3. **[Bước vào câu chuyện](screens/start-story-sheet.md)**: sheet chọn persona. Mở "Tuỳ chỉnh story" để đổi bối cảnh, lời mở đầu, ngôn ngữ, Story/DM, kiểu quan hệ, ngôi kể, đại từ dẫn truyện, kiểu suy nghĩ, có đọc suy nghĩ hay không.
 4. **[Chat](screens/chat-story.md)**, hai chế độ chung một dòng thời gian:
@@ -41,6 +41,17 @@ Mọi story và chat chỉ nằm trên máy Mac. Không gửi gì ra ngoài.
    - [Nút "+"](features/F16-menu-cong.md) ở ô chat: "Nhận gợi ý" (chỉ khi bấm), "Xem sự kiện", "Gửi hình ảnh" (Sắp có).
 5. **Ngăn trái tim** trong chat ([cảm xúc](features/F09-ma-tran-cam-xuc.md), [trí nhớ](features/F10-tri-nho.md), [sổ thế giới](features/F17-so-the-gioi.md)): chỉ dẫn diễn xuất, 6 thanh cảm xúc, nơi chốn và thời gian, ký ức (quên được), "Thế giới đã mở khoá".
 6. **[Tương tác](screens/hub.md)** (tab giữa): danh sách story đang chơi. **[Studio](features/F18-xuong-nhan-vat.md)** (tab phải): tạo và sửa nhân vật, sổ thế giới, bật "Công khai".
+
+## Coin (kế hoạch, chưa có code)
+
+Đây là cách Lyris sẽ kiếm tiền, chủ dự án chốt ngày 2026-11-14 ([raw](raw/2026-11-14-coin-tra-loi.md), thiết kế: [docs/coins.md](../docs/coins.md)):
+
+- **Chat tốn coin** ([F42](features/F42-vi-coin.md)): mỗi lượt tốn 6 coin; kế hoạch tính mỗi câu trả lời của nhân vật, kể cả "Tạo lại câu trả lời" và chat thử ở Studio (tạm chọn, chờ PO). Tài khoản mới được 300 coin, mỗi ngày mở app được thêm 60. Lỗi máy không mất coin. Hết coin thì ô nhập khoá, có "Nạp coin" và "Nhiệm vụ". Số coin ở chip trên header và trong Tài khoản. **Chủ máy không tốn coin.**
+- **Nạp coin** ([F43](features/F43-nap-coin.md)): màn có gói "Giá dự kiến" nhưng đang ở chế độ thử, chưa bán coin; chủ máy tặng mã nạp (không bán) hoặc cộng/trừ coin có lý do. Cổng thanh toán thật chỉ nối khi ra mắt.
+- **Thưởng sáng tác** ([F44](features/F44-thuong-sang-tac.md), làm lại 2026-11-14): nhân vật công khai vào top 100 / 50 / 10 của bảng "Nhân vật hot" ([F46](features/F46-bang-xep-hang-nhan-vat-hot.md), xếp theo tổng người chơi, cập nhật mỗi giờ) thì người tạo được +100 / +200 / +300 coin, mỗi bậc một lần; lần đầu có nhân vật công khai đủ 24 giờ và có người chơi: +50 coin. Thay thưởng mốc 10/50/100 người chơi.
+- **Nhiệm vụ ngày** ([F45](features/F45-nhiem-vu-ngay.md)): tối đa 30 coin/ngày: xem quảng cáo mẫu 15 giây +5 (3 lần), trò chuyện với 3 nhân vật khác nhau +10, gửi 20 lượt +5.
+
+Coin không phải tiền, không đổi ra tiền, không chuyển cho người khác. Số dư nằm trong DB của app (sổ coin chỉ thêm, theo từng tài khoản), có trong "Tải dữ liệu của tôi", mất khi xoá tài khoản.
 
 ## Khác WHIF ở đâu
 
@@ -77,12 +88,12 @@ Theo [docs/plan.md](../docs/plan.md) §10 và code hiện có (DB thật đang �
 
 ## Nhân vật hiện có
 
-- Nhân vật mẫu: Hạ Vy (nổi bật), Trần Minh Khang, Tạ Vân Lan, Lạc Dương, Morwenna Penrose (tiếng Anh). File: `backend/lyris/seed/templates/`.
+- Nhân vật mẫu: Hạ Vy (nổi bật tới khi build F46), Trần Minh Khang, Tạ Vân Lan, Lạc Dương, Morwenna Penrose (tiếng Anh). File: `backend/lyris/seed/templates/`.
 - Nhân vật chủ dự án gửi, có thế giới riêng trong `worlds/`: Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương. ([raw](raw/2026-11-12-bon-nhan-vat-va-the-gioi.md))
 
 ## Kiểm tra và tiêu chí xong
 
-Mỗi tính năng (F01–F41) có "Done when" gồm dòng Unit, Bot và Model thật, và mục "Tests" trỏ tới test có thật. Một tính năng chỉ là ✅ khi `verification/verify.sh` chạy xanh: test trong "Tests" (`backend/.venv/bin/pytest`, `npm test`), typecheck, build, và bot trình duyệt trên server LLM giả. Dòng Model thật chỉ chấm khi chạy thêm `--real-model` (cần Ollama). Trạng thái nằm ở `memory/features.json`, không ghi trong wiki. Luật đầy đủ: [README.md](README.md) mục "Trang tính năng".
+Mỗi tính năng (F01–F47) có "Done when" gồm dòng Unit, Bot và Model thật, và mục "Tests" trỏ tới test có thật. Một tính năng chỉ là ✅ khi `verification/verify.sh` chạy xanh: test trong "Tests" (`backend/.venv/bin/pytest`, `npm test`), typecheck, build, và bot trình duyệt trên server LLM giả. Dòng Model thật chỉ chấm khi chạy thêm `--real-model` (cần Ollama). Trạng thái nằm ở `memory/features.json`, không ghi trong wiki. Luật đầy đủ: [README.md](README.md) mục "Trang tính năng".
 
 ## Đọc tiếp
 
@@ -92,3 +103,12 @@ Mỗi tính năng (F01–F41) có "Done when" gồm dòng Unit, Bot và Model th
 - [design/README.md](design/README.md): nguyên tắc thiết kế. [design/style.md](design/style.md): màu, chữ, thành phần.
 - [plan-checklist.md](plan-checklist.md): 8 phần một ý tưởng phải có trước khi làm.
 - [index.md](index.md): mọi trang.
+
+## Hướng đi sau khi nộp bài: máy chủ lớn và App Store (kế hoạch)
+
+PO chốt ngày 2026-11-14 ([raw](raw/2026-11-14-server-lon-appstore-tra-loi.md), [quyết định](decisions/may-chu-lon-va-app-store.md)): Lyris sẽ thành app công khai trên web, App Store và Google Play, khoảng 10 nghìn người dùng mỗi tháng, vài trăm người chat cùng lúc. Bây giờ chỉ có thiết kế ([docs/server.md](../docs/server.md)); code làm sau khi nộp bài, và bản tự chạy một máy (SQLite + Ollama) vẫn giữ.
+
+- Dữ liệu và tài khoản: Postgres thay SQLite ở bản host, Redis cho phiên và cổng sinh, ảnh trên S3; đăng ký mở, email khôi phục, Sign in with Apple/Google ([F50](features/F50-postgres.md)–[F54](features/F54-luu-anh-s3.md), [F61](features/F61-dang-ky-cong-khai.md)).
+- Model: đúng `gemma4:12b` chạy bằng vLLM trên GPU riêng, context vẫn 8192 token ([F53](features/F53-cong-suy-luan-vllm.md)).
+- Màn hình: app iOS/Android bọc chính giao diện hiện có bằng Capacitor ([F55](features/F55-app-ios-android.md)); mua coin bằng IAP trong app, VNPay/MoMo trên web ([F56](features/F56-iap-google-play.md), [F57](features/F57-vnpay-momo.md)).
+- Kiểm tra: mỗi tính năng F50–F62 có Done when đo được; `verification/verify.sh` vẫn chấm trên bản tự chạy, thêm bộ test chạy trên Postgres.

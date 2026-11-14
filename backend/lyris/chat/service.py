@@ -14,6 +14,11 @@ của cả máy: tài khoản đang có lượt sinh ở story khác -> Busy (40
 Phase 3 (docs/phase3.md §4, §6): có `StateService` thì prompt kèm `PromptState` (tóm tắt, chỉ dẫn diễn
 xuất, cảnh, ký ức) và snapshot lưu kèm `state`; có `JobQueue` thì worker nền được báo khi lượt stream
 bắt đầu/kết thúc (nhường model), và job trích xuất được xếp sau mỗi lượt lưu trọn vẹn / khi sửa.
+
+F42 (docs/coins.md §3.2): có `CoinService` thì sau vé cổng sinh, TRƯỚC khi lưu lượt người chơi, giữ chỗ 6 coin
+(`CoinsRequired` → 402 trước byte SSE đầu tiên, lượt người chơi không được lưu). Câu trả lời có chữ được lưu (kể cả
+phần dở khi bị ngắt) thì trừ trong cùng transaction lưu câu trả lời; không có chữ thì nhả trong `finally` của `_run`
+với lý do (error, empty, save_failed, queue_timeout, cancelled, invalid). `coins=None` (test dựng tay) = không tính.
 """
 from __future__ import annotations
 
@@ -27,6 +32,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import anyio
 
 from lyris.chat.gate import (
+    OTHER_WORK_DETAIL,
     WAIT_TIMEOUT_DETAIL,
     AccountBusy,
     GateTimeout,
@@ -34,6 +40,7 @@ from lyris.chat.gate import (
     Ticket,
     other_story_detail,
 )
+from lyris.coins.errors import HoldBusy
 from lyris.db.repo import ANY_ACCOUNT, Repo
 from lyris.llm.base import Done, LLMClient, LLMError, LLMEvent, TextDelta
 from lyris.llm.errors import EMPTY_REPLY, SAVE_FAILED, UserFacingError, error_event, friendly
@@ -43,6 +50,7 @@ from lyris.prompt.builder import PromptBudget, build_prompt
 from lyris.prompt.directives import extract_directives
 
 if TYPE_CHECKING:
+    from lyris.coins.wallet import CoinService, CoinTrack, Hold
     from lyris.jobs.queue import JobQueue
     from lyris.lore.service import LoreService
     from lyris.state.service import StateService
@@ -99,6 +107,9 @@ class _Plan:
     window_start_turn: int | None = None
     # Phase 4: mục thế giới đã chọn cho prompt (ghi lore_hits + snapshot sau khi lưu).
     lore: PromptLore | None = None
+    # F42: giữ chỗ coin của lượt này (None: không tính coin); trừ cùng transaction lưu câu trả lời.
+    hold: Hold | None = None
+    save_failed: bool = False
 
 
 @dataclass
@@ -106,6 +117,9 @@ class _Progress:
     raw_parts: list[str] = field(default_factory=list)
     started: float = field(default_factory=time.perf_counter)
     ttft_ms: float | None = None
+    # Đã gửi cho người chơi ít nhất một `delta` có chữ (khác khoảng trắng). Chưa có (ví dụ mẩu "[Tho…" còn nằm
+    # trong parser) thì dừng không trừ coin.
+    shown: bool = False
 
     @property
     def raw(self) -> str:
@@ -123,8 +137,11 @@ class ChatService:
         jobs: JobQueue | None = None,
         lore: LoreService | None = None,
         gate: GenerationGate | None = None,
+        coins: CoinService | None = None,
     ) -> None:
         self._repo = repo
+        # F42: ví coin. None (test cũ dựng ChatService bằng tay) = không tính coin.
+        self._coins = coins
         # Phase 4b: cổng sinh chung của cả máy (app truyền vào, dùng chung với chat thử / viết nháp).
         self.gate = gate or GenerationGate()
         self._llm = llm
@@ -161,19 +178,21 @@ class ChatService:
 
     # ------------------------------------------------------------------ sinh câu trả lời
 
-    def send(self, story_id: int, text: str) -> AsyncIterator[ChatEvent]:
+    def send(self, story_id: int, text: str, *, coin_track: CoinTrack | None = None) -> AsyncIterator[ChatEvent]:
         """Lưu lượt người chơi (lượt mới) rồi stream câu trả lời của nhân vật."""
-        return self._run(lambda: story_id, lambda story: self._prepare_send(story, text))
+        return self._run(lambda: story_id, lambda story: self._prepare_send(story, text), "send", coin_track)
 
-    def respond(self, story_id: int) -> AsyncIterator[ChatEvent]:
+    def respond(self, story_id: int, *, coin_track: CoinTrack | None = None) -> AsyncIterator[ChatEvent]:
         """Trả lời message người chơi cuối cùng (thử lại sau lỗi hoặc sau khi dừng)."""
-        return self._run(lambda: story_id, self._prepare_respond)
+        return self._run(lambda: story_id, self._prepare_respond, "retry", coin_track)
 
-    def regenerate(self, message_id: int) -> AsyncIterator[ChatEvent]:
+    def regenerate(self, message_id: int, *, coin_track: CoinTrack | None = None) -> AsyncIterator[ChatEvent]:
         """Sinh variant mới cho lượt AI cuối."""
         return self._run(
             lambda: self._repo.get_message(message_id, account_id=ANY_ACCOUNT).story_id,
             lambda story: self._prepare_regenerate(story, message_id),
+            "regenerate",
+            coin_track,
         )
 
     def _context(self, story: Story) -> tuple[CharacterCard, Persona]:
@@ -278,7 +297,7 @@ class ChatService:
             lore=lore,
         )
 
-    def _persist(self, plan: _Plan, raw: str, stats: GenStats) -> Message:
+    def _persist(self, plan: _Plan, raw: str, stats: GenStats, *, charge: bool = True) -> Message:
         """Ghi message assistant (đồng bộ; an toàn để gọi trong finally khi bị huỷ)."""
         assert plan.story.id is not None
         visible, thought = split_thought(raw)
@@ -295,7 +314,12 @@ class ChatService:
             model_name=plan.story.model_name,
             gen_stats=stats,
         )
-        saved = self._repo.add_variant(msg) if plan.as_variant else self._repo.insert_message(msg)
+        # F42: câu trả lời và dòng sổ trừ coin trong CÙNG một transaction. `charge` không bao giờ raise (lỗi coin
+        # chỉ ghi log), nên không bao giờ làm mất câu trả lời.
+        with self._repo.transaction():
+            saved = self._repo.add_variant(msg) if plan.as_variant else self._repo.insert_message(msg)
+            if charge and plan.hold is not None and self._coins is not None:
+                self._coins.charge(plan.hold, saved.id)
         if self._lore is not None and plan.lore is not None and saved.id is not None:
             # Phase 4: lượt này đã dùng / đã gợi ra mục nào (cả lượt bị ngắt). Lỗi thì log, lượt vẫn lưu.
             self._lore.record_hits(plan.story.id, saved.id, plan.lore)
@@ -342,10 +366,33 @@ class ChatService:
         except AccountBusy as exc:
             raise Busy(str(exc)) from exc
 
+    def _hold(self, story: Story, kind: str, track: CoinTrack | None) -> Hold | None:
+        """F42: giữ chỗ coin cho lượt này (None: không tính coin). `CoinsRequired` lan ra (API: 402)."""
+        if self._coins is None:
+            return None
+        assert story.id is not None
+        account_id = self._repo.story_account_id(story.id)
+        try:
+            return self._coins.hold(account_id, story=story, mode=story.mode, kind=kind, track=track)
+        except HoldBusy as exc:
+            raise Busy(OTHER_WORK_DETAIL) from exc
+
+    def _release(self, hold: Hold | None, reason: str) -> None:
+        if hold is None or self._coins is None:
+            return
+        if reason == "save_failed":
+            # Lưu lỗi: transaction có `charge` có thể đã bị cuộn lại sau khi `hold.settled` được đặt trong bộ nhớ.
+            # Nhả theo DB (chỉ khi còn `held`), không tin cờ trong bộ nhớ.
+            self._coins.release(hold, reason, force=True)
+        elif not hold.settled:
+            self._coins.release(hold, reason)
+
     async def _run(
         self,
         resolve_story_id: Callable[[], int],
         prepare: Callable[[Story], Awaitable[_Plan]],
+        kind: str = "send",
+        coin_track: CoinTrack | None = None,
     ) -> AsyncIterator[ChatEvent]:
         story_id = resolve_story_id()
         story = self._repo.get_story(story_id, account_id=ANY_ACCOUNT)
@@ -363,8 +410,18 @@ class ChatService:
         # Báo worker nền ngay từ đầu (trước cả bước tìm ký ức) để model được nhường cho lượt chat.
         if self._jobs is not None:
             self._jobs.generation_started(story_id)
+        hold: Hold | None = None
+        # Lý do nhả giữ chỗ nếu lượt kết thúc mà không có câu trả lời nào được lưu (mặc định: bị ngắt).
+        release_reason = "cancelled"
         try:
-            plan = await prepare(story)
+            # F42: giữ chỗ coin TRƯỚC khi lưu lượt người chơi (402 trước byte SSE đầu tiên, không lưu gì).
+            hold = self._hold(story, kind, coin_track)
+            try:
+                plan = await prepare(story)
+            except BaseException:
+                release_reason = "invalid"
+                raise
+            plan.hold = hold
             for event in plan.prelude:
                 yield event
             if not ticket.ready:
@@ -373,18 +430,25 @@ class ChatService:
                 try:
                     await ticket.wait()
                 except GateTimeout:
+                    release_reason = "queue_timeout"
                     yield ChatEvent("error", {"detail": WAIT_TIMEOUT_DETAIL, "technical": None})
                     return
             generation = self._generate(plan)
             try:
                 async for event in generation:
+                    if event.name == "error":
+                        release_reason = _release_reason(event.data.get("detail"), plan.save_failed)
                     yield event
             finally:
                 # Nếu chính generator này bị đóng khi đang dừng ở yield, generator con vẫn treo ở
                 # yield của nó: đóng ngay để phần dở được lưu trước khi nhả khoá.
                 with anyio.CancelScope(shield=True):
                     await generation.aclose()
+                if plan.save_failed:
+                    release_reason = "save_failed"
         finally:
+            # Không có chữ được lưu (lỗi, rỗng, lưu lỗi, chờ quá lâu, dừng trước chữ đầu tiên): không mất coin.
+            self._release(hold, release_reason)
             ticket.release()
             lock.release()
             if self._jobs is not None:
@@ -416,6 +480,8 @@ class ChatService:
                             progress.ttft_ms = (time.perf_counter() - progress.started) * 1000
                         progress.raw_parts.append(event.text)
                         for parsed in parser.feed(event.text):
+                            if parsed.text.strip():
+                                progress.shown = True
                             yield ChatEvent("delta", {"kind": parsed.kind, "text": parsed.text})
                     elif isinstance(event, Done):
                         stats = event.stats
@@ -431,6 +497,8 @@ class ChatService:
                 return
 
             for parsed in parser.flush():
+                if parsed.text.strip():
+                    progress.shown = True
                 yield ChatEvent("delta", {"kind": parsed.kind, "text": parsed.text})
 
             raw = progress.raw.strip()
@@ -451,6 +519,7 @@ class ChatService:
                 saved = self._persist(plan, raw, stats)
             except Exception as exc:  # gồm cả sqlite3.Error (ví dụ "database is locked")
                 finished = True
+                plan.save_failed = True
                 logger.exception("Không lưu được câu trả lời")
                 yield ChatEvent("error", {"detail": SAVE_FAILED, "technical": f"{type(exc).__name__}: {exc}"})
                 return
@@ -474,8 +543,10 @@ class ChatService:
             aborted=True,
         )
         try:
-            self._persist(plan, raw, stats)
+            # Người chơi chưa thấy chữ nào: vẫn lưu phần dở, nhưng không trừ (`_run` nhả với lý do `cancelled`).
+            self._persist(plan, raw, stats, charge=progress.shown)
         except Exception:
+            plan.save_failed = True
             logger.exception("Không lưu được phần câu trả lời bị ngắt giữa chừng")
 
     # ------------------------------------------------------------------ gợi ý theo yêu cầu (Phase 3b)
@@ -613,6 +684,17 @@ class ChatService:
         if msg.role != "assistant":
             raise InvalidOperation("Chỉ đánh giá được lượt của nhân vật AI.")
         return self._repo.set_feedback(message_id, rating, note)
+
+
+def _release_reason(detail: Any, save_failed: bool) -> str:
+    """Lý do nhả giữ chỗ coin theo sự kiện `error` của lượt (docs/coins.md §3.2)."""
+    if save_failed or detail == SAVE_FAILED:
+        return "save_failed"
+    if detail == EMPTY_REPLY:
+        return "empty"
+    if detail == WAIT_TIMEOUT_DETAIL:
+        return "queue_timeout"
+    return "error"
 
 
 async def _default_suggester(llm: Any, **kwargs: Any) -> list[str]:

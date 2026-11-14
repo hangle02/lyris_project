@@ -193,10 +193,17 @@ export interface ExploreItem {
   creator: string | null;
   /** One short line about the character for the compact card (may be ""). */
   teaser: string;
+  /** F47: the whole description, addressed to the reader (what "Tìm nhân vật" searches besides name, role and tags). */
+  about: string;
 }
 
 /** Max characters of a grid card's teaser (two lines on a phone card). */
 export const TEASER_CHARS = 90;
+
+/** The card's whole description addressed to the reader ("" when there is none): searched by "Tìm nhân vật". */
+export function aboutOf(description: string | null | undefined, name: string, language: string): string {
+  return fillForReader((description ?? "").trim(), name, language === "en" ? "en" : "vi");
+}
 
 /** The card's own description, addressed to the reader and cut short; "" when there is none. */
 export function teaserOf(description: string | null | undefined, name: string, language: string): string {
@@ -232,6 +239,7 @@ export function buildItems(cards: CardSummary[], templates: TemplateInfo[]): Exp
     tags: uniq([...c.tags, ...(vibesByCard.get(c.id) ?? [])].map(normalizeTag)),
     creator: creatorLine({ template: fromTemplate.has(c.id), handle: c.creator_handle }),
     teaser: teaserOf(c.description, c.name, c.language),
+    about: aboutOf(c.description, c.name, c.language),
   }));
   for (const t of templates) {
     if (t.installed_card_id !== null && cardIds.has(t.installed_card_id)) continue;
@@ -246,6 +254,7 @@ export function buildItems(cards: CardSummary[], templates: TemplateInfo[]): Exp
       tags: uniq([...t.vibes, ...t.card.tags].map(normalizeTag)),
       creator: TEMPLATE_CREDIT,
       teaser: teaserOf(t.card.description, t.card.name, t.card.language),
+      about: aboutOf(t.card.description, t.card.name, t.card.language),
     });
   }
   return items;
@@ -279,11 +288,6 @@ export function filterByVibe(items: ExploreItem[], vibe: string | null): Explore
   return items.filter((it) => it.tags.includes(v));
 }
 
-/** The template of the hero card: the first featured one, else the first; null when there are none. */
-export function featuredTemplate(templates: TemplateInfo[]): TemplateInfo | null {
-  return templates.find((t) => t.featured) ?? templates[0] ?? null;
-}
-
 /**
  * Card text addressed to whoever reads the explore page: `{{char}}` becomes the character's name and
  * `{{user}}` becomes "bạn" / "you", capitalised at the start of a sentence.
@@ -315,27 +319,7 @@ export function itemRoute(item: Pick<ExploreItem, "cardId" | "slug">, start = fa
   return null;
 }
 
-/**
- * The hero's picture: once the template is one of your characters, that character's own picture (you
- * may have changed it); otherwise the template's scene picture.
- */
-export function heroImageUrl(t: TemplateInfo, cards: readonly Pick<CardSummary, "id" | "avatar_url">[]): string | null {
-  const own = t.installed_card_id !== null ? cards.find((c) => c.id === t.installed_card_id) : undefined;
-  return own?.avatar_url ?? templateImageUrl(t);
-}
-
-/**
- * Grid items without the character already shown in the hero (its installed card, or the template
- * itself), so it is not listed twice. With a vibe filter on, the grid answers the filter and keeps it.
- */
-export function withoutHero(items: ExploreItem[], hero: Pick<TemplateInfo, "slug" | "installed_card_id"> | null, vibe: string | null): ExploreItem[] {
-  if (!hero || vibe !== null) return items;
-  return items.filter((it) =>
-    hero.installed_card_id !== null ? it.cardId !== hero.installed_card_id : it.slug !== hero.slug || it.kind !== "template",
-  );
-}
-
-/** Profile route of a template (the hero): its installed card when there is one. */
+/** Profile route of a template: its installed card when there is one. */
 export function templateEntryRoute(t: Pick<TemplateInfo, "slug" | "installed_card_id">, start = false): Route {
   return t.installed_card_id !== null ? characterRoute(t.installed_card_id, start) : templateRoute(t.slug, start);
 }
@@ -363,5 +347,6 @@ export function sharedItems(cards: readonly PublicCardSummary[], ownHandle: stri
       tags: uniq(c.tags.map(normalizeTag)),
       creator: byHandle(c.creator_handle),
       teaser: teaserOf(c.description, c.name, c.language),
+      about: aboutOf(c.description, c.name, c.language),
     }));
 }

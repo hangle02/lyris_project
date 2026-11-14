@@ -43,6 +43,10 @@ export const CLIENT_EVENTS = {
   app_opened: { props: { display_mode: e("standalone", "browser"), authed: BOOL }, preAuth: true },
   signup_viewed: { props: { has_invite_code: BOOL }, preAuth: true },
   explore_viewed: { props: {} },
+  // F47: the "Tìm nhân vật" box settled (after the debounce), once per distinct search. Never the typed words.
+  explore_searched: { props: { has_results: BOOL }, required: ["has_results"] },
+  // F46: the "Nhân vật hot" leaderboard opened ("explore" = the "Xem bảng xếp hạng" button).
+  hot_board_viewed: { props: { from: e("explore", "link") } },
   vibe_filter_used: { props: { vibe: e(...VIBE_CODES), position: int(1, 20) }, required: ["vibe"] },
   character_profile_viewed: { props: { source: e(...CARD_SOURCES), from: e(...PROFILE_FROM) }, required: ["source"] },
   story_start_clicked: { props: { source: e(...CARD_SOURCES) }, required: ["source"] },
@@ -50,6 +54,13 @@ export const CLIENT_EVENTS = {
   thought_revealed: { props: {}, story: true },
   heart_drawer_opened: { props: {}, story: true },
   events_timeline_opened: { props: {}, story: true },
+  // F42 (docs/coins.md §11): "Ví coin" opened, and from where.
+  wallet_viewed: { props: { from: e("header", "account", "composer", "link") } },
+  // F43: "Nạp coin" opened (and from where); a planned pack tapped (test mode: nothing is sold).
+  topup_viewed: { props: { from: e("wallet", "composer", "link") } },
+  topup_pack_selected: { props: { pack: e("p100", "p550", "p1200", "p2500") }, required: ["pack"] },
+  // F45: "Nhiệm vụ hôm nay" opened, and from where.
+  missions_viewed: { props: { from: e("wallet", "composer", "link") } },
   // No content_reported: reports (of a reply or of a public character) are recorded by the server,
   // detached from the account, so nobody can tell who reported.
 } as const satisfies Record<string, ClientEventSpec>;
@@ -276,6 +287,7 @@ export function chipPosition(index: number): number {
 export function profileFrom(previousRoute: string | null): ProfileFrom {
   switch (previousRoute) {
     case "explore":
+    case "hot":
       return "explore";
     case "hub":
     case "studio":

@@ -41,7 +41,7 @@ Chủ dự án không muốn thấy chữ kỹ thuật ([raw](../raw/2026-11-13-
 - **Ô nhân vật luôn bằng nhau** ở mọi độ rộng và mọi mục. Số cột cố định: 2 (điện thoại), 3 (máy tính bảng), 5 (máy tính). Hàng cuối thiếu thì để trống, không kéo giãn ô ([raw](../raw/2026-11-14-kham-pha-trung-nhan-vat-va-luoi.md), [quyết định](../decisions/luoi-o-bang-nhau.md)).
 - Các ô cùng hàng cao bằng nhau.
 - Thẻ ở Khám phá nhỏ, vừa đủ đọc thông tin, để không phải cuộn nhiều ([raw](../raw/2026-11-13-kham-pha-va-ho-so-nhan-vat.md), [quyết định](../decisions/the-kham-pha-nho-lai.md)).
-- Một nhân vật chỉ hiện một lần trên một trang (nhân vật nổi bật không lặp trong lưới).
+- Một nhân vật chỉ hiện một lần trong mỗi lưới. Dải "Nhân vật hot" là danh sách xếp hạng, không phải lưới, nên nhân vật trên dải vẫn có ô trong lưới (2026-11-14: khung nổi bật đã bỏ, [quyết định](../decisions/kham-pha-tim-kiem-bo-khung-noi-bat.md)).
 - Bấm thẻ nhân vật mở **hồ sơ chỉ xem**, không mở form sửa, không tạo story ngay ([quyết định](../decisions/ho-so-nhan-vat-chi-doc.md)).
 
 ## 6. Chữ trên giao diện

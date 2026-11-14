@@ -1,6 +1,7 @@
 // Hash router nhỏ cho Lyris: "#/" (Tương tác), "#/explore", "#/chat/12", "#/studio", "#/studio/new",
 // "#/studio/12", "#/personas", "#/character/12", "#/character/template/<slug>", "#/me", "#/u/<handle>",
-// "#/login", "#/signup?code=LYR-…", "#/admin" (Phase 4b), "#/privacy", "#/terms" (ra mắt) và "#/new-story?card=12" cũ (chuyển sang profile nhân vật). Không cần thư viện; mọi đường dẫn lạ
+// "#/login", "#/signup?code=LYR-…", "#/admin" (Phase 4b), "#/privacy", "#/terms" (ra mắt), "#/coins", "#/coins/top-up",
+// "#/missions" (coin, F42) và "#/new-story?card=12" cũ (chuyển sang profile nhân vật). Không cần thư viện; mọi đường dẫn lạ
 // đưa về hub.
 import { useSyncExternalStore } from "react";
 import { formatInvite, normalizeCode } from "./inviteCode.ts";
@@ -10,6 +11,8 @@ export type Route =
   | { name: "hub" }
   /** "#/explore": Khám phá. */
   | { name: "explore" }
+  /** "#/explore/hot": bảng xếp hạng "Nhân vật hot" (F46). */
+  | { name: "hot" }
   /**
    * "#/chat/12": the roleplay workspace. parseRoute only ever returns a number here; `null` is kept in
    * the type for older callers and links to the hub ("#/").
@@ -48,7 +51,13 @@ export type Route =
    * "#/privacy" and "#/terms" (docs/compliance.md §3): the Privacy Policy and the Terms. Open to
    * everyone, signed in or not, also before the owner setup.
    */
-  | { name: "legal"; doc: LegalDocName };
+  | { name: "legal"; doc: LegalDocName }
+  /** "#/coins": "Ví coin" (F42, docs/coins.md §10.2). Member's balance, history, "Nạp coin" and "Nhiệm vụ". */
+  | { name: "coins" }
+  /** "#/coins/top-up": "Nạp coin" (F43, test mode: top-up codes only). */
+  | { name: "topUp" }
+  /** "#/missions": "Nhiệm vụ hôm nay" (F45). */
+  | { name: "missions" };
 
 /** The two legal pages. */
 export type LegalDocName = "terms" | "privacy";
@@ -126,7 +135,8 @@ export function parseRoute(hash: string): Route {
     case undefined:
       return DEFAULT_ROUTE;
     case "explore":
-      return second === undefined ? { name: "explore" } : DEFAULT_ROUTE;
+      if (second === undefined) return { name: "explore" };
+      return second === "hot" ? { name: "hot" } : DEFAULT_ROUTE;
     case "chat": {
       const id = parseId(second);
       return id === null ? DEFAULT_ROUTE : { name: "chat", storyId: id };
@@ -149,6 +159,11 @@ export function parseRoute(hash: string): Route {
       return second === undefined ? { name: "signup", code: normalizeCode(params.get("code")) } : DEFAULT_ROUTE;
     case "admin":
       return second === undefined ? { name: "admin" } : DEFAULT_ROUTE;
+    case "coins":
+      if (second === undefined) return { name: "coins" };
+      return second === "top-up" ? { name: "topUp" } : DEFAULT_ROUTE;
+    case "missions":
+      return second === undefined ? { name: "missions" } : DEFAULT_ROUTE;
     case "privacy":
     case "terms":
       return second === undefined ? { name: "legal", doc: head } : DEFAULT_ROUTE;
@@ -168,6 +183,8 @@ export function routeHref(r: Route): string {
       return "#/";
     case "explore":
       return "#/explore";
+    case "hot":
+      return "#/explore/hot";
     case "chat":
       return r.storyId === null ? "#/" : `#/chat/${r.storyId}`;
     case "studio":
@@ -186,6 +203,12 @@ export function routeHref(r: Route): string {
       return r.code === null ? "#/signup" : `#/signup?code=${formatInvite(r.code)}`;
     case "admin":
       return "#/admin";
+    case "coins":
+      return "#/coins";
+    case "topUp":
+      return "#/coins/top-up";
+    case "missions":
+      return "#/missions";
     case "legal":
       return r.doc === "privacy" ? "#/privacy" : "#/terms";
     case "character": {
@@ -224,6 +247,9 @@ export function tabOf(r: Route): TabName | null {
     case "explore":
     case "studio":
       return r.name;
+    // F46: the leaderboard belongs to Khám phá (its tab stays lit, the bar stays).
+    case "hot":
+      return "explore";
     default:
       return null;
   }

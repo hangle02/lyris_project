@@ -5,6 +5,10 @@ import { Banner } from "../../components/Banner";
 import { CharacterAvatarContext } from "../../components/characterAvatar";
 import { ShowThoughtsContext } from "../../components/showThoughts";
 import { Composer } from "../../components/Composer";
+import { CoinsOutBlock } from "../../components/CoinsOutBlock";
+import { RegenerateCoinLockContext } from "../../components/regenerateLock";
+import { refreshWallet, useWallet } from "../../hooks/useWallet";
+import { composerCoinLock } from "../../lib/coins";
 import { IconChevronLeft } from "../../components/icons";
 import { MessageList } from "../../components/MessageList";
 import { StorySettingsPanel } from "../../components/StorySettingsPanel";
@@ -30,7 +34,7 @@ import { composerActions, replyAnchor, suggestAvailability, suggestView, suggest
 import type { ComposerActionId } from "./suggestLogic";
 import { useStoryExtras } from "./useStoryExtras";
 import { useSuggestions } from "./useSuggestions";
-import { actionLockReason } from "../../lib/actionLock";
+import { actionLockReason, regenerateLockReason } from "../../lib/actionLock";
 
 const LAST_STORY_KEY = "lyris.lastStoryId";
 const HUB_HASH = "#/";
@@ -102,6 +106,7 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
   }, [eventsOpen]);
 
   const health = useHealth();
+  const wallet = useWallet();
   const chat = useChat(storyId, story?.mode ?? "story");
   const busyNow = chat.streaming !== null || chat.mutating;
   // Polling pauses while a reply streams: the job worker waits for the stream anyway.
@@ -172,9 +177,18 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
   // quick replies belong to the previous reply: drop them as soon as a new turn starts.
   const wasBusy = useRef(false);
   useEffect(() => {
-    if (wasBusy.current && !busyNow) void refreshExtras();
+    if (wasBusy.current && !busyNow) {
+      void refreshExtras();
+      // F42: a reply charged (or released) 6 coins: the shared wallet follows (header chip, lock).
+      refreshWallet();
+    }
     wasBusy.current = busyNow;
   }, [busyNow, refreshExtras]);
+
+  // Coming back from "Nạp coin" / "Nhiệm vụ" (or opening the story): the wallet decides the composer lock.
+  useEffect(() => {
+    refreshWallet();
+  }, []);
   const streamingNow = chat.streaming !== null;
   const resetSuggestions = suggest.reset;
   useEffect(() => {
@@ -328,8 +342,15 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
   const last = chat.messages[chat.messages.length - 1];
   const awaitingReply = !busy && !chat.loading && last !== undefined && last.role === "user" && last.id !== null;
 
+  // F42 (docs/coins.md §10.3): a member under 6 usable coins: composer locked, "Bạn đã hết coin" in place
+  // of the banner, "Tạo lại câu trả lời" locked with its reason.
+  const coinLock = composerCoinLock(wallet.wallet);
+  const regenCoinReason = regenerateLockReason(null, coinLock);
+
   let banner: ReactNode = null;
-  if (chat.error) {
+  if (coinLock.locked && !streaming) {
+    banner = <CoinsOutBlock />;
+  } else if (chat.error) {
     banner = (
       <Banner
         tone="error"
@@ -462,6 +483,7 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
       <CharacterAvatarContext.Provider value={story?.card_avatar_url ?? null}>
         <PlayerAvatarContext.Provider value={playerFace}>
           <ShowThoughtsContext.Provider value={showThoughtsOf(story)}>
+          <RegenerateCoinLockContext.Provider value={regenCoinReason}>
           <MessageList
             storyId={story ? storyId : null}
             view={view}
@@ -480,6 +502,7 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
             onFeedback={(m, r) => void chat.feedback(m, r)}
             onReport={setReporting}
           />
+          </RegenerateCoinLockContext.Provider>
           </ShowThoughtsContext.Provider>
         </PlayerAvatarContext.Provider>
       </CharacterAvatarContext.Provider>
@@ -501,6 +524,7 @@ export function ChatPage({ storyId }: { storyId: number }): JSX.Element {
           onMoreSuggestions={askSuggestions}
           onDismissSuggestions={() => suggest.dismiss(suggestion.kind === "items" ? suggestionsKey(suggestion.items) : "")}
           moreSuggestionsBlocked={moreBlocked}
+          coinLocked={coinLock.locked}
         />
       </div>
 

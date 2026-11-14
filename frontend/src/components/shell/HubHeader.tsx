@@ -2,11 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { reloadAccountOnRecovery } from "../../hooks/accountLogic";
 import { getAccountSnapshot, refreshAccount, useAccount } from "../../hooks/useAccount";
 import { useHealth } from "../../hooks/useHealth";
+import { useWallet } from "../../hooks/useWallet";
+import { COIN_COPY } from "../../lib/coinCopy";
+import { formatCoinNumber, noteWalletFrom, showsCoins } from "../../lib/coins";
 import { initialOverlayOpen } from "../../lib/overlayParam";
 import { routeHref } from "../../lib/router";
 import { ThemeToggle } from "../../theme";
 import { Avatar } from "../Avatar";
 import { Wordmark } from "../brand";
+import { IconCoin } from "../icons";
 import { cx } from "../ui/logic";
 import { AccountSheet } from "./AccountSheet";
 import { SHELL_CONTAINER } from "./layout";
@@ -18,6 +22,9 @@ import { usePersonaSettings } from "./usePersonaSettings";
  * below the iPhone status bar. The machine status lives in that sheet; the avatar only carries a
  * small red dot when the machine cannot answer, so failing replies have a visible reason (plain
  * words in its label and tooltip, Phase 3b).
+ *
+ * F42 (docs/coins.md §10.1): a member sees a small coin chip before the theme switch (balance, opens
+ * "Ví coin"). The owner and a server with coins off have no chip.
  */
 export function HubHeader() {
   const health = useHealth();
@@ -51,6 +58,7 @@ export function HubHeader() {
           <Wordmark size={27} />
         </a>
         <div className="ml-auto flex shrink-0 items-center gap-0.5">
+          <CoinChip />
           <ThemeToggle />
           <button
             type="button"
@@ -82,5 +90,26 @@ export function HubHeader() {
         initialView={initialOverlayOpen("about") ? "about" : "main"}
       />
     </header>
+  );
+}
+
+/** The member's balance on the hub header; a 44px tap area around a 32px pill. */
+function CoinChip() {
+  const { wallet } = useWallet();
+  if (!showsCoins(wallet) || !wallet) return null;
+  const n = formatCoinNumber(wallet.balance);
+  return (
+    <a
+      href="#/coins"
+      onClick={() => noteWalletFrom("header")}
+      aria-label={COIN_COPY.chipLabel(n)}
+      title={COIN_COPY.walletTitle}
+      className="group inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full px-0.5"
+    >
+      <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-surface-2 pr-3 pl-2 text-[14px] font-semibold text-fg tabular-nums transition-colors duration-150 group-hover:bg-surface-3">
+        <IconCoin className="text-[17px] text-accent-2" />
+        {n}
+      </span>
+    </a>
   );
 }

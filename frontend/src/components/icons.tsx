@@ -284,3 +284,14 @@ export const IconFlag = (p: IconProps) => (
     <path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528" />
   </Svg>
 );
+
+/* ---------- Coin (F42) ---------- */
+
+/** A coin: rim and inner ring, 1.8px stroke (docs/coins.md §10). Coloured by the caller (`text-accent-2`). */
+export const IconCoin = (p: IconProps) => (
+  <Svg strokeWidth={1.8} {...p}>
+    <circle cx="12" cy="12" r="8.75" />
+    <circle cx="12" cy="12" r="5" />
+    <path d="M12 9.5v5" />
+  </Svg>
+);

@@ -23,6 +23,9 @@ from lyris.api.routes_admin import router as admin_router
 from lyris.api.routes_analytics import admin_router as analytics_admin_router
 from lyris.api.routes_analytics import router as analytics_router
 from lyris.api.routes_auth import router as auth_router
+from lyris.api.routes_coins import admin_router as coins_admin_router
+from lyris.api.routes_coins import explore_router as hot_router
+from lyris.api.routes_coins import router as coins_router
 from lyris.api.routes_compliance import admin_router as compliance_admin_router
 from lyris.api.routes_compliance import public_router as legal_router
 from lyris.api.routes_compliance import router as compliance_router
@@ -37,6 +40,10 @@ from lyris.auth.errors import AuthError
 from lyris.auth.middleware import AuthMiddleware
 from lyris.chat.gate import GenerationGate
 from lyris.chat.service import Busy, ChatService, EmptyContent, InvalidOperation
+from lyris.coins.errors import IDEM_CONFLICT_DETAIL, AdjustRejected, CoinsRequired, HoldBusy, IdemConflict
+from lyris.coins.missions import MissionRejected
+from lyris.coins.topup import TopupRejected
+from lyris.coins.wallet import CoinService, emit_restart_releases
 from lyris.config import Settings, get_settings, migrate_legacy_db
 from lyris.db.connection import connect, migrate
 from lyris.db.repo import ANY_ACCOUNT, HandleTaken, InUse, NotFound, Repo
@@ -177,6 +184,33 @@ def _install_error_handlers(app: FastAPI) -> None:
     async def _busy(_: Request, exc: Busy) -> JSONResponse:
         return _error(409, str(exc))
 
+    @app.exception_handler(CoinsRequired)
+    async def _coins_required(_: Request, exc: CoinsRequired) -> JSONResponse:
+        # F42 (docs/coins.md §3.3): hết coin, trước khi stream (lỗi được "mồi" như 404/409).
+        return JSONResponse(status_code=402, content=exc.payload())
+
+    @app.exception_handler(HoldBusy)
+    async def _hold_busy(_: Request, exc: HoldBusy) -> JSONResponse:
+        return _error(409, "Bạn đang có một việc khác của AI chưa xong. Đợi xong rồi thử lại nhé.")
+
+    @app.exception_handler(AdjustRejected)
+    async def _adjust_rejected(_: Request, exc: AdjustRejected) -> JSONResponse:
+        return JSONResponse(status_code=422, content={"detail": exc.detail, "code": exc.code})
+
+    @app.exception_handler(TopupRejected)
+    async def _topup_rejected(_: Request, exc: TopupRejected) -> JSONResponse:
+        # F43 (docs/coins.md §4.3): mã nạp sai (một câu cho mọi lý do), chủ máy nhập mã, thử sai quá nhiều, quá 50 mã.
+        return JSONResponse(status_code=exc.status, content=exc.payload())
+
+    @app.exception_handler(MissionRejected)
+    async def _mission_rejected(_: Request, exc: MissionRejected) -> JSONResponse:
+        # F45 (docs/coins.md §6, §7): ad_limit, ad_not_finished, ad_expired, mission_not_done, mission_cap, no_missions.
+        return JSONResponse(status_code=exc.status, content=exc.payload())
+
+    @app.exception_handler(IdemConflict)
+    async def _idem_conflict(_: Request, exc: IdemConflict) -> JSONResponse:
+        return JSONResponse(status_code=409, content={"detail": IDEM_CONFLICT_DETAIL, "code": "idem_conflict"})
+
     @app.exception_handler(EmptyContent)
     async def _empty(_: Request, exc: EmptyContent) -> JSONResponse:
         # Nội dung rỗng là dữ liệu sai (422), không phải thao tác sai với trạng thái story (409).
@@ -290,7 +324,12 @@ def create_app(
             # Phase 4b (§5.1): một cổng sinh cho cả máy (chat, gợi ý, chat thử, viết nháp).
             gate = GenerationGate(cfg.chat_slots)
             app.state.gate = gate
-            app.state.chat = ChatService(repo, client, budget=budget, state=state, jobs=jobs, lore=lore, gate=gate)
+            # F42 (docs/coins.md §3.2a): ví coin dùng chung cho chat, chat thử và route /api/coins.
+            coins = CoinService(repo, enabled=cfg.coins_enabled, ad_seconds=cfg.ad_seconds)
+            app.state.coins = coins
+            app.state.chat = ChatService(
+                repo, client, budget=budget, state=state, jobs=jobs, lore=lore, gate=gate, coins=coins
+            )
             # Một lượt viết nháp / chat thử tại một thời điểm (bận -> 409); không chặn chat thường.
             app.state.draft_lock = asyncio.Lock()
             app.state.test_chat_lock = asyncio.Lock()
@@ -325,6 +364,13 @@ def create_app(
                 tracker.on_pending = posthog.notify
             app.state.analytics = tracker
             app.state.posthog = posthog
+            coins.tracker = tracker  # F44: sự kiện thưởng mốc của người tạo (ghi tách khỏi request)
+            # F42 (docs/coins.md §3.2): máy tắt giữa chừng thì giữ chỗ coin còn `held` được nhả (không ai bị trừ cho
+            # lượt không có chữ). CHỈ ở đây, trước khi nhận request: CLI, migrate(), script, test không nhả.
+            released = coins.release_stale()
+            if released:
+                logger.info("Đã nhả %d giữ chỗ coin còn mở từ lần chạy trước", len(released))
+                emit_restart_releases(tracker, released)
             if posthog is not None and (start_forwarder if start_forwarder is not None else True):
                 await posthog.start()
             cleanup = asyncio.create_task(_auth_cleanup_loop(repo))
@@ -360,6 +406,9 @@ def create_app(
     app.include_router(accounts_router)
     app.include_router(lore_router)
     app.include_router(compliance_router)
+    app.include_router(coins_router)
+    app.include_router(coins_admin_router)
+    app.include_router(hot_router)
     return app
 
 

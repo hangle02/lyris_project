@@ -10,11 +10,17 @@
 // waitFor(js, nhãn, ms), evaluate(js), exists(spec), shot(nhãn), step(tên, fn), check(tên, ok, chi tiết),
 // viewport('phone'|'desktop'|{width}), errors (lỗi console), requests (mọi request), creds/member {handle, password}.
 // spec của click/exists: chuỗi CSS, hoặc { css, field, label, labelStarts, labelEnds, text, textHas, within, withinLast, last, visible }.
+import { spawnSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// F44: người chơi của một nhân vật công khai cần câu trả lời ở 2 ngày coin, nên được dựng thẳng trong DB tạm của bot
+// (fake-server.py, reports/bot/) bằng code của app: environment/seed-creator-players.py.
+const PYTHON = path.join(REPO, 'backend', '.venv', 'bin', 'python');
+const SEED_PLAYERS = path.join(REPO, 'environment', 'seed-creator-players.py');
+const BOT_DB = path.join(path.resolve(process.env.BOT_DATA_DIR ?? path.join(REPO, 'reports', 'bot')), 'lyris.db');
 // Ảnh thật có sẵn trong repo (ảnh nhân vật mẫu) để bot tải lên như người dùng chọn file.
 const PHOTO_A = path.join(REPO, 'backend', 'lyris', 'seed', 'templates', 'tran-minh-khang.jpg');
 const PHOTO_B = path.join(REPO, 'backend', 'lyris', 'seed', 'templates', 'ta-van-lan.jpg');
@@ -23,7 +29,6 @@ const C = {
   LOGIN: 'bot: trang đăng nhập hiện và đăng nhập được',
   LEGAL: 'bot: trang pháp lý mở được khi chưa đăng nhập',
   EXPLORE: 'bot: Khám phá tải xong, thẻ đều nhau, không tràn ngang 390px',
-  FEATURED: 'bot: nhân vật nổi bật không lặp trong lưới',
   PROFILE: 'bot: hồ sơ nhân vật chỉ đọc, có nút Bước vào câu chuyện',
   START: 'bot: bắt đầu story qua sheet và persona, story mở với lời chào',
   PLAYER: 'bot: lượt người chơi có lời nói và hành động không bị bọc ngoặc kép ngoài',
@@ -124,11 +129,35 @@ const C = {
   SUMMARY_DETAILS: 'bot: story dài (cửa sổ đã dịch) có Tóm tắt những lượt cũ trong ngăn trái tim',
   AVATAR_EVERYWHERE: 'bot: avatar tải lên ở Studio hiện ở Studio, Khám phá, hồ sơ và chat',
   TEST_PERSONA: 'bot: chat thử ở Studio dùng persona mặc định',
-  FEATURED_START: 'bot: khung nổi bật có ảnh, nút Bước vào câu chuyện mở hồ sơ kèm sheet Chọn persona',
   PERSONA_RADIO: 'bot: danh sách persona trong sheet bắt đầu là radio thật, mỗi persona có avatar',
   PERSONA_FORM_OPEN: 'bot: chưa có persona thì sheet bắt đầu tự mở form Tạo persona mới',
   FONTS_VI: 'bot: chữ tiếng Việt có dấu vẽ bằng đúng ba font tự host, không rơi về font dự phòng',
   EDIT_PROFILE_MEDIA: 'bot: Sửa profile đổi giới thiệu, ảnh đại diện, ảnh bìa và #/me hiện đủ',
+  // --- F42 ví coin
+  COIN_CHIP: 'bot: chip coin trên header mở Ví coin',
+  COIN_DAILY: 'bot: mở app lần đầu trong ngày được +60 coin',
+  COIN_SEND: 'bot: gửi một lượt thì ví giảm đúng 6 coin',
+  COIN_OUT: 'bot: hết coin thì ô nhập khoá, có Nạp coin và Nhiệm vụ',
+  COIN_OUT_DM: 'bot: hết coin thì ô nhập DM cũng khoá',
+  COIN_ACCOUNT: 'bot: sheet Tài khoản có số coin, chủ máy không tốn coin',
+  // --- F43 nạp coin (chế độ thử)
+  TOPUP_PAGE: 'bot: Nạp coin có gói giá chế độ thử và ô mã nạp',
+  TOPUP_CODE: 'bot: chủ máy tạo mã nạp, thành viên dùng mã thì ví tăng',
+  COIN_ADJUST: 'bot: chủ máy cộng coin cho thành viên có lý do',
+  // --- F45 nhiệm vụ ngày, quảng cáo mẫu
+  MISSIONS_PAGE: 'bot: Nhiệm vụ hôm nay có ba nhiệm vụ và trần 30 coin',
+  MISSIONS_AD: 'bot: quảng cáo mẫu đếm ngược rồi nhận 5 coin',
+  // --- F44 thưởng sáng tác theo bảng xếp hạng
+  CREATOR_RANK: 'bot: trình sửa nhân vật công khai có số người chơi, hạng Nhân vật hot và điều kiện bậc thưởng',
+  // --- F46 bảng xếp hạng Nhân vật hot
+  HOT_EMPTY: 'bot: bảng Nhân vật hot rỗng thì Khám phá vẫn có dải và nút Xem bảng xếp hạng, bảng mời Mở Studio',
+  HOT_EXPLORE: 'bot: Khám phá không còn khung nổi bật, có dải Nhân vật hot mở bảng xếp hạng',
+  HOT_BOARD: 'bot: bảng Nhân vật hot có hạng, ảnh, tên, số người chơi và mở hồ sơ',
+  HOT_SIZE: 'bot: bảng Nhân vật hot và dải ở Khám phá không tràn ngang 390px, hàng và nút chạm được 44px',
+  // --- F47 tìm nhân vật ở Khám phá
+  SEARCH: "bot: tìm 'ha vy' không dấu ra thẻ Hạ Vy, xoá tìm thì lưới như cũ",
+  SEARCH_EMPTY: 'bot: tìm không có kết quả thì báo và có nút Xoá tìm kiếm',
+  SEARCH_SIZE: 'bot: ô Tìm nhân vật vừa một dòng 390px, cao 44px, không tràn ngang',
 };
 export const CHECKS = Object.values(C);
 
@@ -142,6 +171,55 @@ const pageText = (c) => c.evaluate('document.body.innerText');
 const overflowX = (c) => c.evaluate('document.documentElement.scrollWidth - window.innerWidth');
 const hashNow = (c) => c.evaluate('location.hash');
 const dialogTitled = (title) => `!!__bot.find({ css: '[role=dialog] h2, [role=dialog] [id]', text: ${J(title)} })`;
+/** Gọi HTTP API của app từ trong trang (cookie đăng nhập + header X-Lyris như giao diện gửi); trả { status, text }. */
+const api = (c, method, p, body) => c.evaluate(`fetch('/api' + ${J(p)}, { method: ${J(method)}, credentials: 'same-origin',
+  headers: { 'X-Lyris': '1', 'Content-Type': 'application/json' }${body === undefined ? '' : `, body: ${J(J(body))}`} })
+  .then(async (r) => ({ status: r.status, text: await r.text() }))`);
+
+/**
+ * F44: thành viên `who` (tạo bằng mã mời của chủ máy, qua HTTP API của app) có một nhân vật công khai và một nhân vật
+ * riêng tư; nhân vật công khai có sẵn `players` người chơi (environment/seed-creator-players.py trên DB tạm của bot).
+ * Kết thúc ở trạng thái đã đăng xuất. Trả { pub, priv, players }.
+ */
+async function seedCreator(c, who, players = 12) {
+  await c.goto('#/terms');
+  await api(c, 'POST', '/auth/logout');
+  const owner = await api(c, 'POST', '/auth/login', { handle: c.creds.handle, password: c.creds.password });
+  if (owner.status !== 200) throw new Error(`chủ máy đăng nhập: HTTP ${owner.status}`);
+  const me = JSON.parse((await api(c, 'GET', '/auth/me')).text);
+  const invite = await api(c, 'POST', '/admin/invites', { note: who.handle });
+  if (invite.status !== 200) throw new Error(`tạo mã mời ${who.handle}: HTTP ${invite.status}`);
+  await api(c, 'POST', '/auth/logout');
+  const signup = await api(c, 'POST', '/auth/signup', {
+    invite_code: JSON.parse(invite.text).code, handle: who.handle, display_name: who.name, password: who.password,
+    accept_terms: true, terms_version: me.legal_version,
+  });
+  if (signup.status !== 200) throw new Error(`tạo @${who.handle}: HTTP ${signup.status} ${signup.text.slice(0, 120)}`);
+  const card = (name, visibility) => ({ card: {
+    name, visibility, gender: 'female', style_profile: 'viet_hien_dai', role: 'Chủ quán trà đầu ngõ',
+    description: 'Chủ quán trà nhỏ, hay kể chuyện phố cũ.', personality: 'Dịu dàng, tinh ý.',
+    address_terms: { self_term: 'mình', player_term: 'cậu' },
+    greeting: 'Chiều mưa, quán vắng. Cô rót một tách trà nóng.\n\n"Lại đến rồi à, ngồi đi."',
+  } });
+  const ids = [];
+  for (const [name, visibility] of [[who.publicName, 'public'], [who.privateName, 'private']]) {
+    const r = await api(c, 'POST', '/cards', card(name, visibility));
+    if (r.status !== 200) throw new Error(`@${who.handle} tạo nhân vật ${name}: HTTP ${r.status} ${r.text.slice(0, 120)}`);
+    ids.push(JSON.parse(r.text).id);
+  }
+  // F46: nhân vật công khai có ảnh (người tạo tải ảnh lên như ở Studio: ảnh có sẵn của nhân vật mẫu Hạ Vy).
+  const avatar = await c.evaluate(`fetch('/api/templates/ha-vy/image', { credentials: 'same-origin' }).then((r) => r.blob())
+    .then((b) => fetch('/api/cards/${ids[0]}/avatar', { method: 'PUT', credentials: 'same-origin',
+      headers: { 'X-Lyris': '1', 'Content-Type': b.type || 'image/jpeg' }, body: b })).then((r) => r.status)`);
+  if (avatar !== 200) throw new Error(`@${who.handle} tải ảnh nhân vật: HTTP ${avatar}`);
+  await api(c, 'POST', '/auth/logout');
+  const out = spawnSync(PYTHON, [SEED_PLAYERS, '--db', BOT_DB, '--card', String(ids[0]), '--players', String(players)], {
+    encoding: 'utf8', timeout: 120000, env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' },
+  });
+  if (out.status !== 0) throw new Error(`seed-creator-players.py: ${(out.stderr || out.error?.message || '').trim().split('\n').slice(-2).join(' ')}`);
+  const seeded = JSON.parse(out.stdout.trim().split('\n').pop());
+  return { pub: ids[0], priv: ids[1], players: seeded.creator_players, rank: seeded.rank };
+}
 
 /** Điền form đăng nhập đang mở rồi bấm Đăng nhập. */
 async function submitLogin(c, who) {
@@ -329,6 +407,10 @@ export async function play(c) {
     return found.length;
   };
   const thoughtSwitches = { headerLabel: false, dmHidden: null, sheet: false, settings: false };
+  // F03: chỗ chọn model của story (ô 'Model trả lời') chỉ nằm trong 'Nâng cao' của Thiết lập story và chỉ chủ máy
+  // thấy. Ghi lại ở từng màn (sheet bắt đầu, Thiết lập story của chủ máy, của thành viên), chấm ở cuối (C.MODEL_ADVANCED).
+  const modelSeen = { ownerSheet: null, ownerFolded: null, ownerAdvanced: null, ownerOpen: null, memberSheet: null, member: null };
+  const modelInDialog = `(() => { const d = document.querySelector('[role=dialog]'); return !!d && (/\\bmodel\\b/i.test(d.innerText) || !!__bot.find({ within: '[role=dialog]', field: 'Model' })); })()`;
   let storyOpen = false;
   let storyHash = '';
   let characterName = '';
@@ -748,6 +830,54 @@ export async function play(c) {
   });
   if (!ownCard) c.check(C.TEST_THOUGHT, false, 'chưa mở được nhân vật trong Studio');
 
+  // F18: chat thử dùng persona mặc định của tài khoản: 'Thiết lập thử' ghi tên persona đó, và request chat thử gửi đúng
+  // persona_id đó. Để không trùng với "persona đầu tiên" hay "persona mới nhất", bước này tạm có 3 persona và đặt
+  // persona ở giữa làm mặc định (qua API như sheet Tài khoản), xong thì trả lại như cũ.
+  await c.step(C.TEST_PERSONA, async () => {
+    if (!ownCard) throw new Error('chưa mở được nhân vật trong Studio');
+    const before = JSON.parse((await api(c, 'GET', '/settings')).text);
+    const extra = JSON.parse((await api(c, 'POST', '/personas', { id: null, name: 'Bot Persona Ba', gender: 'female', description: '' })).text);
+    const all = JSON.parse((await api(c, 'GET', '/personas')).text).sort((a, b) => a.id - b.id);
+    const mid = all.slice(1, -1)[0];
+    if (!mid) throw new Error(`cần ít nhất 3 persona, có ${all.length}`);
+    const want = { id: mid.id, name: mid.name, first: all[0].name, newest: all[all.length - 1].name };
+    try {
+      await api(c, 'PUT', '/settings', { ...before, default_persona_id: mid.id });
+      return await testChatPersona(want);
+    } finally {
+      await api(c, 'PUT', '/settings', before);
+      await api(c, 'DELETE', `/personas/${extra.id}`);
+    }
+  });
+  async function testChatPersona(want) {
+    await c.goto(ownCard.href, { reload: true });
+    await c.click({ within: '[role=tablist][aria-label="Phần của trình sửa"]', css: '[role=tab]', text: 'Chat thử' }, 'tab Chat thử');
+    const aside = 'aside[aria-label="Xem trước và chat thử"]';
+    const input = { css: 'textarea', label: 'Tin nhắn chat thử' };
+    await c.waitFor(`!!__bot.find(${J(input)}) && !__bot.find(${J(input)}).disabled`, 'ô chat thử', 15000);
+    const summary = await c.waitFor(`(__bot.find({ within: ${J(aside)}, css: 'button[aria-expanded]', textHas: 'Thiết lập thử' })?.innerText ?? '').split('\\n').map((l) => l.trim()).filter(Boolean)[1] ?? ''`, 'dòng Thiết lập thử', 10000).catch(() => '');
+    // Ghi thân request chat thử (như xem tab Network): persona_id thật sự gửi đi.
+    await c.evaluate(`(() => {
+      window.__testChatBodies = [];
+      if (window.__fetchWrapped) return;
+      window.__fetchWrapped = true;
+      const orig = window.fetch;
+      window.fetch = (u, o) => {
+        if (String(u).includes('/api/cards/test-chat') && o?.body) { try { window.__testChatBodies.push(JSON.parse(o.body)); } catch {} }
+        return orig(u, o);
+      };
+    })()`);
+    await c.click(input, 'ô chat thử');
+    await c.type('Hôm nay cậu có rảnh không?');
+    await c.click({ within: aside, label: 'Gửi (Enter)' }, 'nút Gửi chat thử');
+    await c.waitFor('window.__testChatBodies.length > 0', 'request chat thử', 10000).catch(() => {});
+    await c.waitFor(`!__bot.find({ within: '${aside}', label: 'Dừng' }) && !!__bot.find({ within: '${aside}', label: 'Gửi (Enter)' })`, 'chat thử trả lời xong', 30000).catch(() => {});
+    const sent = await c.evaluate('window.__testChatBodies.map((b) => b.persona_id)');
+    await c.shot('Chat thử với persona mặc định');
+    const ok = summary.startsWith(want.name) && sent.length > 0 && sent.every((id) => id === want.id);
+    return { ok, detail: `persona mặc định "${want.name}" (#${want.id}; đầu tiên "${want.first}", mới nhất "${want.newest}") · Thiết lập thử: "${summary}" · request gửi persona_id ${sent.join(', ') || 'KHÔNG có request'}` };
+  }
+
   await c.step(C.LORE_ADD, async () => {
     if (!ownCard) throw new Error('chưa mở được nhân vật trong Studio');
     const worldHash = `#/studio/${ownCard.id}?section=world`;
@@ -903,6 +1033,43 @@ export async function play(c) {
     return { ok: true, detail: "mẫu: không có công tắc · nhân vật nhập từ .json: công tắc ở phần 'Cơ bản', lưu xong có 'Người khác thấy gì'" };
   });
 
+  // F18: tải avatar lên ở trình sửa Studio (chọn file như người dùng) thì CHÍNH ảnh đó (/api/cards/<id>/avatar, đã tải
+  // được) hiện ở danh sách Studio, lưới Khám phá, hồ sơ nhân vật và màn chat của story với nhân vật đó.
+  await c.step(C.AVATAR_EVERYWHERE, async () => {
+    if (!sharedCard) throw new Error('chưa có nhân vật nhập từ .json');
+    const part = `/api/cards/${sharedCard.id}/avatar`;
+    await c.goto(sharedCard.href, { reload: true });
+    await showFormTab(c);
+    await c.waitFor(`!!__bot.find({ css: 'main button', labelEnds: 'ảnh đại diện' })`, 'nút ảnh đại diện', 15000);
+    await c.setFiles(await fileInputBeside(c, { css: 'main button', labelEnds: 'ảnh đại diện' }, 'card-avatar'), [PHOTO_A]);
+    const uploaded = await c.waitFor(`fetch('/api/cards/${sharedCard.id}').then((r) => r.json()).then((x) => x.avatar_url || '')`, 'avatar đã lưu trên server', 15000).catch(() => '');
+    const where = {};
+    where.editor = await imageShown(c, part, 'ảnh trong trình sửa');
+    await c.shot('Studio: avatar vừa tải lên');
+    await c.goto('#/studio');
+    await c.waitFor(`!!document.querySelector('main a[href^="#/studio/"]')`, 'danh sách Studio', 15000);
+    where.studio = await imageShown(c, part, 'ảnh trong danh sách Studio');
+    await c.goto('#/explore');
+    await c.waitFor('document.querySelectorAll("section[aria-labelledby=explore-all] ul > li").length > 0', 'lưới Khám phá', 15000);
+    where.explore = await imageShown(c, part, 'ảnh trong lưới Khám phá');
+    await c.shot('Khám phá: avatar của nhân vật');
+    await c.goto(`#/character/${sharedCard.id}`);
+    await c.waitFor(`!!__bot.find({ css: 'button', text: 'Bước vào câu chuyện' })`, 'hồ sơ nhân vật', 15000);
+    where.profile = await imageShown(c, part, 'ảnh trên hồ sơ');
+    await c.shot('Hồ sơ: avatar của nhân vật');
+    // Bắt đầu một story với nhân vật này như người dùng (sheet, persona mặc định) rồi xem màn chat.
+    await c.click({ css: 'button', text: 'Bước vào câu chuyện' }, 'nút Bước vào câu chuyện');
+    await c.waitFor(dialogTitled('Chọn persona'), 'sheet Chọn persona');
+    await c.waitFor(`!__bot.find({ within: '[role=dialog]', css: 'button', text: 'Bước vào câu chuyện' })?.disabled`, 'nút bắt đầu bật', 15000);
+    await c.click({ within: '[role=dialog]', css: 'button', text: 'Bước vào câu chuyện' }, 'nút Bước vào câu chuyện trong sheet');
+    await c.waitFor('/^#\\/chat\\/\\d+$/.test(location.hash)', 'story mở', 15000);
+    await c.waitFor(`__bot.all({ css: ${J(LAST_REPLY)} }).length > 0`, 'lời chào của nhân vật', 15000);
+    where.chat = await imageShown(c, part, 'ảnh trong màn chat');
+    await c.shot('Chat: avatar của nhân vật');
+    const missing = Object.entries(where).filter(([, n]) => !n).map(([k]) => k);
+    return { ok: !!uploaded && missing.length === 0, detail: `${uploaded ? `server: ${uploaded}` : 'avatar KHÔNG được lưu'} · ${Object.entries(where).map(([k, n]) => `${k} ${n}`).join(', ')}${missing.length ? ` · THIẾU ở: ${missing.join(', ')}` : ''}` };
+  });
+
   // ================================================================ Khám phá
   await c.step(C.EXPLORE, async () => {
     await c.goto('#/explore');
@@ -915,29 +1082,16 @@ export async function play(c) {
       const rows = {};
       for (const r of cards) (rows[Math.round(r.top)] ??= []).push(Math.round(r.height));
       const unevenRow = Object.values(rows).find((hs) => Math.max(...hs) - Math.min(...hs) > 1);
-      return { n: cards.length, wSpread: Math.max(...widths) - Math.min(...widths), unevenRow: unevenRow ?? null,
-               hero: !!document.querySelector('section[aria-labelledby=explore-featured]') };
+      return { n: cards.length, wSpread: Math.max(...widths) - Math.min(...widths), unevenRow: unevenRow ?? null };
     })()`);
     const over = await overflowX(c);
     await scan('#/explore');
     await c.shot('Khám phá');
     const problems = [];
-    if (!r.hero) problems.push('không có nhân vật nổi bật');
     if (r.wSpread > 1) problems.push(`thẻ lệch rộng ${r.wSpread}px`);
     if (r.unevenRow) problems.push(`thẻ cùng hàng lệch cao: ${r.unevenRow.join('/')}`);
     if (over > 1) problems.push(`tràn ngang ${over}px`);
     return { ok: problems.length === 0, detail: problems.join('; ') || `${r.n} thẻ` };
-  });
-
-  await c.step(C.FEATURED, async () => {
-    const r = await c.evaluate(`(() => {
-      const name = document.querySelector('#explore-featured a')?.innerText.trim() ?? '';
-      const grid = [...document.querySelectorAll('section[aria-labelledby=explore-all] ul > li > a')]
-        .map((a) => a.querySelector('span.font-semibold')?.innerText.trim() ?? '');
-      return { name, dup: grid.filter((n) => n === name).length, n: grid.length };
-    })()`);
-    characterName = r.name;
-    return { ok: !!r.name && r.dup === 0, detail: r.name ? `${r.name}: ${r.dup} lần trong lưới ${r.n} thẻ` : 'không thấy tên nhân vật nổi bật' };
   });
 
   await c.step(C.VIBE, async () => {
@@ -1010,10 +1164,12 @@ export async function play(c) {
   });
 
   // ================================================================ hồ sơ nhân vật mẫu + sheet bắt đầu
+  // F23: bấm thẻ 'Hạ Vy' trong lưới 'Nhân vật' (khung nổi bật đã bỏ, F46).
+  const haVyCard = { within: 'section[aria-labelledby=explore-all]', css: 'a', labelStarts: 'Xem nhân vật Hạ Vy' };
   await c.step(C.PROFILE, async () => {
     await c.goto('#/explore');
-    await c.waitFor('!!document.querySelector("#explore-featured a")', 'nhân vật nổi bật', 15000);
-    await c.click('#explore-featured a', 'tên nhân vật nổi bật');
+    await c.waitFor(`!!__bot.find(${J(haVyCard)})`, "thẻ 'Hạ Vy' trong lưới Nhân vật", 15000);
+    await c.click(haVyCard, "thẻ 'Hạ Vy' trong lưới");
     await c.waitFor('location.hash.startsWith("#/character/")', 'mở hồ sơ nhân vật');
     await c.waitFor(`!!__bot.find({ css: 'button', text: 'Bước vào câu chuyện' })`, 'nút Bước vào câu chuyện', 15000);
     const r = await c.evaluate(`(() => ({
@@ -1028,7 +1184,8 @@ export async function play(c) {
     const problems = [];
     if (r.fields) problems.push(`${r.fields} ô nhập liệu`);
     if (!r.tabs) problems.push('không có tab thông tin');
-    return { ok: problems.length === 0, detail: problems.join('; ') || r.name };
+    if (r.name !== 'Hạ Vy') problems.push(`hồ sơ "${r.name}" (cần "Hạ Vy")`);
+    return { ok: problems.length === 0, detail: problems.join('; ') || `${r.name} · ${await hashNow(c)}` };
   });
 
   await c.step(C.TEMPLATE_PROFILE, async () => {
@@ -1057,6 +1214,8 @@ export async function play(c) {
     c.check(C.START_DEFAULT, !!defaultPersona && pre.picked.includes(defaultPersona) && pre.folded === 'false', `chọn sẵn: "${pre.picked.replace(/\s+/g, ' ').slice(0, 40)}" (persona đang dùng: "${defaultPersona}") · Tuỳ chỉnh story aria-expanded=${pre.folded}`);
     await c.click({ within: '[role=dialog]', css: 'button[aria-expanded]', textHas: 'Tuỳ chỉnh story' }, 'Tuỳ chỉnh story');
     thoughtSwitches.sheet = await c.waitFor(`!!__bot.find({ within: '[role=dialog]', css: '[role=switch]', textHas: 'Đọc suy nghĩ của nhân vật' })`, 'công tắc Đọc suy nghĩ trong sheet', 10000).catch(() => false);
+    // F03: 'Tuỳ chỉnh story' đã mở mà sheet bắt đầu (của chủ máy) vẫn không có chỗ chọn model (check C.MODEL_ADVANCED).
+    modelSeen.ownerSheet = await c.evaluate(modelInDialog);
     await c.click({ css: '[role=dialog] [role=radiogroup][aria-label=Persona] label' }, 'persona đầu tiên');
     const checked = await c.evaluate(`!!document.querySelector('[role=dialog] [role=radiogroup][aria-label=Persona] input:checked')`);
     await c.shot('Sheet chọn persona');
@@ -1290,6 +1449,29 @@ export async function play(c) {
     return { ok: missing.length === 0 && thoughtSwitches.settings && !!confirm && stillThere,
       detail: `${missing.length ? `thiếu: ${missing.join(', ')} · ` : ''}${thoughtSwitches.settings ? '' : 'không có công tắc Đọc suy nghĩ · '}${confirm ? 'có hỏi lại "Xoá vĩnh viễn"' : 'KHÔNG hỏi lại'} · bấm Huỷ: GET /api/stories/${storyId ?? '?'} → ${status}` };
   });
+
+  // F03 (phần chủ máy, chấm ở C.MODEL_ADVANCED): Thiết lập story mở ra thì 'Nâng cao' đang gập và chưa có chữ/ô model;
+  // mở 'Nâng cao' thì có ô 'Model trả lời' với danh sách model (LLM giả: gemma4:12b).
+  try {
+    needStory();
+    await c.waitFor(`![...document.querySelectorAll('h1')].some((h) => h.textContent.trim() === 'Đang mở story')`, 'story tải xong', 15000).catch(() => {});
+    await c.click({ label: 'Thiết lập story' }, 'nút Thiết lập story');
+    await c.waitFor(dialogTitled('Thiết lập story'), 'panel Thiết lập story');
+    await c.sleep(300);
+    const adv = { within: '[role=dialog]', css: 'button[aria-expanded]', textHas: 'Nâng cao' };
+    modelSeen.ownerFolded = await c.evaluate(modelInDialog);
+    modelSeen.ownerAdvanced = await c.evaluate(`__bot.find(${J(adv)})?.getAttribute('aria-expanded') ?? null`);
+    if (modelSeen.ownerAdvanced === 'false') await c.click(adv, 'mục Nâng cao');
+    const field = { within: '[role=dialog]', field: 'Model trả lời' };
+    modelSeen.ownerOpen = await c.waitFor(`(() => { const s = __bot.find(${J(field)}); return s && !s.disabled ? [...s.options].map((o) => o.value) : null; })()`, 'ô Model trả lời có danh sách', 10000).catch(() => null);
+    await c.shot('Thiết lập story: Nâng cao có Model trả lời (chủ máy)');
+    if (modelSeen.ownerAdvanced === 'false') await c.click(adv, 'gập Nâng cao');
+    await c.press('Escape');
+    await c.waitFor(`!${dialogTitled('Thiết lập story')}`, 'đóng panel', 5000).catch(() => {});
+  } catch (e) {
+    modelSeen.ownerErr = e.message.split('\n')[0];
+    await closeOverlays(c).catch(() => {});
+  }
 
   await c.step(C.ACTIONS, async () => {
     needStory();
@@ -1622,6 +1804,49 @@ export async function play(c) {
     return { ok: section && !!jump, detail: `${section ? 'có' : 'KHÔNG có'} phần Thế giới đã mở khoá · ${jump ? 'có' : 'KHÔNG có'} nút Xem lúc được nhắc tới lần đầu` };
   });
 
+  // ================================================================ F10: story dài có tóm tắt những lượt cũ
+  // Dựng story dài bằng chính HTTP API của app (như giao diện gọi, LLM giả): 6 lượt người chơi dài. Lịch sử dài hơn
+  // cả num_ctx (8192 token, ước 3 ký tự/token) nên cửa sổ lịch sử CHẮC CHẮN đã dịch; việc nền tóm tắt lượt cũ
+  // (fake-server.py trả một câu tóm tắt cố định). Rồi mở #/chat/<id> như người dùng: ngăn 'Cảm xúc & ký ức' có
+  // <details> 'Tóm tắt những lượt cũ', mở ra thì hiện đúng tóm tắt server đã lưu.
+  await c.step(C.SUMMARY_DETAILS, async () => {
+    if (!ownCard) throw new Error('chưa có nhân vật seed');
+    const settings = JSON.parse((await api(c, 'GET', '/settings')).text);
+    const made = await api(c, 'POST', '/stories', { card_id: ownCard.id, persona_id: settings.default_persona_id });
+    if (made.status !== 200) throw new Error(`tạo story: ${made.status} ${made.text.slice(0, 120)}`);
+    const id = JSON.parse(made.text).id;
+    const para = 'Chiều nay mình đi dọc mấy con phố cổ, ghé từng hiệu sách cũ, kể cho cậu nghe chuyện ngày bé ở quê, chuyện con đê và cánh đồng lúa chín vàng mỗi mùa gặt. ';
+    const long = para.repeat(Math.ceil(6000 / para.length));
+    for (let i = 1; i <= 6; i++) {
+      const r = await api(c, 'POST', `/stories/${id}/messages`, { content: `Lượt ${i}. ${long}` });
+      if (r.status !== 200 || !r.text.includes('event: done')) throw new Error(`lượt ${i}: ${r.status} ${r.text.slice(-160)}`);
+    }
+    const history = JSON.parse((await api(c, 'GET', `/stories/${id}/messages`)).text);
+    const chars = history.reduce((n, m) => n + String(m.visible_content ?? m.raw_content ?? '').length, 0);
+    // Tóm tắt do việc nền viết (không chặn lượt chat): chờ server có tóm tắt.
+    let stored = '';
+    const until = Date.now() + 45000;
+    while (!stored && Date.now() < until) {
+      stored = JSON.parse((await api(c, 'GET', `/stories/${id}/extras`)).text).summary ?? '';
+      if (!stored) await c.sleep(500);
+    }
+    await c.goto(`#/chat/${id}`);
+    await c.waitFor(`__bot.all({ css: ${J(LAST_REPLY)} }).length > 0`, 'story dài mở', 15000);
+    await c.click({ label: 'Cảm xúc & ký ức' }, 'nút trái tim');
+    await c.waitFor(dialogTitled('Cảm xúc & ký ức'), 'ngăn Cảm xúc & ký ức');
+    const sum = { within: '[role=dialog]', css: 'details > summary', text: 'Tóm tắt những lượt cũ' };
+    const has = await c.waitFor(`!!__bot.find(${J(sum)})`, '<details> Tóm tắt những lượt cũ', 15000).catch(() => false);
+    const folded = has ? await c.evaluate(`!__bot.find(${J(sum)}).parentElement.open`) : null;
+    if (has) await c.click(sum, 'Tóm tắt những lượt cũ');
+    const shown = has ? await c.waitFor(`(() => { const d = __bot.find(${J(sum)})?.parentElement; return d?.open ? [...d.children].filter((e) => e.tagName !== 'SUMMARY').map((e) => e.innerText.trim()).join(' ') : ''; })()`, 'nội dung tóm tắt', 5000).catch(() => '') : '';
+    await c.shot('Story dài: Tóm tắt những lượt cũ');
+    await c.press('Escape');
+    await c.waitFor(`!${dialogTitled('Cảm xúc & ký ức')}`, 'đóng ngăn trái tim', 5000).catch(() => {});
+    const tokens = Math.round(chars / 3);
+    const ok = tokens > 8192 && !!stored && has && folded === true && shown === stored.trim();
+    return { ok, detail: `story #${id}: ${history.length} lượt, ${chars} ký tự (~${tokens} token > num_ctx 8192) · tóm tắt server: ${stored ? `"${stored.slice(0, 60)}"` : 'KHÔNG có'} · <details>: ${has ? `có (${folded ? 'gập sẵn' : 'đang mở'}), mở ra: "${shown.slice(0, 60)}"` : 'KHÔNG có'}` };
+  });
+
   // ================================================================ quản trị
   await c.step(C.ADMIN, async () => {
     await c.goto('#/admin');
@@ -1733,6 +1958,54 @@ export async function play(c) {
     return { ok: now.split('?')[0] === want && !!sheet, detail: `#/new-story?card=${ownCard.id} → ${now}${sheet ? ', sheet bắt đầu mở' : ', KHÔNG mở sheet'}` };
   });
 
+  // F24: danh sách persona trong sheet bắt đầu là radio THẬT (input type=radio cùng một name, phím mũi tên đổi lựa
+  // chọn như radio của trình duyệt), đủ mọi persona của tài khoản, mỗi dòng có avatar (ảnh, hoặc chữ cái đầu khi chưa
+  // có ảnh) cạnh tên.
+  await c.step(C.PERSONA_RADIO, async () => {
+    if (!ownCard) throw new Error('chưa có id nhân vật');
+    await closeOverlays(c);
+    await c.goto(`#/character/${ownCard.id}`);
+    await c.waitFor(`!!__bot.find({ css: 'button', text: 'Bước vào câu chuyện' })`, 'hồ sơ nhân vật', 15000);
+    await c.click({ css: 'button', text: 'Bước vào câu chuyện' }, 'nút Bước vào câu chuyện');
+    await c.waitFor(dialogTitled('Chọn persona'), 'sheet Chọn persona');
+    const group = '[role=dialog] [role=radiogroup][aria-label=Persona]';
+    await c.waitFor(`document.querySelectorAll(${J(group + ' label')}).length > 0`, 'danh sách persona', 15000);
+    const personas = await c.evaluate(`fetch('/api/personas').then((r) => r.json()).then((ps) => ps.map((p) => ({ name: p.name, img: !!p.avatar_url })))`);
+    const rows = await c.evaluate(`[...document.querySelectorAll(${J(group + ' label')})].map((l) => {
+      const input = l.querySelector('input');
+      const face = [...l.querySelectorAll('span[aria-hidden=true]')].find((s) => {
+        const r = s.getBoundingClientRect();
+        return r.width >= 32 && Math.abs(r.width - r.height) <= 1 && (!!s.querySelector('img') || s.innerText.trim().length === 1);
+      });
+      const img = face?.querySelector('img');
+      return { name: (l.innerText.split('\\n').map((t) => t.trim()).find((t) => t.length > 1) ?? ''), radio: input?.type === 'radio', group: input?.name ?? '',
+               avatar: !!face, img: !!img && img.complete && img.naturalWidth > 0, letter: !img && !!face };
+    })`);
+    // Phím mũi tên trên radio đang chọn: trình duyệt tự chuyển sang radio kế (chỉ có ở radio thật cùng name).
+    const checkedName = `([...document.querySelectorAll(${J(group + ' input:checked')})][0]?.closest('label')?.innerText.split('\\n').map((t) => t.trim()).find((t) => t.length > 1) ?? '')`;
+    const before = await c.evaluate(checkedName);
+    await c.evaluate(`document.querySelector(${J(group + ' input:checked')})?.focus()`);
+    await c.press('ArrowDown');
+    const afterDown = await c.evaluate(checkedName);
+    await c.press('ArrowUp');
+    const afterUp = await c.evaluate(checkedName);
+    await c.shot('Sheet bắt đầu: persona là radio có avatar');
+    await c.press('Escape');
+    await c.waitFor(`!${dialogTitled('Chọn persona')}`, 'sheet đóng', 5000).catch(() => {});
+    const problems = [];
+    if (rows.length !== personas.length || rows.length < 2) problems.push(`${rows.length} dòng, tài khoản có ${personas.length} persona`);
+    const notRadio = rows.filter((r) => !r.radio).map((r) => r.name);
+    if (notRadio.length) problems.push(`không phải radio: ${notRadio.join(', ')}`);
+    if (new Set(rows.map((r) => r.group)).size !== 1 || !rows[0]?.group) problems.push('các radio không cùng name');
+    const noFace = rows.filter((r) => !r.avatar).map((r) => r.name);
+    if (noFace.length) problems.push(`không có avatar: ${noFace.join(', ')}`);
+    const wantImg = personas.filter((p) => p.img).map((p) => p.name);
+    const imgMissing = wantImg.filter((n) => !rows.find((r) => r.name === n)?.img);
+    if (imgMissing.length) problems.push(`có ảnh mà không hiện ảnh: ${imgMissing.join(', ')}`);
+    if (!before || afterDown === before || afterUp !== before) problems.push(`phím mũi tên: "${before}" → "${afterDown}" → "${afterUp}"`);
+    return { ok: problems.length === 0, detail: problems.join('; ') || `${rows.length} persona, mỗi dòng input radio cùng name + avatar (${rows.filter((r) => r.img).length} ảnh, ${rows.filter((r) => r.letter).length} chữ cái) · mũi tên: "${before}" → "${afterDown}" → "${afterUp}"` };
+  });
+
   // ================================================================ đăng xuất → link mời → thành viên thứ hai
   await c.goto('#/');
   await openAccountSheet(c).catch(() => {});
@@ -1809,6 +2082,64 @@ export async function play(c) {
     return { ok, detail: line || 'không có dòng bản sao' };
   });
 
+  // F24: thành viên chưa có persona nào: sheet bắt đầu TỰ mở form 'Tạo persona mới' (không phải bấm gì), không có
+  // danh sách persona; tạo persona trong form thì persona đó được chọn và bắt đầu story được.
+  let memberStory = '';
+  await c.step(C.PERSONA_FORM_OPEN, async () => {
+    if (!memberIn) throw new Error('thành viên chưa đăng nhập được');
+    const count = await c.evaluate(`fetch('/api/personas').then((r) => r.json()).then((ps) => ps.length)`);
+    await closeOverlays(c);
+    await c.waitFor(`!!__bot.find({ css: 'button', text: 'Bước vào câu chuyện' })`, 'hồ sơ nhân vật', 10000);
+    await c.click({ css: 'button', text: 'Bước vào câu chuyện' }, 'nút Bước vào câu chuyện');
+    await c.waitFor(dialogTitled('Chọn persona'), 'sheet Chọn persona');
+    const form = '[role=dialog] form[aria-label="Tạo persona mới"]';
+    const opened = await c.waitFor(`!!__bot.find({ css: ${J(form)} }) && !!__bot.find({ within: ${J(form)}, field: 'Tên persona' })`, 'form Tạo persona mới tự mở', 10000).catch(() => false);
+    const pre = await c.evaluate(`({ radios: document.querySelectorAll('[role=dialog] [role=radiogroup][aria-label=Persona] input[type=radio]').length,
+      toggle: !!__bot.find({ within: '[role=dialog]', css: 'button', text: 'Tạo persona mới' }) })`);
+    await c.shot('Chưa có persona: sheet tự mở form Tạo persona mới');
+    const name = 'Thành viên Bot';
+    let picked = false;
+    if (opened) {
+      await c.fill({ within: form, field: 'Tên persona' }, name, 'ô Tên persona');
+      await c.click({ within: form, css: 'button', text: 'Tạo persona' }, 'nút Tạo persona');
+      picked = await c.waitFor(`[...document.querySelectorAll('[role=dialog] [role=radiogroup][aria-label=Persona] input:checked')].some((i) => i.closest('label')?.innerText.includes(${J(name)}))`, 'persona mới được chọn', 10000).catch(() => false);
+    }
+    // Bắt đầu story với persona vừa tạo (dùng cho phần thành viên của C.MODEL_ADVANCED).
+    if (picked) {
+      await c.click({ within: '[role=dialog]', css: 'button[aria-expanded]', textHas: 'Tuỳ chỉnh story' }, 'Tuỳ chỉnh story');
+      await c.sleep(300);
+      modelSeen.memberSheet = await c.evaluate(modelInDialog);
+      await c.waitFor(`!__bot.find({ within: '[role=dialog]', css: 'button', text: 'Bước vào câu chuyện' })?.disabled`, 'nút bắt đầu bật', 15000);
+      await c.click({ within: '[role=dialog]', css: 'button', text: 'Bước vào câu chuyện' }, 'nút Bước vào câu chuyện trong sheet');
+      memberStory = await c.waitFor('/^#\\/chat\\/\\d+$/.test(location.hash) && location.hash', 'story của thành viên mở', 15000).catch(() => '');
+    }
+    const ok = count === 0 && opened && pre.radios === 0 && !pre.toggle && picked && !!memberStory;
+    return { ok, detail: `${count} persona lúc đầu · form ${opened ? 'tự mở' : 'KHÔNG tự mở'}${pre.toggle ? ' (còn nút "Tạo persona mới" phải bấm)' : ''}, ${pre.radios} radio · tạo "${name}": ${picked ? 'được chọn' : 'KHÔNG được chọn'} · Bước vào câu chuyện → ${memberStory || 'KHÔNG vào #/chat/<id>'}` };
+  });
+
+  // F03: thành viên không thấy chỗ chọn model ở đâu cả (Thiết lập story không có 'Nâng cao'); chủ máy chỉ thấy ô
+  // 'Model trả lời' sau khi mở 'Nâng cao' của Thiết lập story (sheet bắt đầu cũng không có).
+  await c.step(C.MODEL_ADVANCED, async () => {
+    if (memberStory) {
+      await c.waitFor(`!!__bot.find({ label: 'Thiết lập story' })`, 'nút Thiết lập story', 15000);
+      // Story vừa mở còn đang tải (header khung xương 'Đang mở story'): người dùng đợi header hiện rồi mới chạm.
+      await c.waitFor(`![...document.querySelectorAll('h1')].some((h) => h.innerText.trim() === 'Đang mở story' || h.textContent.trim() === 'Đang mở story')`, 'story tải xong', 15000).catch(() => {});
+      await c.sleep(200);
+      await c.click({ label: 'Thiết lập story' }, 'nút Thiết lập story');
+      await c.waitFor(dialogTitled('Thiết lập story'), 'panel Thiết lập story');
+      await c.sleep(400);
+      modelSeen.member = await c.evaluate(`(() => ({ model: ${modelInDialog}, advanced: !!__bot.find({ within: '[role=dialog]', css: 'button[aria-expanded]', textHas: 'Nâng cao' }),
+        select: !!__bot.find({ within: '[role=dialog]', field: 'Model', visible: false }) }))()`);
+      await c.shot('Thiết lập story của thành viên: không có chọn model');
+      await c.press('Escape');
+    }
+    const s = modelSeen;
+    const owner = Array.isArray(s.ownerOpen) && s.ownerOpen.includes('gemma4:12b');
+    const member = !!s.member && !s.member.model && !s.member.advanced && !s.member.select;
+    const ok = !s.ownerErr && s.ownerSheet === false && s.ownerFolded === false && s.ownerAdvanced === 'false' && owner && s.memberSheet === false && member;
+    return { ok, detail: `chủ máy: sheet bắt đầu ${s.ownerSheet === false ? 'không có model' : `CÓ model (${s.ownerSheet})`}, Thiết lập story ${s.ownerFolded === false ? 'chưa có model' : 'CÓ model'} khi 'Nâng cao' aria-expanded=${s.ownerAdvanced}, mở ra: ${owner ? `ô Model trả lời (${s.ownerOpen.join(', ')})` : 'KHÔNG có ô Model trả lời'}${s.ownerErr ? ` (lỗi: ${s.ownerErr})` : ''} · thành viên: sheet ${s.memberSheet === false ? 'không có model' : `CÓ/không xem được (${s.memberSheet})`}, Thiết lập story ${s.member ? (member ? "không có 'Nâng cao' hay model" : `CÓ ${J(s.member)}`) : 'KHÔNG xem được (chưa có story)'}` };
+  });
+
   // Đăng nhập thẳng ở #/login (không có trang nào được nhớ) bằng tài khoản ĐÃ CÓ story: phải vào Tương tác (#/),
   // không tự nhảy vào story gần nhất.
   await c.step(C.LOGIN_HUB, async () => {
@@ -1827,6 +2158,736 @@ export async function play(c) {
     await c.shot('Đăng nhập xong: màn Tương tác');
     const ok = (r.hash === '#/' || r.hash === '') && r.account && r.stories > 0;
     return { ok, detail: `sau đăng nhập: ${r.hash || '(trống)'} · ${r.stories} story trong danh sách · ${r.account ? 'có' : 'KHÔNG có'} nút … Mở tài khoản` };
+  });
+
+  // ================================================================ F42 ví coin
+  // Tài khoản thử dựng qua HTTP API của chính app (không sửa fake-server.py): chủ máy tạo hai mã mời; @hetcoin tạo
+  // tài khoản (+300), mở app hôm nay (+60), có một story Story và một story DM, rồi chủ máy trừ tay về 0 coin
+  // ("Cộng/trừ coin", docs/coins.md §4.4); @coinmoi tạo tài khoản và CHƯA mở app lần nào.
+  const coinChip = `[...document.querySelectorAll('header a[href], header button')].find((b) => /^Coin: [0-9.]+\\. Mở ví coin$/.test(b.getAttribute('aria-label') || ''))`;
+  const coinPassword = 'coin bot mat khau 2026';
+  const coinWhere = 'coin: đổi tài khoản';
+  expectedErrors.push(new RegExp(`^\\[${coinWhere}\\] Failed to load resource: the server responded with a status of 40[13]\\b`));
+  const ownerCoin = { chip: null, line: false, button: true, err: '' };
+  const coinSetup = { moi: 0, het: 0, hetStory: 0, hetDm: 0, err: '' };
+  try {
+    await c.goto('#/');
+    await c.waitFor('!!__bot.find({ labelEnds: "Mở tài khoản" })', 'header của chủ máy', 15000);
+    await c.sleep(1200); // ví (nếu có) đã kịp tải
+    ownerCoin.chip = await c.evaluate(`!!(${coinChip})`);
+    await openAccountSheet(c);
+    await c.waitFor(`(document.querySelector('[role=dialog]')?.innerText || '').includes('Tài khoản quản lý không tốn coin.')`, 'dòng Tài khoản quản lý không tốn coin', 8000).catch(() => {});
+    ownerCoin.line = await c.evaluate(`!!document.querySelector('[role=dialog] section[aria-label="Coin"]') && document.querySelector('[role=dialog]').innerText.includes('Tài khoản quản lý không tốn coin.')`);
+    ownerCoin.button = await c.evaluate(`!!__bot.find({ within: '[role=dialog]', css: 'button', text: 'Mở ví coin' })`);
+    await c.shot('Sheet Tài khoản của chủ máy: không tốn coin');
+    await closeOverlays(c);
+  } catch (e) {
+    ownerCoin.err = e.message.split('\n')[0];
+  }
+  try {
+    // Trang pháp lý (mở, không gọi API nào khác) trong lúc đổi tài khoản qua API: app không tự tải lại giữa chừng.
+    await c.goto('#/terms');
+    await c.sleep(500);
+    const me = JSON.parse((await api(c, 'GET', '/auth/me')).text);
+    const codes = [];
+    for (const note of ['coinmoi', 'hetcoin']) {
+      const r = await api(c, 'POST', '/admin/invites', { note });
+      if (r.status !== 200) throw new Error(`tạo mã mời ${note}: HTTP ${r.status}`);
+      codes.push(JSON.parse(r.text).code);
+    }
+    c.setWhere(coinWhere);
+    const signup = async (code, handle, name) => {
+      await api(c, 'POST', '/auth/logout');
+      const r = await api(c, 'POST', '/auth/signup', {
+        invite_code: code, handle, display_name: name, password: coinPassword, accept_terms: true, terms_version: me.legal_version,
+      });
+      if (r.status !== 200) throw new Error(`tạo @${handle}: HTTP ${r.status} ${r.text.slice(0, 120)}`);
+      return JSON.parse(r.text).account.id;
+    };
+    coinSetup.het = await signup(codes[1], 'hetcoin', 'Hết Coin');
+    coinSetup.hetStory = JSON.parse((await api(c, 'POST', '/stories')).text).id;
+    coinSetup.hetDm = JSON.parse((await api(c, 'POST', '/stories')).text).id;
+    const dm = await api(c, 'PATCH', `/stories/${coinSetup.hetDm}`, { mode: 'dm' });
+    if (dm.status !== 200) throw new Error(`đổi story DM: HTTP ${dm.status}`);
+    const daily = JSON.parse((await api(c, 'POST', '/coins/checkin')).text); // mở app hôm nay: +60
+    coinSetup.moi = await signup(codes[0], 'coinmoi', 'Coin Mới');
+    await api(c, 'POST', '/auth/logout');
+    const owner = await api(c, 'POST', '/auth/login', { handle: c.creds.handle, password: c.creds.password });
+    if (owner.status !== 200) throw new Error(`chủ máy đăng nhập lại: HTTP ${owner.status}`);
+    const zero = await api(c, 'POST', `/admin/accounts/${coinSetup.het}/coins`, {
+      delta: -daily.wallet.balance, reason: 'bot: về 0 coin', request_id: `bot-hetcoin-${Date.now()}`,
+    });
+    if (zero.status !== 200 || JSON.parse(zero.text).balance !== 0) throw new Error(`trừ @hetcoin về 0: HTTP ${zero.status} ${zero.text.slice(0, 120)}`);
+    await api(c, 'POST', '/auth/logout');
+  } catch (e) {
+    coinSetup.err = e.message.split('\n')[0];
+  }
+
+  /** Số dư đang hiện ở "#/coins" (chữ to trong khối số dư). */
+  const walletShown = async () => {
+    await c.goto('#/coins');
+    await c.waitFor(`!!document.querySelector('[data-coin-balance]')`, 'số dư ở Ví coin', 15000);
+    await c.sleep(300); // ví làm mới khi mở trang: chờ lần làm mới xong
+    await c.waitFor(`!document.querySelector('[data-coin-balance]')?.closest('[aria-busy]')`, 'ví làm mới xong', 8000).catch(() => {});
+    return c.evaluate(`document.querySelector('[data-coin-balance]').innerText.trim()`);
+  };
+  const coinNumber = (s) => Number(String(s).replace(/\./g, ''));
+
+  // @coinmoi đăng nhập lần đầu: thông báo "+60 coin cho hôm nay", ví 300 + 60.
+  let moiIn = false;
+  await c.step(C.COIN_DAILY, async () => {
+    if (coinSetup.err) throw new Error(`dựng tài khoản thử: ${coinSetup.err}`);
+    await c.goto('#/login', { reload: true });
+    await submitLogin(c, { handle: 'coinmoi', password: coinPassword });
+    const seen = await c.waitFor(`document.body.innerText.includes('+60 coin cho hôm nay')`, "thông báo '+60 coin cho hôm nay'", 20000).catch(() => false);
+    moiIn = await c.evaluate(`!!__bot.find({ labelEnds: 'Mở tài khoản' })`);
+    await c.shot('Mở app lần đầu trong ngày: +60 coin');
+    const hash = await hashNow(c);
+    const shown = await walletShown();
+    await scan('#/coins (thành viên)');
+    return { ok: !!seen && coinNumber(shown) === 360, detail: `thông báo: ${seen ? 'có' : 'KHÔNG có'} '+60 coin cho hôm nay' ở ${hash || '#/'} · số dư ở #/coins: ${shown} (cần 360)` };
+  });
+
+  // Gửi một lượt (LLM giả): số dư ở "#/coins" giảm đúng 6.
+  await c.step(C.COIN_SEND, async () => {
+    if (!moiIn) throw new Error('@coinmoi chưa đăng nhập được');
+    const before = coinNumber(await walletShown());
+    const made = await api(c, 'POST', '/stories');
+    const sid = JSON.parse(made.text).id;
+    await c.goto(`#/chat/${sid}`);
+    await c.waitFor(`!!__bot.find(${J(STORY_INPUT)}) && !__bot.find(${J(STORY_INPUT)}).disabled`, 'ô nhập của story', 15000);
+    await c.fill(STORY_INPUT, '"Chào cậu, hôm nay thế nào?"', 'ô nhập');
+    await c.click({ label: 'Gửi (Enter)' }, 'nút Gửi');
+    await waitReplyDone(c);
+    const after = coinNumber(await walletShown());
+    await c.shot('Ví coin sau một lượt');
+    return { ok: before - after === 6, detail: `#/coins: ${before} → ${after} (giảm ${before - after}, cần 6)` };
+  });
+
+  // Chip trên header của thành viên → "Ví coin" cùng số dư, Nạp coin, Nhiệm vụ, Lịch sử có "Quà tạo tài khoản".
+  await c.step(C.COIN_CHIP, async () => {
+    if (!moiIn) throw new Error('@coinmoi chưa đăng nhập được');
+    await c.goto('#/');
+    const label = await c.waitFor(`(${coinChip})?.getAttribute('aria-label') || ''`, "nút 'Coin: <số>. Mở ví coin' trên header", 15000);
+    const chipN = (label.match(/^Coin: ([0-9.]+)\./) || [])[1] ?? '';
+    const headerOver = await overflowX(c);
+    await c.shot('Header thành viên có chip coin');
+    await c.evaluate(`(${coinChip}).setAttribute('data-bot-chip', '1')`);
+    await c.click('[data-bot-chip]', 'chip coin');
+    await c.waitFor(`location.hash === '#/coins'`, 'sang #/coins', 8000);
+    await c.waitFor(`!!document.querySelector('[data-coin-balance]')`, 'số dư ở Ví coin', 15000);
+    await c.waitFor(`document.body.innerText.includes('Quà tạo tài khoản')`, "dòng 'Quà tạo tài khoản' trong Lịch sử", 10000).catch(() => {});
+    const r = await c.evaluate(`({ title: document.querySelector('h1')?.innerText.trim() ?? '',
+      balance: document.querySelector('[data-coin-balance]')?.innerText.trim() ?? '',
+      topUp: !!__bot.find({ css: 'a, button', text: 'Nạp coin' }), missions: !!__bot.find({ css: 'a, button', text: 'Nhiệm vụ' }),
+      history: (() => { const s = document.querySelector('section[aria-labelledby=coin-history]'); return !!s && s.querySelector('h2')?.innerText.trim() === 'Lịch sử' && s.innerText.includes('Quà tạo tài khoản'); })() })`);
+    const over = await overflowX(c);
+    await scan('#/coins');
+    await c.shot('Ví coin');
+    const ok = !!chipN && r.title === 'Ví coin' && r.balance === chipN && r.topUp && r.missions && r.history && over <= 1 && headerOver <= 1;
+    return { ok, detail: `chip '${label}' → ${r.title || '(không tiêu đề)'} · số dư ${r.balance} · ${r.topUp ? '' : 'KHÔNG có '}Nạp coin · ${r.missions ? '' : 'KHÔNG có '}Nhiệm vụ · Lịch sử ${r.history ? "có 'Quà tạo tài khoản'" : 'THIẾU'} · tràn ngang ${over}px (header ${headerOver}px)` };
+  });
+
+  // Sheet Tài khoản: hàng "Coin" của thành viên; chủ máy (đo ở trên) có một câu và không có chip.
+  await c.step(C.COIN_ACCOUNT, async () => {
+    if (ownerCoin.err) throw new Error(`phần chủ máy: ${ownerCoin.err}`);
+    if (!moiIn) throw new Error('@coinmoi chưa đăng nhập được');
+    const wallet = JSON.parse((await api(c, 'GET', '/coins/wallet')).text);
+    await c.goto('#/');
+    await openAccountSheet(c);
+    await c.waitFor(`!!document.querySelector('[role=dialog] section[aria-label="Coin"]')`, "hàng 'Coin' trong sheet", 8000);
+    const r = await c.evaluate(`(() => { const s = document.querySelector('[role=dialog] section[aria-label="Coin"]');
+      return { text: s.innerText, open: !!__bot.find({ within: '[role=dialog] section[aria-label="Coin"]', css: 'button', text: 'Mở ví coin' }) }; })()`);
+    await c.shot('Sheet Tài khoản của thành viên: hàng Coin');
+    const want = `${String(wallet.balance).replace(/\B(?=(\d{3})+(?!\d))/g, '.')} coin`;
+    await closeOverlays(c);
+    const member = r.text.includes('Coin') && r.text.includes(want) && r.open;
+    const owner = ownerCoin.line && !ownerCoin.button && ownerCoin.chip === false;
+    return { ok: member && owner, detail: `thành viên: '${r.text.replace(/\n/g, ' · ')}' (cần '${want}' + nút Mở ví coin) · chủ máy: ${ownerCoin.line ? "'Tài khoản quản lý không tốn coin.'" : 'THIẾU câu không tốn coin'}${ownerCoin.button ? ', CÓ nút Mở ví coin' : ''}, header ${ownerCoin.chip ? "CÓ nút 'Coin: …'" : "không có nút 'Coin: …'"}` };
+  });
+
+  // @hetcoin (0 coin): ô nhập Story và DM khoá, khối "Bạn đã hết coin" với Nạp coin và Nhiệm vụ.
+  let hetIn = false;
+  if (!coinSetup.err) {
+    try {
+      await c.goto('#/');
+      await openAccountSheet(c);
+      // Lúc đăng xuất, vài request đang bay nhận 401 trước khi app chuyển sang #/login.
+      c.setWhere(coinWhere);
+      await c.click({ within: '[role=dialog]', css: 'button', text: 'Đăng xuất' }, 'nút Đăng xuất');
+      await c.waitFor('location.hash.startsWith("#/login")', 'về trang đăng nhập', 15000);
+      await c.goto('#/login', { reload: true });
+      await submitLogin(c, { handle: 'hetcoin', password: coinPassword });
+      await c.waitFor('!!__bot.find({ labelEnds: "Mở tài khoản" })', '@hetcoin vào hub', 20000);
+      hetIn = true;
+    } catch (e) {
+      coinSetup.err = `@hetcoin đăng nhập: ${e.message.split('\n')[0]}`;
+    }
+  }
+  const lockedComposer = async (storyId, inputSpec, label) => {
+    await c.goto(`#/chat/${storyId}`);
+    await c.waitFor(`!!__bot.find(${J(inputSpec)})`, `ô nhập ${label}`, 15000);
+    await c.waitFor(`document.body.innerText.includes('Bạn đã hết coin')`, "khối 'Bạn đã hết coin'", 10000).catch(() => {});
+    // Thông báo "+60 coin cho hôm nay" của lần mở app này nổi trên khối; người dùng đợi nó tắt rồi mới chạm.
+    await c.waitFor(`!document.querySelector('div.fixed[role=status] > p')`, 'thông báo tự tắt', 8000).catch(() => {});
+    return c.evaluate(`({ disabled: !!__bot.find(${J(inputSpec)})?.disabled,
+      out: document.body.innerText.includes('Bạn đã hết coin'),
+      topUp: !!__bot.find({ css: 'button', text: 'Nạp coin' }), missions: !!__bot.find({ css: 'button', text: 'Nhiệm vụ' }),
+      send: !!__bot.find({ label: 'Gửi (Enter)' })?.disabled })`);
+  };
+
+  await c.step(C.COIN_OUT, async () => {
+    if (coinSetup.err || !hetIn) throw new Error(`dựng @hetcoin: ${coinSetup.err || 'chưa đăng nhập được'}`);
+    const r = await lockedComposer(coinSetup.hetStory, STORY_INPUT, 'Story');
+    const over = await overflowX(c);
+    await scan('#/chat (hết coin)');
+    await c.shot('Story: hết coin, ô nhập khoá');
+    await c.click({ css: 'button', text: 'Nạp coin' }, 'nút Nạp coin');
+    const topUp = await c.waitFor(`location.hash === '#/coins/top-up'`, 'sang #/coins/top-up', 8000).catch(() => false);
+    await c.shot('Nạp coin (từ khối hết coin)');
+    await c.goto(`#/chat/${coinSetup.hetStory}`);
+    await c.waitFor(`!!__bot.find({ css: 'button', text: 'Nhiệm vụ' })`, "nút 'Nhiệm vụ'", 10000);
+    await c.click({ css: 'button', text: 'Nhiệm vụ' }, 'nút Nhiệm vụ');
+    const missions = await c.waitFor(`location.hash === '#/missions'`, 'sang #/missions', 8000).catch(() => false);
+    const ok = r.disabled && r.out && r.topUp && r.missions && r.send && !!topUp && !!missions && over <= 1;
+    return { ok, detail: `ô nhập ${r.disabled ? 'disabled' : 'KHÔNG khoá'} · nút Gửi ${r.send ? 'khoá' : 'KHÔNG khoá'} · ${r.out ? "có 'Bạn đã hết coin'" : "KHÔNG có 'Bạn đã hết coin'"} · Nạp coin → ${topUp ? '#/coins/top-up' : 'KHÔNG sang #/coins/top-up'} · Nhiệm vụ → ${missions ? '#/missions' : 'KHÔNG sang #/missions'} · tràn ngang ${over}px` };
+  });
+
+  await c.step(C.COIN_OUT_DM, async () => {
+    if (coinSetup.err || !hetIn) throw new Error(`dựng @hetcoin: ${coinSetup.err || 'chưa đăng nhập được'}`);
+    const dmInput = { css: 'textarea', labelStarts: 'Tin nhắn cho ' };
+    const r = await lockedComposer(coinSetup.hetDm, dmInput, 'DM');
+    const over = await overflowX(c);
+    await c.shot('DM: hết coin, ô nhập khoá');
+    const ok = r.disabled && r.out && r.topUp && r.missions && over <= 1;
+    return { ok, detail: `ô 'Tin nhắn cho …' ${r.disabled ? 'disabled' : 'KHÔNG khoá'} · ${r.out ? "có 'Bạn đã hết coin'" : 'THIẾU khối hết coin'} · ${r.topUp ? 'có' : 'KHÔNG có'} Nạp coin · ${r.missions ? 'có' : 'KHÔNG có'} Nhiệm vụ · tràn ngang ${over}px` };
+  });
+
+  // ================================================================ F43 nạp coin (chế độ thử)
+  // @hetcoin (thành viên, đang đăng nhập) xem "Nạp coin"; chủ máy tạo mã nạp 100 coin ở "#/admin" → "Coin" và cộng 20 coin
+  // cho @hetcoin có lý do; @hetcoin nhập mã ở "#/coins/top-up". Đổi tài khoản bằng nút "Đăng xuất" như người dùng.
+  const switchAccount = async (who, label) => {
+    await c.goto('#/');
+    await openAccountSheet(c);
+    c.setWhere(coinWhere); // lúc đăng xuất, vài request đang bay nhận 401 trước khi app chuyển sang #/login
+    await c.click({ within: '[role=dialog]', css: 'button', text: 'Đăng xuất' }, 'nút Đăng xuất');
+    await c.waitFor('location.hash.startsWith("#/login")', 'về trang đăng nhập', 15000);
+    await c.goto('#/login', { reload: true });
+    await submitLogin(c, who);
+    await c.waitFor('!!__bot.find({ labelEnds: "Mở tài khoản" })', `${label} vào hub`, 20000);
+  };
+  const hetLogin = { handle: 'hetcoin', password: coinPassword };
+  const packCards = `section[aria-labelledby=topup-packs] ul > li > button`;
+
+  await c.step(C.TOPUP_PAGE, async () => {
+    if (coinSetup.err || !hetIn) throw new Error(`dựng @hetcoin: ${coinSetup.err || 'chưa đăng nhập được'}`);
+    await c.goto('#/coins/top-up');
+    await c.waitFor(`document.querySelectorAll(${J(packCards)}).length > 0`, 'các thẻ gói', 15000);
+    const r = await c.evaluate(`(() => {
+      const cards = [...document.querySelectorAll(${J(packCards)})].map((b) => b.innerText.replace(/\\s+/g, ' ').trim());
+      const text = document.body.innerText;
+      const input = __bot.find({ css: 'input', label: 'Mã nạp' });
+      return { title: document.querySelector('h1')?.innerText.trim() ?? '', testMode: text.includes('Chế độ thử') && text.includes('chưa bán coin'),
+        cards, cardsOk: cards.length === 4 && cards.every((t) => t.includes('coin') && /\\dđ/.test(t) && t.includes('Giá dự kiến')),
+        input: !!input, redeem: !!__bot.find({ css: 'button', text: 'Dùng mã' }) };
+    })()`);
+    const over = await overflowX(c);
+    await scan('#/coins/top-up');
+    await c.shot('Nạp coin: gói giá dự kiến và ô mã nạp');
+    await c.click({ css: packCards, textHas: '100 coin' }, "thẻ gói '100 coin'");
+    await c.waitFor(`(document.querySelector('[role=dialog]')?.innerText || '').includes('Giá dự kiến khi Lyris ra mắt')`, 'hộp Giá dự kiến', 8000).catch(() => {});
+    const d = await c.evaluate(`(() => { const dlg = document.querySelector('[role=dialog]');
+      if (!dlg) return { open: false, note: false, buttons: [] };
+      const names = [...dlg.querySelectorAll('button, a[href]')].filter(__bot.visible).map((b) => (b.getAttribute('aria-label') || b.innerText).trim());
+      return { open: true, note: dlg.innerText.includes('Giá dự kiến khi Lyris ra mắt'), buttons: names }; })()`);
+    const dialogOver = await overflowX(c);
+    await scan('#/coins/top-up (hộp gói)');
+    await c.shot('Nạp coin: hộp Giá dự kiến của gói 100 coin');
+    if (d.open) await c.click({ within: '[role=dialog]', css: 'button', text: 'Đóng' }, 'nút Đóng');
+    await c.waitFor(`!document.querySelector('[role=dialog]')`, 'hộp gói đóng', 5000).catch(() => {});
+    const onlyClose = d.buttons.length > 0 && d.buttons.every((n) => n === 'Đóng');
+    const ok = r.title === 'Nạp coin' && r.testMode && r.cardsOk && r.input && r.redeem && d.note && onlyClose && over <= 1 && dialogOver <= 1;
+    return { ok, detail: `tiêu đề '${r.title}' · ${r.testMode ? "có 'Chế độ thử … chưa bán coin'" : 'THIẾU câu chế độ thử'} · ${r.cards.length} thẻ gói${r.cardsOk ? '' : ` (SAI: ${r.cards.join(' | ')})`} · ô 'Mã nạp' ${r.input ? 'có' : 'KHÔNG có'} · nút 'Dùng mã' ${r.redeem ? 'có' : 'KHÔNG có'} · hộp gói: ${d.note ? "'Giá dự kiến khi Lyris ra mắt'" : 'THIẾU câu giá dự kiến'}, nút [${d.buttons.join(', ')}]${onlyClose ? '' : ' (cần chỉ có Đóng)'} · tràn ngang ${over}px / ${dialogOver}px` };
+  });
+
+  // Chủ máy: tạo mã nạp 100 coin (ghi lại để @hetcoin dùng ở bước sau).
+  const made = { code: '', title: false, copy: false, err: '' };
+  let ownerIn = false;
+  if (!coinSetup.err && hetIn) {
+    try {
+      await switchAccount(c.creds, 'chủ máy');
+      ownerIn = true;
+      await c.goto('#/admin');
+      await c.waitFor(`!!__bot.find({ css: '[role=radio]', text: 'Coin' })`, "mục 'Coin' của Quản lý", 15000);
+      await c.click({ css: '[role=radio]', text: 'Coin' }, "mục 'Coin'");
+      await c.waitFor(`!!__bot.find({ css: 'button', text: 'Tạo mã nạp' })`, "nút 'Tạo mã nạp'", 10000);
+      await c.click({ css: 'button', text: 'Tạo mã nạp' }, "nút 'Tạo mã nạp'");
+      await c.waitFor(dialogTitled('Tạo mã nạp'), "hộp 'Tạo mã nạp'", 8000);
+      await c.click({ within: '[role=dialog]', css: '[role=radio]', text: '100 coin' }, "gói '100 coin'");
+      await c.click({ within: '[role=dialog]', css: 'button', text: 'Tạo mã' }, "nút 'Tạo mã'");
+      await c.waitFor(dialogTitled('Mã nạp mới'), "hộp 'Mã nạp mới'", 10000);
+      made.title = true;
+      made.copy = await c.evaluate(`!!__bot.find({ within: '[role=dialog]', css: 'button', text: 'Sao chép mã' })`);
+      made.code = await c.evaluate(`document.querySelector('[role=dialog] p.select-all')?.innerText.trim() ?? ''`);
+      await scan('#/admin (Mã nạp mới)');
+      await c.shot('Quản lý → Coin: hộp Mã nạp mới');
+      await c.click({ within: '[role=dialog]', css: 'button', text: 'Xong' }, "nút 'Xong'");
+      await c.waitFor(`!document.querySelector('[role=dialog]')`, 'hộp mã đóng', 5000).catch(() => {});
+      await scan('#/admin (Coin)');
+      await c.shot('Quản lý → Coin: Mã nạp và Nhật ký');
+    } catch (e) {
+      made.err = e.message.split('\n')[0];
+    }
+  }
+
+  // Chủ máy: "…" của @hetcoin → "Cộng/trừ coin" 20, lý do 'thử bot' → hàng có thêm 20 coin, Nhật ký có 'thử bot'.
+  await c.step(C.COIN_ADJUST, async () => {
+    if (!ownerIn) throw new Error(`chủ máy chưa đăng nhập lại được${made.err ? `: ${made.err}` : ''}`);
+    const rowCoins = `(() => { const li = [...document.querySelectorAll('section[aria-labelledby=admin-members] li')].find((l) => l.innerText.includes('@hetcoin'));
+      return li?.querySelector('[data-member-coins]')?.innerText.trim() ?? ''; })()`;
+    await c.goto('#/');
+    await c.goto('#/admin');
+    await c.waitFor(`!!__bot.find({ label: 'Việc với @hetcoin' })`, "nút '…' của @hetcoin", 15000);
+    const before = await c.waitFor(rowCoins, 'số coin trên hàng @hetcoin', 8000);
+    await c.click({ label: 'Việc với @hetcoin' }, "nút '…' của @hetcoin");
+    await c.waitFor(`!!__bot.find({ within: '[role=dialog]', css: 'button', text: 'Cộng/trừ coin' })`, "nút 'Cộng/trừ coin'", 8000);
+    await c.click({ within: '[role=dialog]', css: 'button', text: 'Cộng/trừ coin' }, "nút 'Cộng/trừ coin'");
+    await c.waitFor(dialogTitled('Cộng/trừ coin'), "hộp 'Cộng/trừ coin'", 8000);
+    await c.fill({ within: '[role=dialog]', field: 'Số coin' }, '20', "ô 'Số coin'");
+    await c.fill({ within: '[role=dialog]', field: 'Lý do' }, 'thử bot', "ô 'Lý do'");
+    await scan('#/admin (Cộng/trừ coin)');
+    await c.shot('Quản lý: hộp Cộng/trừ coin');
+    await c.click({ within: '[role=dialog]', css: 'button', text: 'Lưu' }, "nút 'Lưu'");
+    await c.waitFor(`!document.querySelector('[role=dialog]')`, 'hộp Cộng/trừ coin đóng', 10000).catch(() => {});
+    const after = await c.waitFor(`(() => { const t = ${rowCoins}; return t && t !== ${J(before)} ? t : ''; })()`, 'số coin mới trên hàng', 8000).catch(() => '');
+    const rowOver = await overflowX(c);
+    await c.shot('Quản lý: hàng @hetcoin sau khi cộng 20 coin');
+    await c.click({ css: '[role=radio]', text: 'Coin' }, "mục 'Coin'");
+    const logged = await c.waitFor(`(document.querySelector('ul[aria-label="Nhật ký coin"]')?.innerText || '').includes('thử bot')`, "dòng 'thử bot' trong Nhật ký", 10000).catch(() => false);
+    const logOver = await overflowX(c);
+    await c.shot('Quản lý → Coin: Nhật ký có dòng thử bot');
+    const n = (s) => Number(String(s).replace(/[^0-9]/g, ''));
+    const ok = !!before && !!after && n(after) - n(before) === 20 && !!logged && rowOver <= 1 && logOver <= 1;
+    return { ok, detail: `hàng @hetcoin: '${before}' → '${after || '(không đổi)'}' (cần +20) · Nhật ký ${logged ? "có 'thử bot'" : "KHÔNG có 'thử bot'"} · tràn ngang ${rowOver}px / ${logOver}px` };
+  });
+
+  // @hetcoin nhập mã vừa tạo: "Đã nạp 100 coin." và số dư ở "#/coins" tăng đúng 100.
+  await c.step(C.TOPUP_CODE, async () => {
+    if (!ownerIn || made.err) throw new Error(`chủ máy tạo mã: ${made.err || 'chưa đăng nhập được'}`);
+    if (!made.code) throw new Error("hộp 'Mã nạp mới' không có mã");
+    await switchAccount(hetLogin, '@hetcoin');
+    const before = coinNumber(await walletShown());
+    await c.goto('#/coins/top-up');
+    await c.waitFor(`!!__bot.find({ css: 'input', label: 'Mã nạp' })`, "ô 'Mã nạp'", 15000);
+    await c.fill({ css: 'input', label: 'Mã nạp' }, made.code.toLowerCase(), "ô 'Mã nạp'");
+    await c.click({ css: 'button', text: 'Dùng mã' }, "nút 'Dùng mã'");
+    const done = await c.waitFor(`document.body.innerText.includes('Đã nạp 100 coin.')`, "'Đã nạp 100 coin.'", 10000).catch(() => false);
+    await scan('#/coins/top-up (đã nạp)');
+    await c.shot('Nạp coin: Đã nạp 100 coin');
+    const after = coinNumber(await walletShown());
+    await c.shot('Ví coin sau khi nạp mã');
+    const ok = made.title && made.copy && !!done && after - before === 100;
+    return { ok, detail: `chủ máy: ${made.title ? "hộp 'Mã nạp mới'" : 'KHÔNG có hộp Mã nạp mới'}${made.copy ? " có 'Sao chép mã'" : " THIẾU 'Sao chép mã'"} · @hetcoin: ${done ? "'Đã nạp 100 coin.'" : "KHÔNG thấy 'Đã nạp 100 coin.'"} · #/coins ${before} → ${after} (cần +100)` };
+  });
+
+  // ================================================================ F45 nhiệm vụ ngày, quảng cáo mẫu
+  // Thành viên @hetcoin (đang đăng nhập sau bước nạp mã) mở "#/missions" ở 390px như người dùng.
+  let missionsIn = false;
+  const missionsWho = async () => {
+    if (missionsIn) return;
+    if (coinSetup.err) throw new Error(`dựng tài khoản thử: ${coinSetup.err}`);
+    const me = await api(c, 'GET', '/auth/me');
+    const handle = me.status === 200 ? JSON.parse(me.text)?.account?.handle : null;
+    if (handle !== 'hetcoin') await switchAccount(hetLogin, '@hetcoin');
+    missionsIn = true;
+  };
+  const missionRowSel = (id) => `[data-mission=${id}]`;
+
+  await c.step(C.MISSIONS_PAGE, async () => {
+    await missionsWho();
+    await c.goto('#/coins');
+    await c.waitFor(`!!__bot.find({ css: 'button', text: 'Nhiệm vụ' })`, "nút 'Nhiệm vụ' ở Ví coin", 15000);
+    await c.click({ css: 'button', text: 'Nhiệm vụ' }, "nút 'Nhiệm vụ'");
+    await c.waitFor(`location.hash === '#/missions'`, 'sang #/missions', 8000);
+    await c.waitFor(`document.querySelectorAll('[data-mission]').length === 3`, 'ba dòng nhiệm vụ', 15000);
+    const r = await c.evaluate(`(() => {
+      const rows = [...document.querySelectorAll('[data-mission]')].map((el) => ({
+        id: el.getAttribute('data-mission'), title: el.querySelector('h2')?.innerText.trim() ?? '',
+        progress: el.querySelector('[data-mission-progress]')?.innerText.trim() ?? '' }));
+      return { title: document.querySelector('h1')?.innerText.trim() ?? '',
+        earned: document.querySelector('[data-missions-earned]')?.innerText.trim() ?? '', rows,
+        watch: !!__bot.find({ within: '[data-mission=ad]', css: 'button', text: 'Xem' }) };
+    })()`);
+    const over = await overflowX(c);
+    await scan('#/missions');
+    await c.shot('Nhiệm vụ hôm nay (thành viên)');
+    const want = ['Xem quảng cáo', 'Trò chuyện với 3 nhân vật khác nhau', 'Gửi 20 lượt'];
+    const titles = r.rows.map((x) => x.title);
+    const earnedOk = r.earned.includes('Đã nhận') && r.earned.includes('/30 coin hôm nay');
+    const ok = r.title === 'Nhiệm vụ hôm nay' && earnedOk && J(titles) === J(want) && r.rows.every((x) => /^\d+\/\d+$/.test(x.progress)) && r.watch && over <= 1;
+    return { ok, detail: `tiêu đề '${r.title}' · '${r.earned}'${earnedOk ? '' : " (cần 'Đã nhận …/30 coin hôm nay')"} · dòng: ${r.rows.map((x) => `${x.title} ${x.progress}`).join(' | ') || '(không có)'} · nút 'Xem' ${r.watch ? 'có' : 'KHÔNG có'} · tràn ngang ${over}px` };
+  });
+
+  // Bấm "Xem" → hộp "Quảng cáo mẫu" trung thực, "Nhận 5 coin" khoá khi còn giây; hết giờ (đồng hồ server: 15 giây, hoặc
+  // 2 giây nếu server giả dựng app với ad_seconds=2) bấm "Nhận 5 coin" → dòng "1/3", ví ở "#/coins" tăng đúng 5.
+  await c.step(C.MISSIONS_AD, async () => {
+    await missionsWho();
+    const before = coinNumber(await walletShown());
+    await c.goto('#/missions');
+    await c.waitFor(`!!__bot.find({ within: '[data-mission=ad]', css: 'button', text: 'Xem' })`, "nút 'Xem' của 'Xem quảng cáo'", 15000);
+    const progressBefore = await c.evaluate(`document.querySelector('${missionRowSel('ad')} [data-mission-progress]')?.innerText.trim() ?? ''`);
+    await c.click({ within: '[data-mission=ad]', css: 'button', text: 'Xem' }, "nút 'Xem'");
+    await c.waitFor(dialogTitled('Quảng cáo mẫu'), "hộp 'Quảng cáo mẫu'", 8000);
+    await c.waitFor(`(document.querySelector('[data-ad-countdown]')?.innerText || '').startsWith('Còn ')`, "đếm ngược 'Còn … giây'", 10000);
+    const d = await c.evaluate(`(() => { const dlg = document.querySelector('[role=dialog]');
+      const btn = __bot.find({ within: '[role=dialog]', css: 'button', text: 'Nhận 5 coin' });
+      return { honest: (dlg?.innerText || '').includes('chưa phải quảng cáo thật'), countdown: document.querySelector('[data-ad-countdown]')?.innerText.trim() ?? '',
+        button: !!btn, locked: !!btn && btn.disabled }; })()`);
+    const dialogOver = await overflowX(c);
+    await scan('#/missions (Quảng cáo mẫu)');
+    await c.shot('Quảng cáo mẫu đang đếm ngược');
+    const ready = await c.waitFor(`(() => { const b = __bot.find({ within: '[role=dialog]', css: 'button', text: 'Nhận 5 coin' }); return !!b && !b.disabled; })()`,
+      "nút 'Nhận 5 coin' mở khoá khi hết giờ", 30000).catch(() => false);
+    await c.shot('Quảng cáo mẫu đã xem xong');
+    if (ready) await c.click({ within: '[role=dialog]', css: 'button', text: 'Nhận 5 coin' }, "nút 'Nhận 5 coin'");
+    const closed = await c.waitFor(`!document.querySelector('[role=dialog]')`, 'hộp quảng cáo đóng sau khi nhận', 10000).catch(() => false);
+    const progress = await c.waitFor(`(() => { const t = document.querySelector('${missionRowSel('ad')} [data-mission-progress]')?.innerText.trim() ?? ''; return t === '1/3' ? t : ''; })()`,
+      "dòng 'Xem quảng cáo' thành '1/3'", 10000).catch(async () => c.evaluate(`document.querySelector('${missionRowSel('ad')} [data-mission-progress]')?.innerText.trim() ?? ''`));
+    const earned = await c.evaluate(`document.querySelector('[data-missions-earned]')?.innerText.trim() ?? ''`);
+    await scan('#/missions (đã nhận quảng cáo)');
+    await c.shot('Nhiệm vụ sau khi nhận 5 coin');
+    const after = coinNumber(await walletShown());
+    const ok = d.honest && d.button && d.locked && !!ready && !!closed && progressBefore === '0/3' && progress === '1/3' && after - before === 5 && dialogOver <= 1;
+    return { ok, detail: `hộp: ${d.honest ? "có 'chưa phải quảng cáo thật'" : "THIẾU 'chưa phải quảng cáo thật'"} · '${d.countdown}' · nút 'Nhận 5 coin' ${d.button ? (d.locked ? 'khoá lúc đầu' : 'KHÔNG khoá lúc đầu') : 'KHÔNG có'} · ${ready ? 'mở khoá khi hết giờ' : 'KHÔNG mở khoá'} · dòng ${progressBefore} → ${progress || '(không đổi)'} (cần 0/3 → 1/3) · '${earned}' · #/coins ${before} → ${after} (cần +5) · tràn ngang ${dialogOver}px` };
+  });
+
+  // ================================================================ F44 thưởng sáng tác theo bảng xếp hạng
+  // @sangtac (thành viên) có "Hạ Vy Quán Trà" công khai (có ảnh) với 12 người chơi dựng sẵn và "Hạ Vy Riêng" riêng tư
+  // (seedCreator; script dựng người chơi tính lại bảng "Nhân vật hot" như lần tính mỗi giờ). Đăng nhập như người dùng,
+  // mở "#/studio/<id>": khối người chơi và hạng nằm trong phần 'Cơ bản' của nhân vật công khai; riêng tư thì không có.
+  // F46: trước khi dựng người chơi, bảng "Nhân vật hot" của bot còn rỗng (chưa ai có người chơi). Dải ở Khám phá là lối
+  // vào #/explore/hot nên vẫn phải có tiêu đề, một dòng báo rỗng và nút 'Xem bảng xếp hạng'; bảng rỗng mời 'Mở Studio'.
+  await c.step(C.HOT_EMPTY, async () => {
+    const strip = 'section[aria-labelledby=explore-hot]';
+    const board = JSON.parse((await api(c, 'GET', '/explore/hot')).text || '{}');
+    await c.goto('#/explore');
+    await c.waitFor('document.querySelectorAll("section[aria-labelledby=explore-all] ul > li").length > 0', 'lưới nhân vật', 15000);
+    await c.waitFor(`!!document.querySelector(${J(`${strip} [data-hot-strip-empty]`)})`, "dòng báo rỗng trên dải 'Nhân vật hot'", 10000).catch(() => {});
+    const r = await c.evaluate(`(() => {
+      const sec = document.querySelector(${J(strip)});
+      return {
+        section: !!sec,
+        title: sec?.querySelector('h2')?.innerText.trim() ?? '',
+        empty: sec?.querySelector('[data-hot-strip-empty]')?.innerText.trim() ?? '',
+        rows: sec ? sec.querySelectorAll('ol > li').length : 0,
+      };
+    })()`);
+    await scan('#/explore (bảng Nhân vật hot rỗng)');
+    await c.shot('Khám phá: dải Nhân vật hot khi bảng rỗng');
+    const button = { within: strip, css: 'a, button', text: 'Xem bảng xếp hạng' };
+    const hasButton = await c.exists(button);
+    if (hasButton) await c.click(button, 'Xem bảng xếp hạng');
+    const at = hasButton ? await c.waitFor('location.hash === "#/explore/hot" ? location.hash : ""', '#/explore/hot', 8000).catch(() => hashNow(c)) : '';
+    const emptyBoard = await c.waitFor(`document.body.innerText.includes('Chưa có nhân vật nào trên bảng xếp hạng.') && !!__bot.find({ css: 'button', text: 'Mở Studio' })`, "bảng rỗng có 'Mở Studio'", 10000).catch(() => false);
+    await c.shot('Bảng Nhân vật hot rỗng');
+    const studio = { css: 'button', text: 'Mở Studio' };
+    if (emptyBoard) await c.click(studio, 'Mở Studio');
+    const opened = emptyBoard ? await c.waitFor('location.hash === "#/studio" ? location.hash : ""', '#/studio', 8000).catch(() => hashNow(c)) : '';
+    const problems = [];
+    if ((board.items ?? []).length !== 0) problems.push(`bảng của bot không rỗng (${(board.items ?? []).length} hàng)`);
+    if (!r.section) problems.push("KHÔNG có dải 'Nhân vật hot'");
+    if (r.title !== 'Nhân vật hot') problems.push(`tiêu đề dải "${r.title}"`);
+    if (r.empty !== 'Chưa có nhân vật nào trên bảng xếp hạng.') problems.push(`dòng báo rỗng "${r.empty}"`);
+    if (r.rows !== 0) problems.push(`${r.rows} hàng trên dải rỗng`);
+    if (at !== '#/explore/hot') problems.push(`bấm 'Xem bảng xếp hạng' → ${at || 'KHÔNG có nút'}`);
+    if (!emptyBoard) problems.push("#/explore/hot không có câu bảng rỗng và nút 'Mở Studio'");
+    if (emptyBoard && opened !== '#/studio') problems.push(`'Mở Studio' → ${opened}`);
+    return { ok: problems.length === 0, detail: problems.join('; ') || `dải: '${r.title}' · '${r.empty}' · 'Xem bảng xếp hạng' → ${at} · bảng rỗng · 'Mở Studio' → ${opened}` };
+  });
+
+  const sangtac = { handle: 'sangtac', name: 'Sáng Tác', password: coinPassword, publicName: 'Hạ Vy Quán Trà', privateName: 'Hạ Vy Riêng' };
+  let seeded = null;
+  await c.step(C.CREATOR_RANK, async () => {
+    c.setWhere(coinWhere); // đăng xuất qua API: vài request của trang đang mở nhận 401
+    seeded = await seedCreator(c, sangtac);
+    await c.goto('#/login', { reload: true });
+    await submitLogin(c, sangtac);
+    await c.waitFor('!!__bot.find({ labelEnds: "Mở tài khoản" })', '@sangtac vào hub', 20000);
+    const block = `(() => { const el = document.querySelector('#sec-basic [data-creator-rank]'); return el ? el.innerText.trim() : ''; })()`;
+    const nameIs = (n) => `(__bot.find({ within: '#sec-basic', field: 'Tên nhân vật' })?.value || '') === ${J(n)}`;
+    await c.goto(`#/studio/${seeded.pub}`);
+    await c.waitFor(nameIs(sangtac.publicName), `trình sửa '${sangtac.publicName}'`, 15000);
+    const text = await c.waitFor(`(() => { const t = ${block}; return t.includes('người chơi') ? t : ''; })()`, "khối người chơi trong 'Cơ bản'", 10000).catch(() => '');
+    const head = await c.evaluate(`document.querySelector('#sec-basic [data-creator-rank] p')?.innerText.trim() ?? ''`);
+    const toggle = await c.evaluate(`(() => { const t = __bot.find({ within: '#sec-basic', css: '[role=switch]', textHas: 'Công khai' }); return t ? t.getAttribute('aria-checked') : 'không có'; })()`);
+    const over = await overflowX(c);
+    await c.evaluate(`document.querySelector('#sec-basic [data-creator-rank]')?.scrollIntoView({ block: 'center' })`);
+    await scan('#/studio/<id> (nhân vật công khai)');
+    await c.shot('Trình sửa nhân vật công khai: số người chơi và hạng Nhân vật hot');
+    await c.goto(`#/studio/${seeded.priv}`);
+    await c.waitFor(nameIs(sangtac.privateName), `trình sửa '${sangtac.privateName}'`, 15000);
+    await c.sleep(1200); // khối (nếu có) đã kịp hiện
+    const privateLine = await c.evaluate(`(() => { const sec = document.querySelector('#sec-basic');
+      return !!sec?.querySelector('[data-creator-rank]') || [...(sec ? sec.querySelectorAll('p') : [])].some((el) => el.innerText.includes('người chơi')); })()`);
+    await c.shot('Trình sửa nhân vật riêng tư: không có dòng người chơi');
+    // Bảng của bot chỉ có nhân vật của 1 người tạo: bậc tiếp theo theo hạng 1 là top 10, chưa trả được và trình sửa nói rõ.
+    const flat = text.replace(/\s+/g, ' ');
+    const next = 'Bậc thưởng tiếp theo: top 10 (+300 coin)';
+    const rule = 'Thưởng top 10 chỉ có khi bảng có nhân vật của ít nhất 10 người tạo khác nhau (hiện có 1).';
+    const ok = seeded.players === 12 && head.includes('12 người chơi') && head.includes('Hạng 1 Nhân vật hot')
+      && flat.includes(next) && flat.includes(rule)
+      && !text.includes('Mốc tiếp theo') && toggle === 'true' && !privateLine && over <= 1;
+    return { ok, detail: `dựng sẵn ${seeded.players} người chơi (hạng ${seeded.rank ?? '—'}) · công khai: ${text ? `'${flat.slice(0, 260)}'` : 'KHÔNG có khối người chơi'} (cần '12 người chơi', 'Hạng 1 Nhân vật hot', '${next}' và '${rule}'${text.includes('Mốc tiếp theo') ? ", CÒN chữ 'Mốc tiếp theo'" : ''}) · công tắc Công khai ${toggle} · riêng tư: ${privateLine ? "CÓ dòng 'người chơi'" : 'không có dòng người chơi'} · tràn ngang ${over}px` };
+  });
+
+  // ================================================================ F46 bảng xếp hạng Nhân vật hot (vẫn là @sangtac)
+  const hotSection = 'section[aria-labelledby=explore-hot]';
+  const hotList = 'ol[aria-label="Bảng xếp hạng Nhân vật hot"]';
+  await c.step(C.HOT_EXPLORE, async () => {
+    if (!seeded) throw new Error('chưa dựng được nhân vật có người chơi (check trình sửa ở trên)');
+    await c.goto('#/explore');
+    await c.waitFor('document.querySelectorAll("section[aria-labelledby=explore-all] ul > li").length > 0', 'lưới nhân vật', 15000);
+    await c.waitFor(`!!document.querySelector(${J(hotSection)})`, "dải 'Nhân vật hot'", 10000).catch(() => {});
+    const r = await c.evaluate(`(() => {
+      const sec = document.querySelector(${J(hotSection)});
+      const all = document.querySelector('section[aria-labelledby=explore-all]');
+      const rows = sec ? [...sec.querySelectorAll('ol > li > a')] : [];
+      const grid = [...(all ? all.querySelectorAll('ul > li > a') : [])].map((a) => a.querySelector('span.font-semibold')?.innerText.trim() ?? '');
+      return {
+        featured: !!document.querySelector('section[aria-labelledby=explore-featured]'),
+        enter: !!__bot.find({ css: 'a, button', text: 'Bước vào câu chuyện' }),
+        title: sec?.querySelector('h2')?.innerText.trim() ?? '',
+        rows: rows.map((a) => a.getAttribute('aria-label') || ''),
+        above: !!sec && !!all && sec.getBoundingClientRect().bottom <= all.getBoundingClientRect().top + 1,
+        haVy: grid.includes('Hạ Vy'),
+      };
+    })()`);
+    await scan('#/explore (dải Nhân vật hot)');
+    await c.shot('Khám phá: dải Nhân vật hot thay khung nổi bật');
+    const button = { within: hotSection, css: 'a, button', text: 'Xem bảng xếp hạng' };
+    const hasButton = await c.exists(button);
+    if (hasButton) await c.click(button, 'Xem bảng xếp hạng');
+    const at = hasButton ? await c.waitFor('location.hash === "#/explore/hot" ? location.hash : ""', '#/explore/hot', 8000).catch(() => hashNow(c)) : '';
+    const problems = [];
+    if (r.featured) problems.push('CÒN khung nổi bật');
+    if (r.enter) problems.push("CÒN nút 'Bước vào câu chuyện'");
+    if (r.title !== 'Nhân vật hot') problems.push(`tiêu đề dải "${r.title}"`);
+    if (r.rows.length < 1 || r.rows.length > 3) problems.push(`${r.rows.length} hàng trên dải (cần 1–3)`);
+    if (!r.rows.some((l) => l.startsWith(`Hạng 1: ${sangtac.publicName}, 12 người chơi`))) problems.push(`không có hàng 'Hạng 1: ${sangtac.publicName}, 12 người chơi' (${r.rows.join(' | ')})`);
+    if (!r.above) problems.push("dải không đứng trên mục 'Nhân vật'");
+    if (!r.haVy) problems.push("không có thẻ 'Hạ Vy' trong lưới 'Nhân vật'");
+    if (at !== '#/explore/hot') problems.push(`bấm 'Xem bảng xếp hạng' → ${at || 'KHÔNG có nút'}`);
+    return { ok: problems.length === 0, detail: problems.join('; ') || `không khung nổi bật · dải: ${r.rows.join(' | ')} · thẻ Hạ Vy trong lưới · bấm 'Xem bảng xếp hạng' → ${at}` };
+  });
+
+  await c.step(C.HOT_BOARD, async () => {
+    if (!seeded) throw new Error('chưa dựng được nhân vật có người chơi');
+    await c.goto('#/explore/hot');
+    await c.waitFor(`!!document.querySelector(${J(`${hotList} li a`)})`, 'bảng xếp hạng', 15000);
+    const r = await c.waitFor(`(() => {
+      const first = document.querySelector(${J(`${hotList} li a[data-hot-rank="1"]`)});
+      const img = first?.querySelector('img');
+      if (img && !img.complete) return null;
+      return {
+        title: document.querySelector('main h1')?.innerText.trim() ?? '',
+        updated: (document.querySelector('[data-hot-updated]')?.innerText ?? '').trim(),
+        label: first?.getAttribute('aria-label') ?? '',
+        text: first?.innerText.replace(/\\s+/g, ' ').trim() ?? '',
+        img: !!img && img.naturalWidth > 0 && __bot.visible(img),
+        href: first?.getAttribute('href') ?? '',
+      };
+    })()`, 'ảnh hàng hạng 1 tải xong', 10000);
+    await scan('#/explore/hot');
+    await recordTabs('#/explore/hot');
+    await c.shot('Bảng Nhân vật hot');
+    await c.click({ within: hotList, css: 'a', labelStarts: 'Hạng 1:' }, 'hàng hạng 1');
+    const opened = await c.waitFor('location.hash.startsWith("#/character/") ? location.hash : ""', 'mở hồ sơ', 8000).catch(() => hashNow(c));
+    const profile = await c.waitFor(`document.querySelector('main h2')?.innerText.trim() || ''`, 'tên trên hồ sơ', 10000).catch(() => '');
+    await c.goto('#/explore/hot');
+    await c.waitFor(`!!__bot.find({ css: 'a', label: 'Về Khám phá' })`, "nút 'Về Khám phá'", 10000);
+    await c.click({ css: 'a', label: 'Về Khám phá' }, 'Về Khám phá');
+    const back = await c.waitFor('location.hash === "#/explore" ? location.hash : ""', '#/explore', 8000).catch(() => hashNow(c));
+    const problems = [];
+    if (r.title !== 'Nhân vật hot') problems.push(`tiêu đề "${r.title}"`);
+    if (!r.updated.startsWith('Cập nhật lúc')) problems.push(`không có dòng 'Cập nhật lúc' (${r.updated})`);
+    if (!r.img) problems.push('hàng hạng 1 KHÔNG có ảnh đã tải');
+    if (!r.text.includes(sangtac.publicName) || !r.text.includes('12 người chơi')) problems.push(`hàng hạng 1: "${r.text}"`);
+    if (opened !== `#/character/${seeded.pub}`) problems.push(`bấm hàng → ${opened} (cần #/character/${seeded.pub})`);
+    if (profile !== sangtac.publicName) problems.push(`hồ sơ "${profile}"`);
+    if (back !== '#/explore') problems.push(`'Về Khám phá' → ${back}`);
+    return { ok: problems.length === 0, detail: problems.join('; ') || `'${r.label}' (ảnh đã tải) · ${r.updated} · bấm → ${opened} "${profile}" · 'Về Khám phá' → ${back}` };
+  });
+
+  await c.step(C.HOT_SIZE, async () => {
+    if (!seeded) throw new Error('chưa dựng được nhân vật có người chơi');
+    const saved = await c.evaluate(`localStorage.getItem('lyris.theme')`);
+    const rowsOf = (sel) => `[...document.querySelectorAll(${J(sel)})].filter(__bot.visible).map((a) => Math.round(a.getBoundingClientRect().height))`;
+    const box = (spec) => `(() => { const b = __bot.find(${J(spec)}); if (!b) return null; const r = b.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; })()`;
+    const problems = [];
+    const seen = [];
+    for (const theme of ['light', 'dark']) {
+      await lookTheme(c, theme, '#/explore');
+      await c.waitFor(`!!document.querySelector(${J(`${hotSection} ol a`)})`, "dải 'Nhân vật hot'", 15000);
+      await c.sleep(300);
+      const exploreOver = await overflowX(c);
+      const strip = await c.evaluate(rowsOf(`${hotSection} ol > li > a`));
+      const see = await c.evaluate(box({ within: hotSection, css: 'a', text: 'Xem bảng xếp hạng' }));
+      await c.shot(`Khám phá 390px: dải Nhân vật hot (${theme === 'light' ? 'sáng' : 'tối'})`);
+      await c.goto('#/explore/hot');
+      await c.waitFor(`!!document.querySelector(${J(`${hotList} li a`)})`, 'bảng xếp hạng', 15000);
+      await c.sleep(300);
+      const hotOver = await overflowX(c);
+      const rows = await c.evaluate(rowsOf(`${hotList} > li > a`));
+      const back = await c.evaluate(box({ css: 'a', label: 'Về Khám phá' }));
+      await c.shot(`Nhân vật hot 390px (${theme === 'light' ? 'sáng' : 'tối'})`);
+      const t = theme === 'light' ? 'sáng' : 'tối';
+      if (exploreOver > 1) problems.push(`${t}: #/explore tràn ngang ${exploreOver}px`);
+      if (hotOver > 1) problems.push(`${t}: #/explore/hot tràn ngang ${hotOver}px`);
+      if (!strip.length || strip.some((h) => h < 44)) problems.push(`${t}: hàng dải ${strip.join('/')}px`);
+      if (!rows.length || rows.some((h) => h < 44)) problems.push(`${t}: hàng bảng ${rows.join('/')}px`);
+      if (!see || see[0] < 44 || see[1] < 44) problems.push(`${t}: 'Xem bảng xếp hạng' ${see ? see.join('×') : 'không có'}`);
+      if (!back || back[0] < 44 || back[1] < 44) problems.push(`${t}: 'Về Khám phá' ${back ? back.join('×') : 'không có'}`);
+      seen.push(`${t}: dải ${strip.join('/')}px, bảng ${rows.length} hàng ${Math.min(...rows)}px+, nút ${see?.join('×')} / ${back?.join('×')}`);
+    }
+    await c.evaluate(saved === null ? `localStorage.removeItem('lyris.theme')` : `localStorage.setItem('lyris.theme', ${J(saved)})`);
+    await c.goto('#/explore', { reload: true });
+    return { ok: problems.length === 0, detail: problems.join('; ') || seen.join(' · ') };
+  });
+
+  // ================================================================ F47 tìm nhân vật (chủ máy: đúng một ô Hạ Vy trong lưới)
+  const search = 'input[type=search]';
+  const counterOf = `(document.querySelector('section[aria-labelledby=explore-all] h2')?.parentElement.querySelector('span')?.innerText ?? '').trim()`;
+  const gridNamesOf = `[...document.querySelectorAll('section[aria-labelledby=explore-all] ul > li > a')].map((a) => a.querySelector('span.font-semibold')?.innerText.trim() ?? '')`;
+  const typeInto = async (text) => {
+    await c.click(search, 'ô Tìm nhân vật');
+    for (const ch of text) await c.type(ch); // gõ từng chữ như người dùng (mỗi chữ cách ~80ms)
+  };
+  let ownerBack = false;
+  try {
+    c.setWhere(coinWhere);
+    await c.goto('#/terms');
+    await api(c, 'POST', '/auth/logout');
+    await c.goto('#/login', { reload: true });
+    await submitLogin(c, c.creds);
+    await c.waitFor('!!__bot.find({ labelEnds: "Mở tài khoản" })', 'chủ máy vào hub', 20000);
+    ownerBack = true;
+  } catch (e) {
+    console.log(`(đăng nhập lại chủ máy cho F47: ${e.message.split('\n')[0]})`);
+  }
+
+  await c.step(C.SEARCH, async () => {
+    if (!ownerBack) throw new Error('không đăng nhập lại được chủ máy');
+    await c.goto('#/explore');
+    await c.waitFor('document.querySelectorAll("section[aria-labelledby=explore-all] ul > li").length > 0', 'lưới nhân vật', 15000);
+    await c.waitFor(`!!document.querySelector(${J(hotSection)})`, "dải 'Nhân vật hot'", 8000).catch(() => {});
+    const before = { counter: await c.evaluate(counterOf), grid: await c.evaluate(gridNamesOf) };
+    const r = await c.evaluate(`(() => {
+      const i = document.querySelector(${J(search)});
+      const all = document.querySelector('section[aria-labelledby=explore-all]');
+      const hot = document.querySelector(${J(hotSection)});
+      const bottom = i ? i.getBoundingClientRect().bottom : 0;
+      return {
+        input: !!i, placeholder: i?.getAttribute('placeholder') ?? '', label: i?.getAttribute('aria-label') ?? '',
+        aboveGrid: !!all && bottom <= all.getBoundingClientRect().top + 1,
+        aboveHot: !hot || bottom <= hot.getBoundingClientRect().top + 1, hot: !!hot,
+      };
+    })()`);
+    await typeInto('ha vy');
+    const t0 = Date.now();
+    await c.waitFor(`${counterOf}.includes('/')`, 'bộ đếm lọc', 3000).catch(() => {});
+    const waited = Date.now() - t0;
+    const after = { counter: await c.evaluate(counterOf), grid: await c.evaluate(gridNamesOf), hot: await c.evaluate(`!!document.querySelector(${J(hotSection)})`) };
+    await scan('#/explore (tìm "ha vy")');
+    await c.shot("Khám phá: tìm 'ha vy'");
+    await c.click({ css: 'button', label: 'Xoá tìm kiếm' }, "nút 'Xoá tìm kiếm' trong ô");
+    await c.waitFor(`!${counterOf}.includes('/')`, 'bộ đếm về tổng', 3000).catch(() => {});
+    await c.sleep(200);
+    const cleared = { value: await c.evaluate(`document.querySelector(${J(search)})?.value ?? null`), counter: await c.evaluate(counterOf), grid: await c.evaluate(gridNamesOf) };
+    const problems = [];
+    if (!r.input) problems.push('không có ô input[type=search]');
+    if (r.placeholder !== 'Tìm nhân vật') problems.push(`placeholder "${r.placeholder}"`);
+    if (r.label !== 'Tìm nhân vật theo tên, tag hoặc giới thiệu') problems.push(`aria-label "${r.label}"`);
+    if (!r.aboveGrid || !r.aboveHot) problems.push("ô tìm không đứng trên dải 'Nhân vật hot' và mục 'Nhân vật'");
+    if (after.counter !== `1 / ${before.counter}`) problems.push(`bộ đếm "${after.counter}" (cần "1 / ${before.counter}")`);
+    if (after.grid.length !== 1 || !after.grid.every((n) => n.includes('Hạ Vy'))) problems.push(`lưới: ${after.grid.join(', ')}`);
+    if (waited > 1000) problems.push(`lọc sau ${waited}ms`);
+    if (after.hot) problems.push("dải 'Nhân vật hot' vẫn hiện khi đang tìm");
+    if (cleared.value !== '') problems.push(`ô sau khi xoá: "${cleared.value}"`);
+    if (cleared.counter !== before.counter) problems.push(`xoá: bộ đếm "${cleared.counter}" (trước "${before.counter}")`);
+    if (J(cleared.grid) !== J(before.grid)) problems.push(`xoá: lưới khác lúc đầu (${cleared.grid.length} thẻ, trước ${before.grid.length})`);
+    return { ok: problems.length === 0, detail: problems.join('; ') || `'ha vy' → ${after.counter}: ${after.grid.join(', ')} (${waited}ms; dải ${r.hot ? 'ẩn' : 'không có'}) · 'Xoá tìm kiếm' → ${cleared.counter}, lưới như cũ` };
+  });
+
+  await c.step(C.SEARCH_EMPTY, async () => {
+    if (!ownerBack) throw new Error('không đăng nhập lại được chủ máy');
+    await c.goto('#/explore');
+    await c.waitFor('document.querySelectorAll("section[aria-labelledby=explore-all] ul > li").length > 0', 'lưới nhân vật', 15000);
+    const before = await c.evaluate(gridNamesOf);
+    const empty = 'Không tìm thấy nhân vật nào cho “zzqxy”.';
+    await typeInto('zzqxy');
+    const shown = await c.waitFor(`document.body.innerText.includes(${J(empty)})`, 'câu báo không có kết quả', 3000).catch(() => false);
+    const cards = await c.evaluate(`document.querySelectorAll('section[aria-labelledby=explore-all] ul > li, section[aria-labelledby=explore-shared] ul > li').length`);
+    const button = { css: 'button', text: 'Xoá tìm kiếm' };
+    const hasButton = await c.exists(button);
+    await scan('#/explore (tìm không có kết quả)');
+    await c.shot('Khám phá: tìm không có kết quả');
+    if (hasButton) await c.click(button, "nút chữ 'Xoá tìm kiếm'");
+    await c.sleep(400);
+    const back = await c.evaluate(gridNamesOf);
+    // Tìm 'ha vy' khi đang bật một chip cảm xúc mà Hạ Vy không có.
+    const chips = await c.evaluate(`__bot.all({ within: '[role=group][aria-label="Lọc theo cảm xúc"]', css: 'button' }).map((b) => b.innerText.trim())`);
+    const haVyTags = await c.evaluate(`fetch('/api/templates').then((r) => r.json()).then((ts) => { const t = ts.find((x) => x.slug === 'ha-vy'); return [...(t?.vibes ?? []), ...(t?.card?.tags ?? [])].map((x) => x.toLocaleLowerCase('vi-VN')); })`);
+    const other = chips.find((t) => t !== 'Tất cả' && !haVyTags.includes(t.toLocaleLowerCase('vi-VN')));
+    let combined = false;
+    if (other) {
+      await c.click({ within: '[role=group][aria-label="Lọc theo cảm xúc"]', css: 'button', text: other }, `chip ${other}`);
+      await typeInto('ha vy');
+      combined = await c.waitFor(`document.body.innerText.includes('Không tìm thấy nhân vật nào cho “ha vy”.')`, 'không có kết quả khi có chip', 3000).catch(() => false);
+      await c.shot(`Khám phá: tìm 'ha vy' với chip ${other}`);
+      await c.click({ css: 'button', label: 'Xoá tìm kiếm' }, "nút 'Xoá tìm kiếm' trong ô");
+      await c.click({ within: '[role=group][aria-label="Lọc theo cảm xúc"]', css: 'button', text: other }, `chip ${other} (bỏ lọc)`);
+      await c.sleep(300);
+    }
+    const problems = [];
+    if (!shown) problems.push(`không có câu "${empty}"`);
+    if (!hasButton) problems.push("không có nút 'Xoá tìm kiếm'");
+    if (cards) problems.push(`còn ${cards} thẻ trong hai lưới`);
+    if (J(back) !== J(before)) problems.push(`bấm nút: lưới khác lúc đầu (${back.length} thẻ, trước ${before.length})`);
+    if (!other) problems.push('không có chip cảm xúc nào mà Hạ Vy không có');
+    else if (!combined) problems.push(`tìm 'ha vy' với chip '${other}': không báo không có kết quả`);
+    return { ok: problems.length === 0, detail: problems.join('; ') || `'zzqxy': báo không có kết quả, 0 thẻ · 'Xoá tìm kiếm' → lưới như cũ (${back.length} thẻ) · 'ha vy' + chip '${other}': không có kết quả` };
+  });
+
+  await c.step(C.SEARCH_SIZE, async () => {
+    if (!ownerBack) throw new Error('không đăng nhập lại được chủ máy');
+    const saved = await c.evaluate(`localStorage.getItem('lyris.theme')`);
+    const problems = [];
+    const seen = [];
+    for (const theme of ['light', 'dark']) {
+      const t = theme === 'light' ? 'sáng' : 'tối';
+      await lookTheme(c, theme, '#/explore');
+      await c.waitFor(`!!document.querySelector(${J(search)})`, 'ô Tìm nhân vật', 15000);
+      const m = await c.evaluate(`(() => { const i = document.querySelector(${J(search)}); const r = i.getBoundingClientRect();
+        const ph = document.createElement('span'); const cs = getComputedStyle(i);
+        ph.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:' + cs.font;
+        ph.textContent = i.placeholder; document.body.appendChild(ph); const need = ph.getBoundingClientRect().width; ph.remove();
+        const room = i.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        return { h: Math.round(r.height), sw: i.scrollWidth, cw: i.clientWidth, need: Math.ceil(need), room: Math.floor(room) }; })()`);
+      await typeInto('ha');
+      await c.sleep(100);
+      const x = await c.evaluate(`(() => { const b = __bot.find({ css: 'button', label: 'Xoá tìm kiếm' }); if (!b) return null; const r = b.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; })()`);
+      const over = await overflowX(c);
+      await c.shot(`Khám phá 390px: ô Tìm nhân vật (${t})`);
+      await c.click({ css: 'button', label: 'Xoá tìm kiếm' }, "nút 'Xoá tìm kiếm' trong ô").catch(() => {});
+      if (m.sw > m.cw || m.need > m.room) problems.push(`${t}: placeholder bị cắt (cần ${m.need}px, có ${m.room}px)`);
+      if (m.h < 44) problems.push(`${t}: ô cao ${m.h}px`);
+      if (!x || x[0] < 44 || x[1] < 44) problems.push(`${t}: nút 'Xoá tìm kiếm' ${x ? x.join('×') : 'không có'}`);
+      if (over > 1) problems.push(`${t}: tràn ngang ${over}px`);
+      seen.push(`${t}: ô cao ${m.h}px, placeholder ${m.need}/${m.room}px, nút × ${x?.join('×')}`);
+    }
+    await c.evaluate(saved === null ? `localStorage.removeItem('lyris.theme')` : `localStorage.setItem('lyris.theme', ${J(saved)})`);
+    await c.goto('#/explore', { reload: true });
+    return { ok: problems.length === 0, detail: problems.join('; ') || seen.join(' · ') };
   });
 
   // ================================================================ tổng kết cả lượt chạy
@@ -1855,6 +2916,194 @@ export async function play(c) {
   c.check(C.TECH, leaks.length === 0 && seen.length > 0, leaks.slice(0, 4).join(', ') || `${seen.length} màn`);
 }
 
+/** Đổi theme đã lưu rồi tải lại trang ở `hash` (để chụp cả hai theme). */
+async function lookTheme(c, theme, hash) {
+  await c.evaluate(`localStorage.setItem('lyris.theme', ${J(theme)})`);
+  await c.goto(hash, { reload: true });
+  await c.sleep(600);
+}
+
+/**
+ * --look, F42: màn coin của thành viên @thanhvien ở 390px, hai theme: chip trên header, thông báo "+60 coin cho
+ * hôm nay", Ví coin, hàng Coin trong sheet Tài khoản; rồi chủ máy trừ tay về 0 coin (HTTP API của app) để chụp
+ * khối "Bạn đã hết coin" ở Story và DM.
+ */
+async function lookCoins(c) {
+  const member = c.member;
+  await c.goto('#/terms');
+  await api(c, 'POST', '/auth/logout');
+  await c.evaluate(`localStorage.setItem('lyris.theme', 'dark')`);
+  await c.goto('#/login', { reload: true });
+  await submitLogin(c, member);
+  await c.waitFor('!!__bot.find({ labelEnds: "Mở tài khoản" })', 'thành viên vào hub', 20000);
+  await c.waitFor(`document.body.innerText.includes('+60 coin cho hôm nay')`, 'thông báo +60', 8000).catch(() => {});
+  await c.shot('Coin: hub thành viên với chip và thông báo +60 (tối)');
+  await c.goto('#/coins');
+  await c.waitFor(`!!document.querySelector('[data-coin-balance]')`, 'Ví coin', 15000).catch(() => {});
+  await c.sleep(800);
+  await c.shot('Coin: Ví coin (tối)');
+  await c.goto('#/');
+  await openAccountSheet(c);
+  await c.shot('Coin: sheet Tài khoản của thành viên (tối)');
+  await closeOverlays(c);
+  await lookTheme(c, 'light', '#/coins');
+  await c.waitFor(`!!document.querySelector('[data-coin-balance]')`, 'Ví coin', 15000).catch(() => {});
+  await c.sleep(600);
+  await c.shot('Coin: Ví coin (sáng)');
+  await c.goto('#/');
+  await c.sleep(800);
+  await c.shot('Coin: hub thành viên với chip (sáng)');
+  await openAccountSheet(c);
+  await c.shot('Coin: sheet Tài khoản của thành viên (sáng)');
+  await closeOverlays(c);
+  // Hai story của thành viên, rồi chủ máy trừ về 0 coin.
+  const story = JSON.parse((await api(c, 'POST', '/stories')).text).id;
+  const dm = JSON.parse((await api(c, 'POST', '/stories')).text).id;
+  await api(c, 'PATCH', `/stories/${dm}`, { mode: 'dm' });
+  const wallet = JSON.parse((await api(c, 'GET', '/coins/wallet')).text);
+  await c.goto('#/terms');
+  await api(c, 'POST', '/auth/logout');
+  await api(c, 'POST', '/auth/login', { handle: c.creds.handle, password: c.creds.password });
+  const accounts = JSON.parse((await api(c, 'GET', '/admin/accounts')).text);
+  const id = accounts.find((a) => a.handle === member.handle)?.id;
+  await api(c, 'POST', `/admin/accounts/${id}/coins`, { delta: -wallet.balance, reason: 'nhìn: về 0 coin', request_id: `look-${Date.now()}` });
+  await api(c, 'POST', '/auth/logout');
+  await c.goto('#/login', { reload: true });
+  await submitLogin(c, member);
+  await c.waitFor('!!__bot.find({ labelEnds: "Mở tài khoản" })', 'thành viên vào hub', 20000);
+  for (const theme of ['light', 'dark']) {
+    await lookTheme(c, theme, `#/chat/${story}`);
+    await c.waitFor(`document.body.innerText.includes('Bạn đã hết coin')`, 'khối hết coin', 10000).catch(() => {});
+    await c.shot(`Coin: Story hết coin (${theme === 'light' ? 'sáng' : 'tối'})`);
+    await c.goto(`#/chat/${dm}`);
+    await c.waitFor(`document.body.innerText.includes('Bạn đã hết coin')`, 'khối hết coin DM', 10000).catch(() => {});
+    await c.sleep(400);
+    await c.shot(`Coin: DM hết coin (${theme === 'light' ? 'sáng' : 'tối'})`);
+    await c.goto('#/coins');
+    await c.sleep(900);
+    await c.shot(`Coin: Ví coin hết coin (${theme === 'light' ? 'sáng' : 'tối'})`);
+  }
+  // F43: "Nạp coin" của thành viên (hai theme, cả hộp gói và lỗi mã sai), rồi "#/admin" → "Coin" của chủ máy.
+  for (const theme of ['light', 'dark']) {
+    const t = theme === 'light' ? 'sáng' : 'tối';
+    await lookTheme(c, theme, '#/coins/top-up');
+    await c.waitFor(`document.querySelectorAll('section[aria-labelledby=topup-packs] li').length > 0`, 'gói', 10000).catch(() => {});
+    await c.sleep(400);
+    await c.shot(`Coin: Nạp coin (${t})`);
+    await c.fill({ css: 'input', label: 'Mã nạp' }, 'abcd-efgh-jkmn', 'ô Mã nạp').catch(() => {});
+    await c.click({ css: 'button', text: 'Dùng mã' }, 'Dùng mã').catch(() => {});
+    await c.sleep(900);
+    await c.shot(`Coin: Nạp coin mã sai (${t})`);
+    await c.click({ css: 'section[aria-labelledby=topup-packs] li button', textHas: '550 coin' }, 'gói 550').catch(() => {});
+    await c.sleep(500);
+    await c.shot(`Coin: Nạp coin hộp gói (${t})`);
+    await closeOverlays(c);
+  }
+  // F45: "Nhiệm vụ hôm nay" hai theme; hộp "Quảng cáo mẫu" đang đếm ngược, rồi (tối) đợi hết giờ và nhận 5 coin.
+  for (const theme of ['light', 'dark']) {
+    const t = theme === 'light' ? 'sáng' : 'tối';
+    await lookTheme(c, theme, '#/missions');
+    await c.waitFor(`document.querySelectorAll('[data-mission]').length === 3`, 'nhiệm vụ', 10000).catch(() => {});
+    await c.sleep(400);
+    await c.shot(`Coin: Nhiệm vụ hôm nay (${t})`);
+    await c.click({ within: '[data-mission=ad]', css: 'button', text: 'Xem' }, 'Xem').catch(() => {});
+    await c.waitFor(`(document.querySelector('[data-ad-countdown]')?.innerText || '').startsWith('Còn ')`, 'đếm ngược', 8000).catch(() => {});
+    await c.sleep(1200);
+    await c.shot(`Coin: Quảng cáo mẫu đang đếm (${t})`);
+    if (theme === 'dark') {
+      await c.waitFor(`(() => { const b = __bot.find({ within: '[role=dialog]', css: 'button', text: 'Nhận 5 coin' }); return !!b && !b.disabled; })()`, 'hết giờ', 30000).catch(() => {});
+      await c.shot('Coin: Quảng cáo mẫu đã xem xong (tối)');
+      await c.click({ within: '[role=dialog]', css: 'button', text: 'Nhận 5 coin' }, 'Nhận 5 coin').catch(() => {});
+      await c.sleep(1200);
+      await c.shot('Coin: Nhiệm vụ sau khi nhận 5 coin (tối)');
+    } else {
+      await c.click({ within: '[role=dialog]', css: 'button', text: 'Đóng' }, 'Đóng').catch(() => {});
+      await c.sleep(400);
+    }
+  }
+  // Chủ máy: tạo một mã nạp, "Coin" (mã + nhật ký), "Cộng/trừ coin" của thành viên.
+  await c.goto('#/terms');
+  await api(c, 'POST', '/auth/logout');
+  await api(c, 'POST', '/auth/login', { handle: c.creds.handle, password: c.creds.password });
+  await api(c, 'POST', `/admin/accounts/${id}/coins`, { delta: 20, reason: 'nhìn: thử cộng', request_id: `look-up-${Date.now()}` });
+  await api(c, 'POST', '/admin/coins/codes', { pack_id: 'p550', note: 'cho bạn thử', expires_days: 7 });
+  // Lần mở đầu sau khi đổi tài khoản, app về Tương tác (không mở trang của tài khoản trước): mở hub một lần trước.
+  await c.goto('#/', { reload: true });
+  await c.waitFor('!!__bot.find({ labelEnds: "Mở tài khoản" })', 'chủ máy vào hub', 15000).catch(() => {});
+  for (const theme of ['light', 'dark']) {
+    const t = theme === 'light' ? 'sáng' : 'tối';
+    await lookTheme(c, theme, '#/admin');
+    await c.waitFor(`!!__bot.find({ css: '[role=radio]', text: 'Coin' })`, 'mục Coin', 15000).catch(() => {});
+    await c.sleep(500);
+    await c.shot(`Coin: Quản lý, hàng thành viên có coin (${t})`);
+    await c.click({ label: `Việc với @${member.handle}` }, 'nút …').catch(() => {});
+    await c.sleep(400);
+    await c.click({ within: '[role=dialog]', css: 'button', text: 'Cộng/trừ coin' }, 'Cộng/trừ coin').catch(() => {});
+    await c.sleep(400);
+    await c.click({ within: '[role=dialog]', css: 'button', text: 'Lưu' }, 'Lưu (trống)').catch(() => {});
+    await c.sleep(300);
+    await c.shot(`Coin: Quản lý, hộp Cộng/trừ coin báo lỗi (${t})`);
+    await closeOverlays(c);
+    await c.click({ css: '[role=radio]', text: 'Coin' }, 'mục Coin').catch(() => {});
+    await c.sleep(900);
+    await c.shot(`Coin: Quản lý → Coin (${t})`);
+    await c.click({ css: 'button', text: 'Tạo mã nạp' }, 'Tạo mã nạp').catch(() => {});
+    await c.sleep(400);
+    await c.click({ within: '[role=dialog]', css: '[role=radio]', text: 'Tự nhập' }, 'Tự nhập').catch(() => {});
+    await c.sleep(300);
+    await c.shot(`Coin: Quản lý → Tạo mã nạp (${t})`);
+    if (theme === 'dark') {
+      await c.click({ within: '[role=dialog]', css: '[role=radio]', text: '100 coin' }, '100 coin').catch(() => {});
+      await c.click({ within: '[role=dialog]', css: 'button', text: 'Tạo mã' }, 'Tạo mã').catch(() => {});
+      await c.sleep(800);
+      await c.shot('Coin: Quản lý → Mã nạp mới (tối)');
+      await c.click({ within: '[role=dialog]', css: 'button', text: 'Xong' }, 'Xong').catch(() => {});
+    }
+    await closeOverlays(c);
+  }
+}
+
+/**
+ * --look, F44/F46/F47: thành viên @sangtac có nhân vật công khai (có ảnh) với 12 người chơi dựng sẵn, bảng "Nhân vật hot"
+ * đã tính. Hai theme ở 390px: khối người chơi và hạng trong trình sửa, Khám phá có ô tìm và dải "Nhân vật hot",
+ * bảng `#/explore/hot`, Khám phá khi tìm 'ha vy' và khi tìm không có kết quả.
+ */
+async function lookCreator(c) {
+  const who = { handle: 'sangtac', name: 'Sáng Tác', password: 'coin bot mat khau 2026', publicName: 'Hạ Vy Quán Trà', privateName: 'Hạ Vy Riêng' };
+  const seeded = await seedCreator(c, who);
+  await c.goto('#/login', { reload: true });
+  await submitLogin(c, who);
+  await c.waitFor('!!__bot.find({ labelEnds: "Mở tài khoản" })', '@sangtac vào hub', 20000);
+  for (const theme of ['light', 'dark']) {
+    const t = theme === 'light' ? 'sáng' : 'tối';
+    await lookTheme(c, theme, `#/studio/${seeded.pub}`);
+    await c.waitFor(`!!document.querySelector('#sec-basic [data-creator-rank]')`, 'khối người chơi', 15000).catch(() => {});
+    await c.evaluate(`document.querySelector('#sec-basic [data-creator-rank]')?.scrollIntoView({ block: 'center' })`);
+    await c.sleep(500);
+    await c.shot(`Thưởng sáng tác: trình sửa nhân vật công khai (${t})`);
+    await c.goto('#/explore');
+    await c.waitFor(`!!document.querySelector('section[aria-labelledby=explore-hot] ol a img')`, 'dải Nhân vật hot', 15000).catch(() => {});
+    await c.sleep(600);
+    await c.shot(`Khám phá: ô tìm và dải Nhân vật hot (${t})`);
+    await c.goto('#/explore/hot');
+    await c.waitFor(`!!document.querySelector('ol[aria-label="Bảng xếp hạng Nhân vật hot"] li a img')`, 'bảng xếp hạng', 15000).catch(() => {});
+    await c.sleep(600);
+    await c.shot(`Nhân vật hot (${t})`);
+    await c.goto('#/explore');
+    await c.waitFor('!!document.querySelector("input[type=search]")', 'ô tìm', 15000).catch(() => {});
+    await c.click('input[type=search]', 'ô Tìm nhân vật');
+    for (const ch of 'ha vy') await c.type(ch);
+    await c.sleep(700);
+    await c.shot(`Khám phá: tìm 'ha vy' (${t})`);
+    await c.click({ css: 'button', label: 'Xoá tìm kiếm' }, 'Xoá tìm kiếm').catch(() => {});
+    await c.click('input[type=search]', 'ô Tìm nhân vật');
+    for (const ch of 'zzqxy') await c.type(ch);
+    await c.sleep(700);
+    await c.shot(`Khám phá: tìm không có kết quả (${t})`);
+    await c.click({ css: 'button', label: 'Xoá tìm kiếm' }, 'Xoá tìm kiếm').catch(() => {});
+  }
+}
+
 /** --look: chỉ chụp các màn chính để Model tự nhìn (không chấm). */
 export async function look(c) {
   await c.goto('#/login', { reload: true });
@@ -1866,7 +3115,7 @@ export async function look(c) {
   await c.goto('#/explore');
   await c.waitFor('document.querySelectorAll("section[aria-labelledby=explore-all] ul > li").length > 0', 'lưới nhân vật', 15000);
   await c.shot('Khám phá');
-  await c.click('#explore-featured a', 'nhân vật nổi bật');
+  await c.click({ within: 'section[aria-labelledby=explore-all]', css: 'a', labelStarts: 'Xem nhân vật Hạ Vy' }, "thẻ 'Hạ Vy'");
   await c.waitFor(`!!__bot.find({ css: 'button', text: 'Bước vào câu chuyện' })`, 'hồ sơ nhân vật', 15000);
   await c.shot('Hồ sơ nhân vật');
   // Story seed có sẵn (lời chào của nhân vật mẫu Lạc Dương) — mở story đầu tiên ở Tương tác.
@@ -1885,6 +3134,14 @@ export async function look(c) {
   await c.goto('#/admin');
   await c.waitFor(`!!document.querySelector('#admin-invites')`, 'trang quản trị', 15000).catch(() => {});
   await c.shot('Quản trị');
+  await lookCoins(c).catch(async (e) => {
+    console.log(`(nhìn coin dừng giữa chừng: ${e.message.split('\n')[0]})`);
+    await c.shot('LỖI nhìn coin').catch(() => {});
+  });
+  await lookCreator(c).catch(async (e) => {
+    console.log(`(nhìn thưởng sáng tác dừng giữa chừng: ${e.message.split('\n')[0]})`);
+    await c.shot('LỖI nhìn thưởng sáng tác').catch(() => {});
+  });
   await c.viewport('desktop');
   await c.goto('#/explore');
   await c.sleep(800);

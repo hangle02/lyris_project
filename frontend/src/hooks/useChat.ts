@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError, errorMessage, errorTechnical, isAbortError, streams } from "../api/client";
+import { refreshWallet } from "./useWallet";
 import { friendlyError } from "../lib/friendlyError";
 import { appendSegment, extractDirectives, joinSegments } from "../lib/text";
 import type { ReplySegment } from "../lib/text";
@@ -277,7 +278,9 @@ export function useChat(storyId: number | null, storyMode: Mode) {
           };
           window.setTimeout(() => void resync(0), ABORT_RESYNC_MS[0]);
         } else if (!accepted && e instanceof ApiError && e.status !== 0) {
-          // Refused before streaming (404/409/422): nothing was saved.
+          // Refused before streaming (404/409/422, or 402 out of coins): nothing was saved.
+          // F42: 402 `coins_required` (another tab spent the last coins): the shared wallet locks the composer.
+          if (e.status === 402) refreshWallet();
           setMessages((ms) => ms.filter((m) => m.id !== null));
           opts.onRefused?.();
           setError({ detail: errorMessage(e), technical: errorTechnical(e), retry: kind === "send" ? null : opts.retry });

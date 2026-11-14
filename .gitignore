@@ -24,5 +24,6 @@ reports/
 demo-video/node_modules/
 demo-video/out/
 demo-video/public/clips/
+demo-video/public/clips-fake/
 demo-video/public/music/
 demo-video/

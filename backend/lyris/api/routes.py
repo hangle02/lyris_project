@@ -29,6 +29,7 @@ from lyris.api.routes_studio import (
     public_card_view,
     remove_orphan_avatars,
 )
+from lyris.api.routes_coins import coin_track
 from lyris.api.sse import EventStreamResponse, event_stream_response
 from lyris.auth import clock, errors
 from lyris.auth.errors import AuthError
@@ -565,7 +566,9 @@ async def send_message(
     with _repo(request).locked() as conn:
         last = analytics_store.last_activity(conn, story_id)
     response = await event_stream_response(
-        _with_tracking(request, _chat(request).send(story_id, body.content), story, "send")
+        _with_tracking(
+            request, _chat(request).send(story_id, body.content, coin_track=coin_track(request)), story, "send"
+        )
     )
     _track_message_sent(request, story, body.content, last)  # lượt người chơi đã lưu (sự kiện đầu đã ra)
     return response
@@ -574,7 +577,8 @@ async def send_message(
 @router.post("/stories/{story_id}/reply", response_class=EventStreamResponse)
 async def reply(request: Request, story_id: int, account: CurrentAccount) -> EventStreamResponse:
     story = _own_story(request, account_id_of(account), story_id)
-    return await event_stream_response(_with_tracking(request, _chat(request).respond(story_id), story, "retry"))
+    events = _chat(request).respond(story_id, coin_track=coin_track(request))
+    return await event_stream_response(_with_tracking(request, events, story, "retry"))
 
 
 # ---------------------------------------------------------------------------- messages
@@ -591,7 +595,9 @@ def _message_story(request: Request, account_id: int, message_id: int) -> tuple[
 async def regenerate(request: Request, message_id: int, account: CurrentAccount) -> EventStreamResponse:
     _, story = _message_story(request, account_id_of(account), message_id)
     response = await event_stream_response(
-        _with_tracking(request, _chat(request).regenerate(message_id), story, "regenerate")
+        _with_tracking(
+            request, _chat(request).regenerate(message_id, coin_track=coin_track(request)), story, "regenerate"
+        )
     )
     track(request, "regenerate_used", {"mode": story.mode}, story_id=story.id)
     return response

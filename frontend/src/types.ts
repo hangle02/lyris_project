@@ -27,6 +27,16 @@ export interface NarrationPronouns {
 
 export interface CharacterCard {
   id: number | null;
+  /** F44: players, rank on "Nhân vật hot" and the next reward tier; only for the creator of a saved public character. */
+  creator?: {
+    players: number;
+    rank: number | null;
+    next_tier: number | null;
+    next_reward: number | null;
+    waiting_coins: number;
+    /** How many different creators have a ranked character (a top N tier pays only when ≥ N). */
+    board_creators: number;
+  } | null;
   /** Phase 2c: global id set by the backend; send back unchanged. */
   uid?: string | null;
   visibility?: Visibility;
@@ -619,6 +629,8 @@ export interface AdminAccount {
   invited_by_handle: string | null;
   /** Devices signed in. */
   session_count: number;
+  /** F43: the member's coins; null for the owner (never charged). */
+  coin_balance?: number | null;
 }
 
 export type InviteStatus = "active" | "used" | "expired" | "revoked";

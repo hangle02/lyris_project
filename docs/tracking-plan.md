@@ -29,7 +29,7 @@ tracking plan answers six product questions, one per stage of the funnel in §5:
 4. **Retention.** Do people come back the next day and the next week, and do they pick up old stories?
 5. **Creation.** Do people create, import and publish characters and worlds that others play?
 6. **Monetisation readiness.** How many turns does an active user write per day, and what does a turn cost in
-   compute? These are the inputs for the planned coin system (README "Launch channel and business model").
+   compute? These are the inputs for the coin system (built in test mode: 6 coin per reply, see [coins.md](coins.md); README "Revenue model").
 
 Safety (reports, `minor_safety`) and privacy (opt-out, deletion, export) are tracked as guardrails.
 
@@ -96,7 +96,7 @@ through the HttpOnly cookie, and `POST /api/events` refuses any extra field.
 
 ## 4. Event catalog
 
-**40 events.** "S" = recorded by the server, "C" = sent by the client through `POST /api/events`.
+**57 events.** "S" = recorded by the server, "C" = sent by the client through `POST /api/events`.
 
 Property types: `enum(a|b)`, `bool`, `int[lo..hi]`, `int{a,b}`. Shared buckets:
 `length_bucket` = `1_20|21_80|81_200|201_500|501_plus` characters of visible text;
@@ -123,6 +123,8 @@ For client story events, `mode` is filled by the server from the story; the clie
 | Event | Src | Trigger | Properties | What it measures | Why it matters | KPI / funnel |
 |---|---|---|---|---|---|---|
 | `explore_viewed` | C | Khám phá page shown | none | Reach of the catalog | Activation funnel step 1 | Activation funnel |
+| `explore_searched` | C | The "Tìm nhân vật" box on Khám phá settled after the 250 ms debounce, at most once per distinct search ([F47](../wiki/features/F47-tim-nhan-vat.md)). The typed words are **never** sent | `has_results: bool` | How often people search, and how often a search finds nothing | Searches that find nothing show which characters people look for and do not find | % of Khám phá visits with a search; empty-result rate |
+| `hot_board_viewed` | C | The "Nhân vật hot" leaderboard (`#/explore/hot`) opened ([F46](../wiki/features/F46-bang-xep-hang-nhan-vat-hot.md)) | `from: enum(explore\|link)` (`explore` = the "Xem bảng xếp hạng" button) | Reach of the leaderboard | Whether the ranking (and its creator rewards) draws people to public characters | Leaderboard views/week |
 | `vibe_filter_used` | C | A vibe chip is tapped | `vibe: enum(chua_lanh\|diu_dang\|bi_an_noi_tam\|tinh_dau\|other_template\|other_tag)`, `position: int[1..20]` | Which moods people browse by (a fixed code, never the tag text) | Shapes which characters and vibes to make next | Content strategy |
 | `character_profile_viewed` | C | Character profile opened | `source: enum(own\|template\|public)`, `from: enum(explore\|library\|profile\|story\|link)` | Interest in a character | Funnel step 2; template vs community characters | Activation funnel |
 
@@ -174,6 +176,29 @@ For client story events, `mode` is filled by the server from the story; the clie
 | `data_exported` | S | Personal data export downloaded (`GET /api/account/export`) | none | Use of data portability | Privacy-compliance evidence | Exports |
 | `analytics_opt_out` | S | Usage sharing turned off | none (stored without account or device, never forwarded) | Opt-out rate | Trust signal; a high rate means the policy text needs work | Opt-out rate |
 
+### 4.7 Coins ([F42](../wiki/features/F42-vi-coin.md), [F43](../wiki/features/F43-nap-coin.md), [F44](../wiki/features/F44-thuong-sang-tac.md), [F45](../wiki/features/F45-nhiem-vu-ngay.md), [docs/coins.md §11](coins.md))
+
+Coin amounts are bounded integers; never a character name, an adjustment reason or a top-up code. The one-time
+wallet opening of existing members (`backfill_grant`) is written by the migration SQL and records no event.
+
+| Event | Src | Trigger | Properties | What it measures | Why it matters | KPI / funnel |
+|---|---|---|---|---|---|---|
+| `coins_spent` | S | A reply with text was saved and its 6-coin hold was charged | `mode: enum(story\|dm\|test)`, `kind: enum(send\|retry\|regenerate)` | Coins spent per reply type (`test` = Studio test chat) | Coin sink; regenerate share shows how much spend is re-rolls | Coins spent/day |
+| `coins_released` | S | A hold was released without charging (no text) | `kind`, `reason: enum(error\|empty\|cancelled\|queue_timeout\|save_failed\|invalid\|restart)` | Replies that cost nothing because they failed | Players never pay for errors; a high rate is a reliability problem | Release rate |
+| `coins_insufficient` | S | A reply was refused with 402 `coins_required` | `mode: enum(story\|dm\|test)`, `kind` | Players hitting zero | Top of the top-up funnel; too frequent means prices are too high | % members at 0 coins/7 days |
+| `coins_granted` | S | Coins were added: account created, first app open of the day, top-up code redeemed, daily mission claimed, creator ranking reward or first public character bonus paid ([F44](../wiki/features/F44-thuong-sang-tac.md), recorded detached) | `source: enum(signup\|daily\|mission_ad\|mission_characters\|mission_turns\|creator_rank\|creator_first_public\|topup_code)`, `amount: int[1..10000]` | Coins issued by source | Balance between coins issued and spent | Coins issued/day |
+| `wallet_viewed` | C | "Ví coin" (`#/coins`) opened | `from: enum(header\|account\|composer\|link)` | Interest in the wallet | Shows whether the header chip or the out-of-coins block lead people there | Wallet reach |
+| `coins_adjusted` | S | The owner added or removed coins by hand ("Cộng/trừ coin", with a reason; [F43](../wiki/features/F43-nap-coin.md)) | `direction: enum(up\|down)`, `amount_bucket: enum(1_50\|51_300\|301_plus)` | Manual corrections (never the reason or the exact amount) | Many corrections mean a bug, a price problem or abuse | Adjustments/week |
+| `topup_viewed` | C | "Nạp coin" (`#/coins/top-up`) opened | `from: enum(wallet\|composer\|link)` | Interest in topping up | Second step of the top-up funnel (`coins_insufficient` → `topup_viewed` → `topup_code_redeemed`) | Top-up funnel |
+| `topup_pack_selected` | C | A pack card on "Nạp coin" tapped (opens the "Giá dự kiến" explanation; nothing is sold in test mode) | `pack: enum(p100\|p550\|p1200\|p2500)` | Which planned pack people look at | Checks the planned prices before real payments exist | Pack interest share |
+| `topup_code_redeemed` | S | A member redeemed a top-up code (also `coins_granted{source: topup_code}`) | `pack: enum(p100\|p550\|p1200\|p2500\|custom)` | Codes used (never the code) | Last step of the top-up funnel | Codes redeemed/week |
+| `topup_code_failed` | S | A top-up code was refused (the member always sees the same sentence) | `reason: enum(invalid\|expired\|used\|revoked\|rate_limited)` | Typos, stale codes, guessing | A high `invalid` or `rate_limited` rate means guessing or a confusing code format | Failure rate |
+| `topup_code_created` | S | The owner created a top-up code | `pack: enum(p100\|p550\|p1200\|p2500\|custom)`, `expires_days: int{1,7,30}` | Codes handed out | Supply side of test-mode top-ups | Codes created/week |
+| `missions_viewed` | C | "Nhiệm vụ hôm nay" (`#/missions`) opened ([F45](../wiki/features/F45-nhiem-vu-ngay.md)) | `from: enum(wallet\|composer\|link)` | Interest in daily missions | Shows whether the out-of-coins block leads people to missions instead of leaving | Missions reach |
+| `ad_started` | S | A member started the 15-second sample ad (`POST /api/coins/ads/start`). The sample ad sends nothing to any ad network | none | Sample ads started | With `mission_claimed{mission: ad}`, the share of ads watched to the end | Ad completion rate |
+| `mission_claimed` | S | A daily mission reward was claimed (also `coins_granted{source: mission_*}`); a repeated tap records nothing | `mission: enum(ad\|characters\|turns)` | Completion of each daily mission | Whether missions are reachable and worth it; checks the 30-coin daily cap is not too low or too high | Mission completion rate |
+| `creator_rank_reached` | S | A public character entered the top 100, top 50 or top 10 of the "Nhân vật hot" leaderboard for the first time and the tier was recorded once ([F44](../wiki/features/F44-thuong-sang-tac.md); also `coins_granted{source: creator_rank}` when paid). Recorded **detached** (no account, device or story; local only), since it happens when the board is computed during someone else's request | `tier: int{100,50,10}`, `paid: bool` (false: the creator is the owner, coins are off, or the reward waits under the 600-coin weekly cap) | Characters reaching each ranking tier | Whether public characters find real players; a burst of tiers from one creator is a sign of friend-group farming (the owner checks "Nhật ký") | Characters reaching tiers/week |
+
 Notes on the safety and account events:
 - `content_reported` is recorded by the server with the report, **detached** (`account_id` NULL, empty `anon_id`
   and `session_id`, no `story_id`, local only): the owner promises reporters that nobody knows who reported, and
@@ -194,7 +219,7 @@ Notes on the safety and account events:
 | **Engagement** | Do they keep going, and is the AI good? | `message_sent`, `reply_completed`, `reply_failed`, `regenerate_used`, `message_edited`, `reply_rated`, feature events | **WES** (North Star); messages per active user per day; turns per story; TTFT distribution (`ttft_bucket` where `aborted = false`); failure rate = `reply_failed` / (`reply_completed` + `reply_failed`); dissatisfaction = (`regenerate_used` + assistant `message_edited` + `reply_rated{down}`) / `reply_completed`; feature adoption = share of active users with `thought_revealed`, `heart_drawer_opened`, `mode_switched`, `suggestions_requested` |
 | **Retention** | Do they come back? | any event except `session_started`; `story_resumed` | DAU / WAU / MAU; **D1 / D7 retention** (users whose first event was on day d0 and who are active on d0+1 / d0+7; a device's signed-out events count as the account later seen on it); stories resumed per week; sessions per user per week |
 | **Creation** | Do they build for others? | `character_created`, `character_published`, `lore_imported`, `persona_created`, `story_started{source: public}` | Creators/week; AI-draft share = `character_created{via: ai_draft}` / all; public characters/week; **community plays** = `story_started{source: public}` per week |
-| **Monetisation readiness** (coin system, planned) | What would people spend, and what does it cost? | `message_sent`, `reply_completed` (`kind`, `output_tokens`, `duration_ms`), `story_started{source: public}` | **Messages per active user per day** = future coin spend per user; generations per message = (`reply_completed`) / `message_sent` (regenerate and retry cost compute too); **compute per turn** = mean `output_tokens` and `duration_ms` per `reply_completed` → coin price per turn; share of heavy users (≥ 50 messages/day) = candidates for top-ups; creator payout base = community plays per creator (from public-character stories) |
+| **Monetisation readiness** (coin system, built in test mode) | What would people spend, and what does it cost? | `message_sent`, `reply_completed` (`kind`, `output_tokens`, `duration_ms`), `story_started{source: public}` | **Messages per active user per day** = future coin spend per user; generations per message = (`reply_completed`) / `message_sent` (regenerate and retry cost compute too); **compute per turn** = mean `output_tokens` and `duration_ms` per `reply_completed` → coin price per turn; share of heavy users (≥ 50 messages/day) = candidates for top-ups; creator payout base = community plays per creator (from public-character stories) |
 
 Guardrails: **Safety** = `content_reported` per 1,000 `message_sent`, by `reason` (`minor_safety` must stay at
 zero and every one is reviewed); **Privacy** = opt-out rate (`analytics_opt_out` / active accounts), deletions,
@@ -378,10 +403,10 @@ Run against a scratch database (never the real one), e.g.
 ## Tóm tắt tiếng Việt
 
 - **Mục tiêu:** đo cả vòng đời người dùng: thu hút → kích hoạt → tương tác → giữ chân → sáng tạo → sẵn sàng
-  kiếm tiền (hệ thống coin sau này). **Chỉ số North Star: số story "sống" mỗi tuần** (story có từ 3 lượt
+  kiếm tiền (hệ thống coin, đã có ở chế độ thử). **Chỉ số North Star: số story "sống" mỗi tuần** (story có từ 3 lượt
   `message_sent` trong một tuần, giờ Việt Nam).
-- **40 sự kiện** (§4), chia theo nhóm: thu hút và tài khoản, khám phá, bắt đầu story, tương tác và chất lượng AI,
-  sáng tạo, giữ chân, an toàn nội dung, tài khoản. Sự kiện server biết thì server ghi; giao diện chỉ gửi những gì
+- **45 sự kiện** (§4), chia theo nhóm: thu hút và tài khoản, khám phá, bắt đầu story, tương tác và chất lượng AI,
+  sáng tạo, giữ chân, an toàn nội dung, tài khoản, coin. Sự kiện server biết thì server ghi; giao diện chỉ gửi những gì
   chỉ giao diện biết qua `POST /api/events` (tối đa 20 sự kiện, cần `X-Lyris: 1`, 30 lần/phút; chưa đăng nhập: mỗi
   sự kiện một lần mỗi request, 10 lần/phút mỗi IP, tối đa 30 thiết bị mới mỗi giờ mỗi IP).
 - **KPI chính** (§5): tỉ lệ kích hoạt, số lượt mỗi story, DAU/WAU/MAU, D1/D7, thời gian chờ chữ đầu, tỉ lệ lỗi, tỉ

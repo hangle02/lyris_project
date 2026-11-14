@@ -30,6 +30,8 @@ Kỹ thuật:
 - [ ] Bot: sheet mở với persona đang dùng (đã đổi ở sheet Tài khoản, không phải persona mới thêm gần nhất) được chọn sẵn và 'Tuỳ chỉnh story' đang gập.
 - [ ] Bot: mở `#/new-story?card=<id>` (link cũ) thì về hồ sơ `#/character/<id>` với sheet 'Chọn persona' đang mở.
 - [ ] Bot: tài khoản thứ hai bắt đầu story với nhân vật công khai của người khác thì sheet có dòng '@{handle} sửa nhân vật sau này thì story của bạn không đổi.'
+- [ ] Bot: danh sách persona trong sheet 'Chọn persona' là radio thật (mỗi dòng là `input type=radio`, cùng một `name`; phím mũi tên đổi lựa chọn như radio của trình duyệt), có đủ mọi persona của tài khoản, mỗi dòng có avatar cạnh tên (ảnh, hoặc chữ cái đầu khi persona chưa có ảnh).
+- [ ] Bot: tài khoản chưa có persona nào mở sheet thì form 'Tạo persona mới' tự mở (không phải bấm nút, không có danh sách persona); tạo persona trong form thì persona đó được chọn và bấm 'Bước vào câu chuyện' thì vào `#/chat/<id>`.
 
 ## Tests
 
@@ -44,6 +46,8 @@ Kỹ thuật:
 - bot: sheet bắt đầu chọn sẵn persona mặc định, Tuỳ chỉnh gập
 - bot: link new-story cũ chuyển sang hồ sơ
 - bot: nhân vật công khai có dòng bản sao
+- bot: danh sách persona trong sheet bắt đầu là radio thật, mỗi persona có avatar
+- bot: chưa có persona thì sheet bắt đầu tự mở form Tạo persona mới
 
 ## Liên quan
 

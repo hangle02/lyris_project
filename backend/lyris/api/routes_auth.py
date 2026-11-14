@@ -4,6 +4,7 @@ Không log body của các route này, kể cả khi lỗi (bộ xử lý 422 ch
 """
 from __future__ import annotations
 
+import logging
 from typing import Literal
 from urllib.parse import quote
 
@@ -16,10 +17,12 @@ from lyris.analytics.tracker import honour_opt_out_on_login
 from lyris.api.deps import CurrentAuth, PendingAccount
 from lyris.auth import clock, codes, errors, service, store
 from lyris.auth.store import AuthRow
+from lyris.coins.errors import SIGNUP_GRANT
 from lyris.compliance import legal
 from lyris.db.repo import Repo
 
 router = APIRouter(prefix="/api/auth")
+logger = logging.getLogger("lyris.coins")
 
 # Route không qua `current_account` (§6.1). Test xếp loại route đọc danh sách này.
 OPEN_ROUTES: frozenset[tuple[str, str]] = frozenset(
@@ -179,7 +182,21 @@ async def login(request: Request, body: LoginBody) -> AuthState:
         raise
     track(request, "login_succeeded", account_id=row.id)
     honour_opt_out_on_login(request, row.id, _repo(request))
+    _daily_coins(request, row.id)
     return _signed_in(request, row)
+
+
+def _daily_coins(request: Request, account_id: int) -> None:
+    """F42 (docs/coins.md §3.4): đăng nhập bằng mật khẩu cũng là mở app trong ngày: cùng hàm với
+    `POST /api/coins/checkin` (khoá `daily:<id>:<ngày coin>`), nên không bao giờ được hai lần trong một ngày.
+    Lỗi coin không bao giờ chặn đăng nhập."""
+    coins = getattr(request.app.state, "coins", None)
+    if coins is None:
+        return
+    try:
+        coins.checkin(account_id, track=lambda name, props: track(request, name, props, account_id=account_id))
+    except Exception:
+        logger.exception("Không cộng được quà đăng nhập trong ngày")
 
 
 def _invite_age(request: Request, invite_code: str) -> str | None:
@@ -207,6 +224,8 @@ async def signup(request: Request, body: SignupBody) -> AuthState:
     track(request, "signup_completed", account_id=row.id)
     if age is not None:
         track(request, "invite_redeemed", {"invite_age": age}, account_id=row.id)
+    # F42: quà tạo tài khoản +300 đã ghi trong `insert_member` (cùng transaction tạo tài khoản).
+    track(request, "coins_granted", {"source": "signup", "amount": SIGNUP_GRANT}, account_id=row.id)
     return _signed_in(request, row)
 
 

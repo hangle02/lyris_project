@@ -1,0 +1,3 @@
+## 2026-11-14 17:48
+
+Hỏi 1 giá và số dư → 1C: mỗi lượt tốn 6 coin, tk mới tặng 300, đăng nhập tặng 60. Hỏi 2 nạp tiền → 2A (màn Nạp coin có gói giá, chế độ thử: chủ máy tạo mã nạp hoặc cộng tay; ra mắt mới nối cổng thật). Hỏi 3 thưởng sáng tác → 3C (thưởng một lần khi nhân vật đạt mốc 10, 50, 100 người chơi). Hỏi 4 nhiệm vụ → 4A (nhiệm vụ ngày tối đa 30 coin/ngày: xem quảng cáo +5 tối đa 3 lần, trò chuyện với 3 nhân vật khác nhau +10, gửi 20 lượt +5; quảng cáo giả 15 giây). Hỏi 5 hết coin → 5A (khoá ô nhập, câu 'Bạn đã hết coin' + nút 'Nạp coin' và 'Nhiệm vụ'; chủ máy không tốn coin; số coin trong Tài khoản và chip nhỏ trên thanh đầu). Ghi chú: mình vẫn đang dùng app

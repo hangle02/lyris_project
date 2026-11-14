@@ -212,7 +212,8 @@ liệu ra nước ngoài.
 - **Chế độ người lớn có xác minh tuổi** (§6), chỉ làm nếu kênh phát hành cho phép.
 - **Thanh toán coin:** cần nhà cung cấp thanh toán tuân thủ (ở Việt Nam: cổng thanh toán được cấp phép; trong app cửa
   hàng: Google Play Billing / Apple In-App Purchase), điều khoản bán hàng, hoàn tiền, hoá đơn, và xem lại Điều khoản
-  (đổi `LEGAL_VERSION`).
+  (đổi `LEGAL_VERSION`). Kế hoạch coin chi tiết (chế độ thử chưa thu tiền, mục "Coin" trong Điều khoản, quảng cáo mẫu,
+  không phần thưởng ngẫu nhiên): [coins.md §12](coins.md).
 - Bộ lọc đầu ra tự động nếu `content_reported` cho thấy cần; chặn một người dùng cụ thể (hiện chỉ tạm khoá được cả
   tài khoản); khoá không cho đăng lại nhân vật đã bị ẩn (hiện người tạo bật Công khai lại được, và sẽ bị báo cáo lại).
 - Nếu phục vụ người dùng EU: hỏi đồng ý cookie số liệu trước khi đăng nhập.

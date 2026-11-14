@@ -27,6 +27,11 @@ interface Props {
   onDismissSuggestions?: () => void;
   /** Why "Gợi ý khác" cannot run now; null when it can. */
   moreSuggestionsBlocked?: string | null;
+  /**
+   * F42 (docs/coins.md §10.3): out of coins. The input, send and "+" are disabled; the text being typed
+   * stays (and its draft). Lifted as soon as the shared wallet has 6 usable coins again.
+   */
+  coinLocked?: boolean;
 }
 
 const DRAFT_KEY = (id: number) => `lyris.draft.${id}`;
@@ -64,6 +69,7 @@ export function Composer({
   onMoreSuggestions,
   onDismissSuggestions,
   moreSuggestionsBlocked = null,
+  coinLocked = false,
 }: Props) {
   const dm = mode === "dm";
   const [text, setText] = useState(() => readDraft(storyId));
@@ -85,11 +91,11 @@ export function Composer({
     writeDraft(storyId, text);
   }, [storyId, text]);
 
-  const canSend = !streaming && !disabled && storyId !== null && text.trim().length > 0;
+  const canSend = !streaming && !disabled && !coinLocked && storyId !== null && text.trim().length > 0;
 
   /** One send path for the input and the quick replies. */
   const sendText = async (content: string, fromInput: boolean) => {
-    if (streaming || disabled || storyId === null || !content.trim()) return;
+    if (streaming || disabled || coinLocked || storyId === null || !content.trim()) return;
     if (fromInput) setText("");
     const ok = await onSend(content);
     if (!ok && fromInput) {
@@ -125,7 +131,7 @@ export function Composer({
         />
         <SuggestionArea
           view={suggestion}
-          disabled={streaming || disabled || storyId === null}
+          disabled={streaming || disabled || coinLocked || storyId === null}
           onPick={(s) => {
             void sendText(s, false);
             focusHome();
@@ -139,7 +145,7 @@ export function Composer({
         />
         <div className="flex items-end gap-2">
           {actions && onAction && (
-            <ComposerMenu actions={actions} onSelect={onAction} disabled={storyId === null} triggerRef={plusRef} />
+            <ComposerMenu actions={actions} onSelect={onAction} disabled={storyId === null || coinLocked} triggerRef={plusRef} />
           )}
           <AutoTextarea
             // Remount when the mode (and so the placeholder) changes: the height is measured on mount.
@@ -153,7 +159,7 @@ export function Composer({
             aria-label={dm ? `Tin nhắn cho ${characterName}` : "Lượt của bạn: lời nói, *hành động* hoặc ((chỉ đạo cho AI))"}
             enterKeyHint="send"
             maxLength={MAX_CONTENT_CHARS}
-            disabled={storyId === null}
+            disabled={storyId === null || coinLocked}
             className="min-h-11 min-w-0 flex-1 rounded-card border border-line bg-surface-2 px-4 py-[9px] text-[16px] leading-[1.55] text-fg outline-none transition-colors duration-150 placeholder:text-faint focus:border-accent disabled:opacity-60"
           />
           {streaming ? (

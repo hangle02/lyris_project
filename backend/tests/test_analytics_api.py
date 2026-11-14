@@ -344,8 +344,10 @@ async def test_auth_events_link_anon_to_account(app: FastAPI, cheap_scrypt: None
         ("signup_viewed", None),
         ("signup_completed", new_id),
         ("invite_redeemed", new_id),
+        ("coins_granted", new_id),  # F42: quà tạo tài khoản +300 (docs/coins.md §11)
         ("login_failed", None),
         ("login_succeeded", new_id),
+        ("coins_granted", new_id),  # F42: đăng nhập bằng mật khẩu = mở app trong ngày, +60
     ]
     assert last(app, "invite_redeemed")["props"] == {"invite_age": "lt_1h"}
     assert last(app, "login_failed")["props"] == {"reason": "bad_credentials"}

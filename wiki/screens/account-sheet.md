@@ -11,6 +11,7 @@ Mọi thứ về tài khoản ở một chỗ: profile, mật khẩu, persona ch
 Ở điện thoại 390px là sheet trượt từ đáy, tiêu đề "Tài khoản". Từ trên xuống:
 
 1. **Khối tài khoản**: avatar lớn, tên hiển thị, @handle, nút **"Xem profile"** (mở [trang profile](profile.md)).
+   - *Kế hoạch ([F42](../features/F42-vi-coin.md)):* ngay dưới là hàng **"Coin"**: icon coin, số dư ("300 coin") và nút **"Mở ví coin"** (mở [Ví coin](coin-wallet.md)). Chủ máy: hàng chỉ có câu "Tài khoản quản lý không tốn coin." Coin đang tắt (`LYRIS_COINS=0`): không có hàng này.
 2. Nút **"Đổi mật khẩu"**. Chủ máy có thêm **"Quản lý tài khoản"** (mở [trang quản lý](admin.md)).
 3. **"Persona cho story mới"**: dòng "Persona là vai bạn đóng trong story. Story mới sẽ dùng persona này; đổi được ở từng story khi tạo." rồi danh sách persona dạng radio (avatar, tên, giới tính, mô tả). Chạm để đổi, lưu ngay. Nút **"Quản lý persona"** mở [trang persona](personas.md).
 4. **Một câu về máy** (chỉ khi có trục trặc), ví dụ "Lyris chưa kết nối được phần trả lời trên máy này, nên nhân vật tạm thời chưa trả lời được."

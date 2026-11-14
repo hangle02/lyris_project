@@ -112,6 +112,27 @@ DISPLAY_MODE = choice("standalone", "browser")
 LORE_FORMAT = choice("world_md", "card_book")
 RATING = choice("up", "down", "cleared")
 MSG_ROLE = choice("user", "assistant")
+# Coin (docs/coins.md §11). `test` = chat thử ở Studio. Quà mở ví (backfill) do migration ghi, không có sự kiện.
+COIN_MODE = choice("story", "dm", "test")
+COIN_RELEASE = choice("error", "empty", "cancelled", "queue_timeout", "save_failed", "invalid", "restart")
+# F44 làm lại: `creator_milestone` (thưởng mốc người chơi) thay bằng `creator_rank` và `creator_first_public`.
+COIN_SOURCE = choice(
+    "signup", "daily", "mission_ad", "mission_characters", "mission_turns", "creator_rank", "creator_first_public",
+    "topup_code",
+)
+WALLET_FROM = choice("header", "account", "composer", "link")
+# Nạp coin (F43, docs/coins.md §11). `custom` = mã nạp số coin tự nhập (không theo gói).
+PACK = choice("p100", "p550", "p1200", "p2500")
+CODE_PACK = choice("p100", "p550", "p1200", "p2500", "custom")
+TOPUP_FAIL = choice("invalid", "expired", "used", "revoked", "rate_limited")
+TOPUP_FROM = choice("wallet", "composer", "link")
+ADJUST_DIRECTION = choice("up", "down")
+ADJUST_BUCKET = choice("1_50", "51_300", "301_plus")
+# Nhiệm vụ ngày (F45, docs/coins.md §11).
+MISSION = choice("ad", "characters", "turns")
+MISSIONS_FROM = choice("wallet", "composer", "link")
+# Bảng "Nhân vật hot" (F46): mở từ nút "Xem bảng xếp hạng" ở Khám phá hay từ link.
+HOT_FROM = choice("explore", "link")
 
 S: frozenset[Source] = frozenset({"server"})
 C: frozenset[Source] = frozenset({"client"})
@@ -149,6 +170,10 @@ _SPECS: tuple[EventSpec, ...] = (
     _spec("invite_created", S, {"expires_days": IntChoice(frozenset({1, 7, 30}))}, required=("expires_days",)),
     # ---- khám phá
     _spec("explore_viewed", C),
+    # F47: ô "Tìm nhân vật" ổn định sau debounce, một lần cho mỗi chuỗi tìm khác nhau; không bao giờ có chữ đã gõ
+    _spec("explore_searched", C, {"has_results": Flag()}, required=("has_results",)),
+    # F46: bảng "Nhân vật hot" (#/explore/hot) mở
+    _spec("hot_board_viewed", C, {"from": HOT_FROM}),
     _spec("vibe_filter_used", C, {"vibe": VIBE, "position": Count(1, 20)}, required=("vibe",)),
     _spec("character_profile_viewed", C, {"source": CARD_SOURCE, "from": PROFILE_FROM}, required=("source",)),
     # ---- bắt đầu story
@@ -206,6 +231,31 @@ _SPECS: tuple[EventSpec, ...] = (
     _spec("account_deleted", S),
     _spec("data_exported", S),
     _spec("analytics_opt_out", S),
+    # ---- coin (F42, docs/coins.md §11): chỉ enum và số trong khoảng, không tên nhân vật, lý do hay mã nạp
+    _spec("coins_spent", S, {"mode": COIN_MODE, "kind": REPLY_KIND}, required=("mode", "kind")),
+    _spec("coins_released", S, {"kind": REPLY_KIND, "reason": COIN_RELEASE}, required=("kind", "reason")),
+    _spec("coins_insufficient", S, {"mode": COIN_MODE, "kind": REPLY_KIND}, required=("mode", "kind")),
+    _spec("coins_granted", S, {"source": COIN_SOURCE, "amount": Count(1, 10_000)}, required=("source", "amount")),
+    _spec("wallet_viewed", C, {"from": WALLET_FROM}),
+    # ---- nạp coin, chế độ thử (F43): không bao giờ có mã nạp, lý do điều chỉnh hay số coin chính xác của điều chỉnh
+    _spec("coins_adjusted", S, {"direction": ADJUST_DIRECTION, "amount_bucket": ADJUST_BUCKET}, required=("direction", "amount_bucket")),
+    _spec("topup_viewed", C, {"from": TOPUP_FROM}),
+    _spec("topup_pack_selected", C, {"pack": PACK}, required=("pack",)),
+    _spec("topup_code_redeemed", S, {"pack": CODE_PACK}, required=("pack",)),
+    _spec("topup_code_failed", S, {"reason": TOPUP_FAIL}, required=("reason",)),
+    _spec(
+        "topup_code_created", S, {"pack": CODE_PACK, "expires_days": IntChoice(frozenset({1, 7, 30}))},
+        required=("pack", "expires_days"),
+    ),
+    # ---- nhiệm vụ ngày, quảng cáo mẫu (F45): quảng cáo mẫu không gửi gì cho bên quảng cáo nào
+    _spec("missions_viewed", C, {"from": MISSIONS_FROM}),
+    _spec("ad_started", S),
+    _spec("mission_claimed", S, {"mission": MISSION}, required=("mission",)),
+    # ---- thưởng sáng tác theo bảng xếp hạng (F44 làm lại): ghi tách (không gắn người chơi), không tên nhân vật
+    _spec(
+        "creator_rank_reached", S, {"tier": IntChoice(frozenset({100, 50, 10})), "paid": Flag()},
+        required=("tier", "paid"),
+    ),
 )
 
 EVENTS: dict[str, EventSpec] = {spec.name: spec for spec in _SPECS}

@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { api, errorMessage, errorTechnical } from "../../api/client";
+import { api } from "../../api/client";
 import { Avatar } from "../../components/Avatar";
 import { IconMoreHorizontal, IconPlus } from "../../components/icons";
 import { SubpageHeader } from "../../components/shell/SubpageHeader";
-import { Badge, Button, ChoiceGroup, EmptyState, IconButton, InlineAlert, Modal, SegmentedControl, Skeleton, TextField } from "../../components/ui";
+import { Badge, Button, ChoiceGroup, EmptyState, IconButton, InlineAlert, Modal, SegmentedControl, TextField } from "../../components/ui";
 import { cx } from "../../components/ui/logic";
-import { copyText } from "../../lib/clipboard";
 import { inviteLink, formatInvite } from "../../lib/inviteCode";
 import { initialTab } from "../../lib/overlayParam";
 import { routeHref } from "../../lib/router";
@@ -30,84 +29,20 @@ import {
   sortAccounts,
   sortInvites,
 } from "./logic";
+import { AdjustCoinsDialog, CoinView } from "./CoinView";
+import { memberCoinLine } from "./adminCoinLogic";
 import { MetricsView } from "./MetricsView";
+import { ConfirmDialog, CopyButton, RowsSkeleton, SecretText, SectionHead, failure } from "./parts";
+import type { Failure, Load } from "./parts";
 import { ReportsView } from "./ReportsView";
 
-type AdminTab = "accounts" | "metrics" | "reports";
+type AdminTab = "accounts" | "coins" | "metrics" | "reports";
 const ADMIN_TABS: { value: AdminTab; label: string }[] = [
   { value: "accounts", label: "Tài khoản" },
+  { value: "coins", label: "Coin" },
   { value: "metrics", label: "Số liệu" },
   { value: "reports", label: "Báo cáo" },
 ];
-
-type Failure = { text: string; technical: string | null };
-const failure = (e: unknown): Failure => ({ text: errorMessage(e), technical: errorTechnical(e) });
-
-type Load<T> = { kind: "loading" } | { kind: "ready"; items: T[] } | { kind: "error"; error: Failure };
-
-/** "Sao chép" that says "Đã sao chép" for two seconds (and stays readable for screen readers). */
-function CopyButton({
-  text,
-  label,
-  variant = "secondary",
-  onFailed,
-}: {
-  text: string;
-  label: string;
-  variant?: "secondary" | "ghost";
-  /** Copying failed: the text must then be on screen to select by hand. */
-  onFailed?: () => void;
-}) {
-  const [state, setState] = useState<"idle" | "done" | "failed">("idle");
-  const timer = useRef<number | null>(null);
-  useEffect(() => () => {
-    if (timer.current) window.clearTimeout(timer.current);
-  }, []);
-  const run = async () => {
-    const ok = await copyText(text);
-    setState(ok ? "done" : "failed");
-    if (!ok) onFailed?.();
-    if (timer.current) window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setState("idle"), 2000);
-  };
-  return (
-    <Button size="sm" variant={variant} onClick={() => void run()} aria-live="polite">
-      {state === "done" ? "Đã sao chép" : state === "failed" ? "Hãy chọn và sao chép tay" : label}
-    </Button>
-  );
-}
-
-/** A secret shown once: big tabular digits, selectable. */
-function SecretText({ children }: { children: string }) {
-  return (
-    <p className="rounded-control border border-line bg-surface-2 px-4 py-3 text-center text-[20px] leading-tight font-semibold tracking-normal text-fg tabular-nums select-all [overflow-wrap:anywhere]">
-      {children}
-    </p>
-  );
-}
-
-function SectionHead({ id, title, count, action }: { id: string; title: string; count?: number; action?: ReactNode }) {
-  return (
-    <div className="flex min-h-11 items-center justify-between gap-3">
-      <h2 id={id} className="text-[18px] leading-tight font-semibold text-fg">
-        {title}
-        {count !== undefined && <span className="ml-2 text-[14px] font-normal text-muted tabular-nums">{count}</span>}
-      </h2>
-      {action}
-    </div>
-  );
-}
-
-function RowsSkeleton({ rows, height }: { rows: number; height: number }) {
-  return (
-    <div aria-busy="true" className="flex flex-col gap-2">
-      <span className="sr-only">Đang tải…</span>
-      {Array.from({ length: rows }, (_, i) => (
-        <Skeleton key={i} shape="card" height={height} />
-      ))}
-    </div>
-  );
-}
 
 // ---- invites ----
 
@@ -224,68 +159,6 @@ function CreateInviteDialog({ open, onClose, onCreated }: { open: boolean; onClo
   );
 }
 
-function ConfirmDialog({
-  open,
-  title,
-  text,
-  confirmLabel,
-  danger,
-  onCancel,
-  run,
-}: {
-  open: boolean;
-  title: string;
-  text: string;
-  confirmLabel: string;
-  danger?: boolean;
-  onCancel: () => void;
-  run: () => Promise<void>;
-}) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<Failure | null>(null);
-  const cancelRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    if (open) {
-      setBusy(false);
-      setError(null);
-    }
-  }, [open]);
-  const go = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      await run();
-    } catch (e) {
-      setError(failure(e));
-      setBusy(false);
-    }
-  };
-  return (
-    <Modal
-      open={open}
-      onClose={onCancel}
-      title={title}
-      size="sm"
-      dismissible={!busy}
-      initialFocusRef={cancelRef}
-      footer={
-        <>
-          <Button ref={cancelRef} size="sm" variant="ghost" onClick={onCancel} disabled={busy}>
-            Giữ nguyên
-          </Button>
-          <Button size="sm" variant={danger ? "danger" : "primary"} onClick={() => void go()} loading={busy}>
-            {confirmLabel}
-          </Button>
-        </>
-      }
-    >
-      <div className="flex flex-col gap-4">
-        <p className="text-[15px] leading-relaxed text-prose">{text}</p>
-        {error && <InlineAlert tone="error" text={error.text} technical={error.technical} />}
-      </div>
-    </Modal>
-  );
-}
 
 function InviteRow({ invite, onRevoke }: { invite: InviteOut; onRevoke: (i: InviteOut) => void }) {
   const badge = inviteBadge(invite);
@@ -380,10 +253,12 @@ type MemberDialog =
   | { kind: "menu"; account: AdminAccount }
   | { kind: "reset"; account: AdminAccount }
   | { kind: "password"; account: AdminAccount; password: string }
-  | { kind: "disable"; account: AdminAccount };
+  | { kind: "disable"; account: AdminAccount }
+  | { kind: "coins"; account: AdminAccount };
 
 function MemberRow({ account, now, onMenu }: { account: AdminAccount; now: Date; onMenu: (a: AdminAccount) => void }) {
   const badges = accountBadges(account);
+  const coins = account.role === "owner" ? null : memberCoinLine(account.coin_balance);
   return (
     <li className="flex items-center gap-3 px-4 py-3">
       <Avatar name={account.display_name} url={account.avatar_url} size={40} />
@@ -400,6 +275,11 @@ function MemberRow({ account, now, onMenu }: { account: AdminAccount; now: Date;
         <span className="text-[13px] leading-snug text-muted">
           {lastSeenLine(account.last_login_at, now)} · {devicesLine(account.session_count)}
         </span>
+        {coins && (
+          <span data-member-coins className="text-[13px] leading-snug font-medium text-fg tabular-nums">
+            {coins}
+          </span>
+        )}
       </div>
       {account.role !== "owner" && (
         <IconButton
@@ -492,6 +372,9 @@ function MembersSection() {
       >
         {target && (
           <div className="flex flex-col gap-2">
+            <Button block onClick={() => setDialog({ kind: "coins", account: target })} disabled={enabling}>
+              Cộng/trừ coin
+            </Button>
             <Button block onClick={() => setDialog({ kind: "reset", account: target })} disabled={enabling}>
               Đặt lại mật khẩu
             </Button>
@@ -560,19 +443,29 @@ function MembersSection() {
           setDialog(null);
         }}
       />
+
+      <AdjustCoinsDialog
+        account={dialog?.kind === "coins" ? dialog.account : null}
+        onClose={() => setDialog(null)}
+        onSaved={(account, balance) => {
+          replace({ ...account, coin_balance: balance });
+          setDialog(null);
+        }}
+      />
     </section>
   );
 }
 
 /**
- * "#/admin" (docs/auth.md §7.3), owner only. Three tabs: "Tài khoản" (invites: create, copy once,
- * revoke; accounts: status, last sign-in, devices; reset a password, disable, enable), "Số liệu"
- * (usage numbers and the CSV, docs/tracking-plan.md) and "Báo cáo" (reports of AI replies,
- * docs/compliance.md §2). Nothing here opens anyone's stories or private characters. "?tab=metrics"
- * / "?tab=reports" opens a tab on load (screenshots).
+ * "#/admin" (docs/auth.md §7.3), owner only. Four tabs: "Tài khoản" (invites: create, copy once,
+ * revoke; accounts: status, last sign-in, devices, a member's coins; reset a password, disable, enable,
+ * "Cộng/trừ coin"), "Coin" (top-up codes and the coin log, docs/coins.md §4), "Số liệu" (usage numbers
+ * and the CSV, docs/tracking-plan.md) and "Báo cáo" (reports of AI replies, docs/compliance.md §2).
+ * Nothing here opens anyone's stories or private characters. "?tab=coins" / "?tab=metrics" /
+ * "?tab=reports" opens a tab on load (screenshots).
  */
 export function AdminPage() {
-  const [tab, setTab] = useState<AdminTab>(() => initialTab<AdminTab>(["accounts", "metrics", "reports"], "accounts"));
+  const [tab, setTab] = useState<AdminTab>(() => initialTab<AdminTab>(["accounts", "coins", "metrics", "reports"], "accounts"));
   useEffect(() => {
     document.title = "Quản lý tài khoản · Lyris";
   }, []);
@@ -586,6 +479,8 @@ export function AdminPage() {
             <InvitesSection />
             <MembersSection />
           </div>
+        ) : tab === "coins" ? (
+          <CoinView />
         ) : tab === "metrics" ? (
           <MetricsView />
         ) : (

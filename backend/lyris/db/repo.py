@@ -34,6 +34,7 @@ from lyris.models import (
     RelationshipValues,
     Story,
 )
+from lyris.coins.hot import sync_public_since
 from lyris.state.fold import (
     EVENT_KINDS,
     EXTRACTION_KINDS,
@@ -835,6 +836,8 @@ class Repo:
             if card.id is not None:
                 values = {"id": card.id, **values}
             card_id = self._insert("character_cards", values)
+            # F44 (docs/coins.md §5.5): lúc bật Công khai (thưởng công khai lần đầu cần ≥ 24 giờ liên tục).
+            sync_public_since(self._conn, card_id)
         return self.get_card(card_id, account_id=owner)
 
     @_locked
@@ -984,6 +987,8 @@ class Repo:
                 f"UPDATE character_cards SET {assignments}, updated_at = {_NOW} WHERE id = ?",
                 (*columns.values(), card_id),
             )
+            # F44 (§5.5): Riêng tư → Công khai ghi lúc bật; Công khai → Riêng tư xoá (bật lại thì đếm 24 giờ lại).
+            sync_public_since(self._conn, card_id)
         return self.get_card(card_id, account_id=account_id)
 
     @_locked

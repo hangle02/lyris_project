@@ -87,7 +87,7 @@ def test_0008_keeps_rows_and_moves_owner_data(v7_copy: tuple[Path, Path, dict[st
     original, copy, before = v7_copy
     conn = connect(copy)
     try:
-        assert migrate(conn) == 11
+        assert migrate(conn) == 14
         after = _counts(conn, OLD_TABLES)
         assert after == {**before, "app_settings": before["app_settings"] - 1}
         assert _counts(conn, NEW_TABLES) == {t: 0 for t in NEW_TABLES}
@@ -128,7 +128,7 @@ def test_0008_keeps_rows_and_moves_owner_data(v7_copy: tuple[Path, Path, dict[st
             conn.execute("UPDATE accounts SET role = 'admin' WHERE id = ?", (guest["id"],))
         with pytest.raises(sqlite3.IntegrityError):
             conn.execute("INSERT INTO invites (code_hash, code_hint, created_by, created_at, expires_at, max_uses) VALUES (x'00', 'AAAA', 1, 'a', 'b', 2)")
-        assert migrate(conn) == 11  # chạy lại không làm gì
+        assert migrate(conn) == 14  # chạy lại không làm gì
     finally:
         conn.close()
     # Bản gốc không bị đụng.
@@ -158,7 +158,7 @@ def test_default_persona_of_another_account_is_not_moved(tmp_path: Path, which: 
 def test_0008_on_fresh_db_makes_default_account_owner() -> None:
     conn = connect(":memory:")
     try:
-        assert migrate(conn) == 11
+        assert migrate(conn) == 14
         row = conn.execute("SELECT handle, role, training_opt_in, profile_completed FROM accounts").fetchone()
         assert tuple(row) == ("ban", "owner", 1, 0)
         names = {r[0] for r in conn.execute("SELECT name FROM sqlite_master")}

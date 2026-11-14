@@ -18,7 +18,7 @@ Wiki là phần ① của harness (theo mẫu mini-harness của Apero); ba ph�
 - [../environment/README.md](../environment/README.md): ② luật cho AI, kiểm máy, bot trình duyệt (82 check trong `environment/e2e.mjs`), hướng dẫn `--look` ở [look.md](../environment/look.md).
 - [../verification/README.md](../verification/README.md): ③ `verify.sh` (giám khảo) và `plan-check.sh`.
 - [../memory/README.md](../memory/README.md): ④ `features.json` (trạng thái), [progress.md](../memory/progress.md), [po-questions.md](../memory/po-questions.md).
-- Bảng đếm ngày 2026-11-14: ✅ 24 · 🟡 12 (chờ `--real-model`) · ⏳ 5 (Kế hoạch) · ⛔ 0. Mới nhất: `node memory/features.mjs list`.
+- Bảng đếm ngày 2026-11-14: ✅ 24 · 🟡 12 (chờ `--real-model`) · ⏳ 5 (Kế hoạch) · ⛔ 0. Cùng ngày thêm 4 tính năng Kế hoạch về coin (F42–F45), nên Kế hoạch giờ là 9. Mới nhất: `node memory/features.mjs list`.
 
 ## Tính năng
 
@@ -47,7 +47,7 @@ Mỗi trang có "Done when" (dòng Unit / Bot / Model thật) và "Tests" (test 
 | F19 | [ai-viet-nhap](features/F19-ai-viet-nhap.md) | Đã có | 2 | Gõ một dòng ý tưởng, AI viết nháp một card đầy đủ để sửa rồi lưu |
 | F20 | [nhap-xuat-card](features/F20-nhap-xuat-card.md) | Đã có | 2 | Nhập, xuất Character Card V1/V2 (.json, .png) |
 | F21 | [persona](features/F21-persona.md) | Đã có | 2, 2c | Một tài khoản nhiều persona; persona dùng khi trò chuyện |
-| F22 | [kham-pha](features/F22-kham-pha.md) | Đã có | 2b, 4b | Trang Khám phá: nhân vật nổi bật, lọc theo cảm xúc, lưới ô bằng nhau |
+| F22 | [kham-pha](features/F22-kham-pha.md) | Đã có | 2b, 4b | Trang Khám phá: lọc theo cảm xúc, lưới ô bằng nhau, nhân vật được chia sẻ (khung nổi bật bị bỏ: F46) |
 | F23 | [ho-so-nhan-vat](features/F23-ho-so-nhan-vat.md) | Đã có | 2b (§16) | Hồ sơ nhân vật chỉ xem, không bao giờ hiện bí mật |
 | F24 | [buoc-vao-cau-chuyen](features/F24-buoc-vao-cau-chuyen.md) | Đã có | 2b (§16) | Nút "Bước vào câu chuyện": chọn persona, "Tuỳ chỉnh story" gập sẵn |
 | F25 | [danh-sach-story](features/F25-danh-sach-story.md) | Đã có | 2b | Tab "Tương tác": mọi story, mới nhất trên cùng |
@@ -67,6 +67,12 @@ Mỗi trang có "Done when" (dòng Unit / Bot / Model thật) và "Tests" (test 
 | F39 | [cong-dong](features/F39-cong-dong.md) | Kế hoạch | 7 | Bình luận, đăng ảnh, chia sẻ ra ngoài máy Mac |
 | F40 | [dao-dien-khoanh-khac](features/F40-dao-dien-khoanh-khac.md) | Kế hoạch | 8 (tuỳ chọn) | Đạo diễn nhịp truyện, nhiều nhân vật, Khoảnh khắc |
 | F41 | [tu-train-model](features/F41-tu-train-model.md) | Kế hoạch | 5 | Fine-tune LoRA từ chat đã đánh giá, rồi nạp lại vào app |
+| F42 | [vi-coin](features/F42-vi-coin.md) | Đã có | Ra mắt (coin) | Ví coin: mỗi lượt 6 coin (mỗi câu trả lời, kể cả tạo lại và chat thử: tạm chọn), tài khoản mới 300, mỗi ngày +60, hết coin khoá ô nhập; chủ máy không tốn coin |
+| F43 | [nap-coin](features/F43-nap-coin.md) | Đã có | Ra mắt (coin) | "Nạp coin" có gói "Giá dự kiến", chế độ thử chưa bán coin: chủ máy tặng mã nạp hoặc cộng/trừ coin có lý do |
+| F44 | [thuong-sang-tac](features/F44-thuong-sang-tac.md) | Đã có (làm lại) | Ra mắt (coin) | Nhân vật vào top 100/50/10 "Nhân vật hot" → người tạo +100/+200/+300 coin (mỗi bậc một lần, cộng dồn); công khai lần đầu +50; thay thưởng mốc người chơi |
+| F45 | [nhiem-vu-ngay](features/F45-nhiem-vu-ngay.md) | Đã có | Ra mắt (coin) | Nhiệm vụ ngày tối đa 30 coin: quảng cáo mẫu 15 giây, 3 nhân vật, 20 lượt |
+| F46 | [bang-xep-hang-nhan-vat-hot](features/F46-bang-xep-hang-nhan-vat-hot.md) | Đã có | Ra mắt (coin) | Bảng "Nhân vật hot" `#/explore/hot`: top 100 theo tổng người chơi, cập nhật mỗi giờ; dải 3 hạng đầu thay khung nổi bật ở Khám phá |
+| F47 | [tim-nhan-vat](features/F47-tim-nhan-vat.md) | Đã có | Ra mắt (coin) | Ô "Tìm nhân vật" ở Khám phá: không dấu, tên/vai trò/tag/giới thiệu, debounce 250 ms |
 
 ## Màn hình
 
@@ -78,7 +84,8 @@ Mỗi trang có "Done when" (dòng Unit / Bot / Model thật) và "Tests" (test 
 | [setup-owner](screens/setup-owner.md) | khi chưa có mật khẩu chủ máy | Chủ máy đặt mật khẩu lần đầu bằng mã in ra Terminal |
 | [force-password](screens/force-password.md) | khi phải đổi mật khẩu | Đổi mật khẩu tạm ngay sau khi chủ máy đặt lại |
 | [hub](screens/hub.md) | `#/` | Tương tác: danh sách story, mở app là thấy |
-| [explore](screens/explore.md) | `#/explore` | Khám phá: nhân vật nổi bật, lọc cảm xúc, lưới nhân vật |
+| [explore](screens/explore.md) | `#/explore` | Khám phá: ô tìm, dải "Nhân vật hot" (thay nhân vật nổi bật), lọc cảm xúc, lưới nhân vật |
+| [hot-ranking](screens/hot-ranking.md) | `#/explore/hot` | Bảng "Nhân vật hot": top 100 theo tổng người chơi, cập nhật mỗi giờ |
 | [character-profile](screens/character-profile.md) | `#/character/<id>` | Hồ sơ nhân vật chỉ đọc, có CTA "Bước vào câu chuyện" |
 | [start-story-sheet](screens/start-story-sheet.md) | trên hồ sơ nhân vật, `#/character/<id>?start=1` (cả link cũ `#/new-story?card=<id>`) | Chọn persona và tuỳ chỉnh story trước khi tạo |
 | [chat-story](screens/chat-story.md) | `#/chat/<id>` | Chat chế độ Story: văn tiểu thuyết toàn màn hình |
@@ -97,7 +104,10 @@ Mỗi trang có "Done when" (dòng Unit / Bot / Model thật) và "Tests" (test 
 | [account-sheet](screens/account-sheet.md) | avatar trên header | Sheet "Tài khoản": profile, mật khẩu, đăng xuất, "Nâng cao" |
 | [profile](screens/profile.md) | `#/me`, `#/u/<handle>` | Trang profile của một tài khoản |
 | [edit-profile-sheet](screens/edit-profile-sheet.md) | `#/me` > "Sửa profile" | Đổi tên, @handle, giới thiệu, ảnh đại diện, ảnh bìa |
-| [admin](screens/admin.md) | `#/admin` (chủ máy) | Quản lý tài khoản: mã mời, thành viên |
+| [admin](screens/admin.md) | `#/admin` (chủ máy) | Quản lý tài khoản: mã mời, thành viên (Kế hoạch: mục "Coin", "Cộng/trừ coin") |
+| [coin-wallet](screens/coin-wallet.md) | `#/coins` (Kế hoạch) | Ví coin: số dư, "Nạp coin", "Nhiệm vụ", lịch sử |
+| [top-up](screens/top-up.md) | `#/coins/top-up` (Kế hoạch) | Nạp coin ở chế độ thử: gói giá, ô "Mã nạp" |
+| [missions](screens/missions.md) | `#/missions` | Nhiệm vụ hôm nay và hộp "Quảng cáo mẫu" |
 
 ## Quyết định
 
@@ -155,6 +165,17 @@ Xếp theo ngày. "Ai quyết": người dùng, thiết kế, hay đo đạc.
 | 2026-11-14 | [noi-dung-an-toan-chua-cong-tuoi](decisions/noi-dung-an-toan-chua-cong-tuoi.md) | Nội dung mặc định an toàn, chưa có cổng tuổi; chế độ người lớn chỉ là kế hoạch | người dùng |
 | 2026-11-14 | [kich-ban-model-that](decisions/kich-ban-model-that.md) | Mỗi dòng "Model thật" có kịch bản luật máy; phần chỉ người chấm được tách ra (tạm chọn) | thiết kế |
 | 2026-11-14 | [nguong-ttft-f14](decisions/nguong-ttft-f14.md) | TTFT mỗi lượt sau lượt đầu ≤ 6 giây, đo qua app thật (tạm chọn) | đo đạc |
+| 2026-11-14 | [giu-cho-coin-truoc-khi-sinh](decisions/giu-cho-coin-truoc-khi-sinh.md) | Mỗi lượt 6 coin: giữ chỗ trước khi sinh, chỉ trừ khi có chữ, không bao giờ làm mất câu trả lời; ngày theo giờ Việt Nam (phần tạm chọn) | người dùng + thiết kế |
+| 2026-11-14 | [chu-may-khong-ton-coin](decisions/chu-may-khong-ton-coin.md) | Chủ máy không tốn coin, không nhận thưởng, không tính là người chơi (phần tạm chọn) | người dùng + thiết kế |
+| 2026-11-14 | [nap-coin-che-do-thu](decisions/nap-coin-che-do-thu.md) | Nạp coin chế độ thử: mã nạp và cộng tay, chưa có cổng thanh toán; giá gói tạm chọn | người dùng + thiết kế |
+| 2026-11-14 | [moc-nguoi-choi-sang-tac](decisions/moc-nguoi-choi-sang-tac.md) | **Đã thay bởi xep-hang-nhan-vat-hot.** Thưởng mốc 10/50/100 người chơi; người chơi = tài khoản khác có ≥ 3 câu trả lời đã trả coin ở ≥ 2 ngày; trần mốc 10 theo người tạo (tạm chọn) | người dùng + thiết kế |
+| 2026-11-14 | [nhiem-vu-va-quang-cao-mau](decisions/nhiem-vu-va-quang-cao-mau.md) | Nhiệm vụ ngày trần 30 coin; quảng cáo mẫu ghi rõ là mẫu, 15 giây kiểm ở server | người dùng + thiết kế |
+| 2026-11-14 | [coin-f42-khi-build](decisions/coin-f42-khi-build.md) | Coin F42 khi build: không cộng +60 khi tắt coin, thông báo +60 nhớ theo ngày, route cộng/trừ coin có từ F42, trang tạm Nạp coin/Nhiệm vụ, test F34 so số sự kiện với tracking-plan (tạm chọn) | AI (tạm chọn) |
+| 2026-11-14 | [coin-f45-khi-build](decisions/coin-f45-khi-build.md) | Coin F45 khi build: chủ máy/coin tắt 409 `no_missions`, thứ tự kiểm khi nhận quảng cáo, tiến độ theo ngày của giữ chỗ, hộp quảng cáo đóng sau khi nhận, bot chờ 15 giây thật (tạm chọn) | AI (tạm chọn) |
+| 2026-11-14 | [coin-ra-soat-2026-11-14](decisions/coin-ra-soat-2026-11-14.md) | Coin sau rà soát đối kháng: tên nhân vật trong lịch sử ví chỉ của chính tài khoản, giữ chỗ kẹt tự nhả, dừng trước chữ đầu tiên không trừ, sổ chặn DELETE (0013), settle_card không làm hỏng việc lưu (tạm chọn) | AI (tạm chọn) |
+| 2026-11-14 | [coin-f44-khi-build](decisions/coin-f44-khi-build.md) | Coin F44 khi build: đếm người chơi qua story và bản sao (id nhân vật bị dùng lại), trần mốc 10 đếm trong sổ, settle khi checkin/lưu Công khai/mở khoá, chủ máy và coin tắt không hứa coin, bot dựng người chơi bằng environment/seed-creator-players.py (tạm chọn) | AI (tạm chọn) |
+| 2026-11-14 | [xep-hang-nhan-vat-hot](decisions/xep-hang-nhan-vat-hot.md) | Thay thưởng mốc người chơi bằng thưởng bảng "Nhân vật hot" top 100/50/10 (+100/+200/+300, cộng dồn) và +50 công khai lần đầu; bậc top N cần bảng ≥ N nhân vật, trần 600 coin/7 ngày, tính bảng mỗi giờ khi cần (tạm chọn) | người dùng + thiết kế |
+| 2026-11-14 | [kham-pha-tim-kiem-bo-khung-noi-bat](decisions/kham-pha-tim-kiem-bo-khung-noi-bat.md) | Khám phá bỏ khung nổi bật Hạ Vy; ô "Tìm nhân vật" không dấu; dải 3 hạng đầu "Nhân vật hot" (tạm chọn) | người dùng + thiết kế |
 
 ## Thiết kế
 
@@ -187,6 +208,10 @@ Lời chủ dự án, chép nguyên văn. Không sửa.
 - [raw/2026-11-13-dang-nhap-va-tai-khoan.md](raw/2026-11-13-dang-nhap-va-tai-khoan.md): đăng nhập, tạo tài khoản, database cho nhiều tài khoản.
 - [raw/2026-11-14-kham-pha-trung-nhan-vat-va-luoi.md](raw/2026-11-14-kham-pha-trung-nhan-vat-va-luoi.md): hai Hạ Vy ở Khám phá, ô nhân vật bằng nhau.
 - [raw/2026-11-14-wiki-du-an.md](raw/2026-11-14-wiki-du-an.md): yêu cầu dựng wiki dự án theo mẫu.
+- [raw/2026-11-14-coin.md](raw/2026-11-14-coin.md): ý tưởng coin: chat tốn coin, nạp tiền, thưởng sáng tác, nhiệm vụ.
+- [raw/2026-11-14-coin-tra-loi.md](raw/2026-11-14-coin-tra-loi.md): câu trả lời về coin: 6 coin mỗi lượt, 300 quà, +60 mỗi ngày, nạp chế độ thử, mốc 10/50/100, nhiệm vụ 30 coin/ngày, hết coin khoá ô nhập.
+- [raw/2026-11-14-f44-bang-xep-hang.md](raw/2026-11-14-f44-bang-xep-hang.md): đổi F44: thưởng khi nhân vật vào top 100/50/10 "nhân vật hot", làm bảng xếp hạng, thưởng nhỏ khi công khai lần đầu.
+- [raw/2026-11-14-f44-bang-xep-hang-tra-loi.md](raw/2026-11-14-f44-bang-xep-hang-tra-loi.md): trả lời 1A 2C 3A 4A 5A; thêm thanh tìm kiếm, bỏ khung Hạ Vy to ở Khám phá.
 
 ## Bài học
 
@@ -196,4 +221,14 @@ Lời chủ dự án, chép nguyên văn. Không sửa.
 
 - [plan-checklist.md](plan-checklist.md): 8 phần một ý tưởng phải có; dùng để hỏi lại khi ý tưởng còn thiếu.
 - Kế hoạch đầy đủ và lộ trình các phase nằm ngoài wiki: [docs/plan.md](../docs/plan.md). Thiết kế chi tiết từng phase: [phase1.md](../docs/phase1.md), [phase2.md](../docs/phase2.md), [design-impl.md](../docs/design-impl.md), [accounts.md](../docs/accounts.md), [phase3.md](../docs/phase3.md), [phase4.md](../docs/phase4.md), [auth.md](../docs/auth.md).
-- Ra mắt: [tracking-plan.md](../docs/tracking-plan.md) (sự kiện, KPI), [compliance.md](../docs/compliance.md) (tuân thủ), [deploy.md](../docs/deploy.md) (chạy production), [demo-script.md](../docs/demo-script.md) (kịch bản video demo).
+- Ra mắt: [tracking-plan.md](../docs/tracking-plan.md) (sự kiện, KPI), [compliance.md](../docs/compliance.md) (tuân thủ), [deploy.md](../docs/deploy.md) (chạy production), [demo-script.md](../docs/demo-script.md) (kịch bản video demo), [coins.md](../docs/coins.md) (coin: ví, nạp chế độ thử, thưởng sáng tác, nhiệm vụ; kế hoạch).
+
+## Máy chủ lớn và App Store (kế hoạch, sau khi nộp bài)
+
+- Thiết kế: [docs/server.md](../docs/server.md) (kiến trúc host, Postgres, Redis, hàng đợi, vLLM, S3, thanh toán, app di động, sức chứa và chi phí, kế hoạch chuyển đổi G0–G8, chế độ tự chạy).
+- [F50](features/F50-postgres.md) Postgres và chuyển lớp Repo · [F51](features/F51-redis-api-khong-trang-thai.md) Redis và máy chủ API không trạng thái · [F52](features/F52-hang-doi-viec-nen.md) Hàng đợi việc nền trên Postgres · [F53](features/F53-cong-suy-luan-vllm.md) Cổng suy luận vLLM · [F54](features/F54-luu-anh-s3.md) Lưu ảnh trên S3
+- [F55](features/F55-app-ios-android.md) App iOS và Android (Capacitor) · [F56](features/F56-iap-google-play.md) Apple IAP và Google Play Billing · [F57](features/F57-vnpay-momo.md) VNPay và MoMo · [F58](features/F58-quan-sat-slo.md) Quan sát và SLO · [F59](features/F59-trien-khai-ci.md) Triển khai, CI/CD, staging
+- [F60](features/F60-kiem-duyet-chan.md) Kiểm duyệt và chặn người tạo · [F61](features/F61-dang-ky-cong-khai.md) Đăng ký công khai, email, Apple/Google · [F62](features/F62-nhap-du-lieu-tu-chay.md) Nhập dữ liệu từ Lyris tự chạy
+- Quyết định: [may-chu-lon-va-app-store](decisions/may-chu-lon-va-app-store.md) (PO chốt), [app-di-dong-capacitor](decisions/app-di-dong-capacitor.md) (AI chọn), [suy-luan-vllm](decisions/suy-luan-vllm.md), [postgres-giu-repo](decisions/postgres-giu-repo.md), [hang-doi-postgres](decisions/hang-doi-postgres.md), [thanh-toan-iap-va-cong-vn](decisions/thanh-toan-iap-va-cong-vn.md), [phien-token-cho-app](decisions/phien-token-cho-app.md), [container-chi-khi-host](decisions/container-chi-khi-host.md)
+- Lời gốc: [raw/2026-11-14-server-lon-appstore.md](raw/2026-11-14-server-lon-appstore.md), [raw/2026-11-14-server-lon-appstore-tra-loi.md](raw/2026-11-14-server-lon-appstore-tra-loi.md)
+- Sau phản biện (2026-11-14): [docs/server.md §21](../docs/server.md) (23 điểm nhận/sửa lại/bác kèm lý do), quyết định [fence-postgres-va-loc-truoc-stream](decisions/fence-postgres-va-loc-truoc-stream.md) (AI chọn, tạm chọn)

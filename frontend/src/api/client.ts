@@ -1,4 +1,9 @@
 import { AUTH_EVENT, signalsAuth } from "../lib/auth.ts";
+import type { Checkin, CoinHistory, Wallet } from "../lib/coins.ts";
+import type { AdjustBody, CodeBody, CoinLog, TopupCodeCreated, TopupCodeItem } from "../pages/admin/adminCoinLogic.ts";
+import type { AdStartOut, ClaimOut, MissionsOut } from "../pages/coins/missionsLogic.ts";
+import type { HotBoard } from "../pages/explore/hotLogic.ts";
+import type { PacksOut, Redeemed } from "../pages/coins/topupLogic.ts";
 import { friendlyError } from "../lib/friendlyError.ts";
 import type { FriendlyError } from "../lib/friendlyError.ts";
 import { SSEParser } from "../lib/sse.ts";
@@ -430,6 +435,8 @@ export const api = {
 
   // ---- Phase 4b: other accounts' public characters (§4.4, §6.4) ----
   listPublicCards: () => request<PublicCardSummary[]>("GET", "/public-cards"),
+  /** F46: the "Nhân vật hot" board (top `limit`, 1–100; recomputed at most once an hour). */
+  getHotBoard: (limit = 100) => request<HotBoard>("GET", `/explore/hot?limit=${limit}`),
   /** Read-only profile: someone's public card, your own card, or the copy of a story (`can_start` false). */
   getPublicCard: (id: number) => request<PublicCardOut>("GET", `/cards/${id}/public`),
 
@@ -463,6 +470,41 @@ export const api = {
     request<AnalyticsSummary>("GET", `/admin/analytics/summary${query({ days })}`, undefined, signal),
   /** Owner: CSV of the usage events (a plain link: GET with the sign-in cookie). Dates are Vietnam days. */
   analyticsCsvUrl: (since: string, until: string) => `${BASE}/admin/analytics/export.csv${query({ since, until })}`,
+
+  // ---- coin (F42, docs/coins.md §7): only the signed-in account's own wallet ----
+  getWallet: (signal?: AbortSignal) => request<Wallet>("GET", "/coins/wallet", undefined, signal),
+  /** First app open of the Vietnam day: +60 (`granted`); again the same day: `granted: false`. */
+  checkin: () => request<Checkin>("POST", "/coins/checkin"),
+  /** 30 rows per page, newest first; `before` = `next` of the previous page. */
+  coinHistory: (before?: number, signal?: AbortSignal) =>
+    request<CoinHistory>("GET", `/coins/history${query({ before })}`, undefined, signal),
+
+  // ---- nhiệm vụ ngày, quảng cáo mẫu (F45, docs/coins.md §6, §7) ----
+  missions: (signal?: AbortSignal) => request<MissionsOut>("GET", "/coins/missions", undefined, signal),
+  /** "Nhận" of "characters" / "turns". 409 `mission_not_done`, 409 `mission_cap`. */
+  claimMission: (mission: "characters" | "turns") => request<ClaimOut>("POST", `/coins/missions/${mission}/claim`),
+  /** Starts a sample ad (the server notes the time). 409 `ad_limit`. */
+  startAd: () => request<AdStartOut>("POST", "/coins/ads/start"),
+  /** 409 `ad_not_finished` (< 15 server seconds), `ad_expired`, `ad_limit`, `mission_cap`. */
+  claimAd: (adId: number) => request<ClaimOut>("POST", `/coins/ads/${adId}/claim`),
+  /** "Đóng" before the claim: that view can never be claimed. Calling it twice is fine. */
+  cancelAd: (adId: number) => request<{ ok: true }>("POST", `/coins/ads/${adId}/cancel`),
+
+  // ---- nạp coin, test mode (F43, docs/coins.md §4, §7) ----
+  /** The planned packs ("Giá dự kiến"); nothing is sold in test mode. */
+  coinPacks: (signal?: AbortSignal) => request<PacksOut>("GET", "/coins/packs", undefined, signal),
+  /** 422 `topup_code_invalid` (one sentence for every wrong code), 422 `topup_code_owner`, 429 `rate_limited`. */
+  redeemCode: (code: string) => request<Redeemed>("POST", "/coins/redeem", { code }),
+  /** Owner: top-up codes (never the full code). */
+  listTopupCodes: () => request<TopupCodeItem[]>("GET", "/admin/coins/codes"),
+  /** Owner: the full code comes back this once. 422 `topup_code_limit` with 50 active codes. */
+  createTopupCode: (body: CodeBody) => request<TopupCodeCreated>("POST", "/admin/coins/codes", body),
+  revokeTopupCode: (id: number) => request<TopupCodeItem>("POST", `/admin/coins/codes/${id}/revoke`),
+  /** Owner: the 50 newest top-ups, adjustments and creator rewards, and the 30-day totals. */
+  coinLog: () => request<CoinLog>("GET", "/admin/coins/log"),
+  /** Owner: "Cộng/trừ coin". 422 `adjust_too_large`; 409 `idem_conflict`. */
+  adjustCoins: (accountId: number, body: AdjustBody) =>
+    request<{ balance: number; available: number }>("POST", `/admin/accounts/${accountId}/coins`, body),
 };
 
 /**

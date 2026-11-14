@@ -29,6 +29,7 @@ Kỹ thuật:
 - [ ] Bot: `#/me` có số liệu và hai tab 'Nhân vật', 'Persona'.
 - [ ] Bot: bấm 'Sửa profile', đổi tên hiển thị, lưu thì nút tài khoản trên header có tên mới (aria-label 'Tài khoản: {tên}. …') mà không tải lại trang; gõ handle có khoảng trắng hoặc ký tự lạ (vd `chu may!`) thì ô có `aria-invalid="true"` và câu lỗi ngay dưới ô.
 - [ ] Bot: `#/u/<handle của mình>` hiện profile; `#/u/khong_ton_tai_xyz` hiện 'Không có tài khoản @khong_ton_tai_xyz trên Lyris.'
+- [ ] Bot: 'Sửa profile' đổi cả giới thiệu, ảnh đại diện, ảnh bìa: chọn ảnh (như hộp chọn file) thì ảnh được lưu và nút thành 'Đổi ảnh đại diện' / 'Đổi ảnh bìa'; sửa 'Giới thiệu', bấm Lưu, tải lại `#/me` thì trang hiện giới thiệu mới, ảnh đại diện và ảnh bìa (ảnh tải được).
 
 ## Tests
 
@@ -39,6 +40,7 @@ Kỹ thuật:
 - bot: #/me có số liệu và hai tab
 - bot: Sửa profile đổi tên ngay, handle sai báo dưới ô
 - bot: profile công khai theo handle
+- bot: Sửa profile đổi giới thiệu, ảnh đại diện, ảnh bìa và #/me hiện đủ
 
 ## Liên quan
 

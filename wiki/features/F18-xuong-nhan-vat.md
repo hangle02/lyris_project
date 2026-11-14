@@ -34,6 +34,8 @@ Kỹ thuật:
 - [ ] Bot: nhập 4 dòng vào 'Lời nói đặc trưng (tuỳ chọn)' rồi bấm Lưu thì không lưu được và hiện 'Chưa lưu được:' (Tối đa 3 lời nói đặc trưng); tải lại thì dòng thứ 4 không có.
 - [ ] Bot: trong 'Xem trước và chat thử', gửi một tin thì có ba chấm khi chờ rồi có câu trả lời.
 - [ ] Bot: 'Công cụ nâng cao' tắt thì trình sửa không có tab 'Xem trước' và không có chữ 'token'.
+- [ ] Bot: tải avatar lên ở trình sửa Studio (chọn file) thì chính ảnh đó (`/api/cards/<id>/avatar`, tải được) hiện ở danh sách Studio, lưới Khám phá, hồ sơ nhân vật và màn chat của story với nhân vật đó.
+- [ ] Bot: chat thử chạy với persona mặc định của tài khoản: 'Thiết lập thử' ghi tên persona mặc định và request chat thử gửi đúng `persona_id` đó (persona mặc định được đặt khác persona đầu tiên và persona mới nhất).
 - [ ] Bot: ở `#/studio/<id>` sửa 'Tên nhân vật' mà chưa lưu rồi bấm 'Về Studio' thì trình duyệt hỏi lại ('Bạn có thay đổi chưa lưu…'); bấm Huỷ thì ở lại và chữ đang sửa còn nguyên, bấm OK thì về `#/studio` và tên đã lưu không đổi.
 
 ## Tests
@@ -60,6 +62,8 @@ Kỹ thuật:
 - bot: chat thử có ba chấm rồi trả lời
 - bot: tắt công cụ nâng cao thì trình sửa không có Xem trước
 - bot: rời trình sửa còn thay đổi chưa lưu thì hỏi lại
+- bot: avatar tải lên ở Studio hiện ở Studio, Khám phá, hồ sơ và chat
+- bot: chat thử ở Studio dùng persona mặc định
 
 ## Liên quan
 

@@ -29,6 +29,7 @@ Kỹ thuật:
 - [ ] Unit: story tiếng Anh dùng prompt tiếng Anh đã kiểm; story tiếng Việt dùng prompt tiếng Việt đã kiểm.
 - [ ] Unit: thành viên không đổi được model của story và không thấy danh sách model; chỉ chủ máy đổi được.
 - [ ] Bot: ở `#/chat/<id>`, bấm 'Thiết lập story' mở panel có ô tiêu đề, bối cảnh, ngôn ngữ, kiểu quan hệ, ngôi kể, kiểu suy nghĩ và công tắc 'Đọc suy nghĩ của nhân vật'; bấm 'Xoá story…' thì hiện hộp 'Xác nhận xoá story' có nút 'Xoá vĩnh viễn' trước khi xoá (bấm 'Huỷ' thì story vẫn còn).
+- [ ] Bot: chọn model của story chỉ có trong 'Nâng cao' và chỉ chủ máy thấy: sheet bắt đầu (cả khi mở 'Tuỳ chỉnh story') không có chữ hay ô model; 'Thiết lập story' của chủ máy có 'Nâng cao' đang gập, chỉ khi mở ra mới có ô 'Model trả lời' (có danh sách model); sheet bắt đầu và 'Thiết lập story' của thành viên không có 'Nâng cao' hay model.
 - [ ] Model thật: card `trung_co_dai` không dùng 'anh/em' hay 'tớ/cậu' (harness `run_eval.py`, kịch bản `07-co-trang`).
 - [ ] Model thật: dẫn truyện ngôi thứ ba không có 'tôi' và không dùng đại từ xưng hô của lời thoại (harness `run_eval.py`, kịch bản `01-mo-dau`, `06-viet-hien-dai`, `07-co-trang`: `narration_forbidden`).
 - [ ] Model thật: story tiếng Anh trả lời bằng tiếng Anh (harness kịch bản `08-tieng-anh`).
@@ -44,6 +45,7 @@ Kỹ thuật:
 - backend/tests/test_auth_routes.py::test_member_cannot_change_story_model_and_health_hides_models
 - frontend/src/lib/storyOptions.test.ts
 - bot: Thiết lập story có đủ ô, Xoá story hỏi lại
+- bot: chọn model của story chỉ có trong Nâng cao của Thiết lập story, chỉ chủ máy thấy
 - model: 01-mo-dau
 - model: 06-viet-hien-dai
 - model: 07-co-trang

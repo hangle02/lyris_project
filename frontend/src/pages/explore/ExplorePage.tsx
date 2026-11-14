@@ -1,93 +1,96 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, errorMessage } from "../../api/client";
 import { CharacterPicture } from "../../components/CharacterPicture";
+import { IconSearch, IconX } from "../../components/icons";
 import { SHELL_CONTAINER } from "../../components/shell/layout";
-import { Button, Chip, EmptyState, Skeleton } from "../../components/ui";
+import { Button, Chip, EmptyState, IconButton, Skeleton, TextField } from "../../components/ui";
 import { cx } from "../../components/ui/logic";
 import { useAuthAccount } from "../../hooks/useAuth";
 import { clearPendingDraft } from "../../lib/draftStore";
 import { navigate, routeHref } from "../../lib/router";
 import { chipPosition, track, vibeCode } from "../../lib/track";
 import type { CardSummary, PublicCardSummary, TemplateInfo } from "../../types";
-import {
-  buildItems,
-  buildVibes,
-  featuredTemplate,
-  fillForReader,
-  filterByVibe,
-  itemRoute,
-  sharedItems,
-  shortText,
-  templateEntryRoute,
-  heroImageUrl,
-  withoutHero,
-  vibeLabel,
-  normalizeTag,
-} from "./logic";
+import { HotRowLink } from "./HotRows";
+import { HOT_COPY, hotRow, hotStripView } from "./hotLogic";
+import type { HotBoard } from "./hotLogic";
+import { buildItems, buildVibes, itemRoute, normalizeTag, sharedItems, vibeLabel } from "./logic";
 import type { ExploreItem } from "./logic";
+import { SEARCH_COPY, createSearchTracker, filterItems, noResultsText, queryWords, useDebounced } from "./search";
 
-function Hero({ template, imageUrl }: { template: TemplateInfo; imageUrl: string | null }) {
-  const card = template.card;
-  const url = imageUrl;
-  const lang = card.language === "en" ? "en" : "vi";
-  const text = shortText(fillForReader(card.scenario.trim() || card.description, card.name, lang), 180);
-  const role = (card.role ?? "").trim();
-
+/**
+ * F47: "Tìm nhân vật". A short placeholder that fits one line at 390px; the full name for screen readers in
+ * aria-label. The × inside clears the box at once.
+ */
+function SearchBox({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const input = useRef<HTMLInputElement>(null);
   return (
-    <section
-      aria-labelledby="explore-featured"
-      className="relative overflow-hidden rounded-card transition-colors duration-150 hover:bg-surface-2 border border-edge bg-surface sm:grid sm:grid-cols-[minmax(0,240px)_minmax(0,1fr)]"
-    >
-      <CharacterPicture url={url} name={card.name} className="aspect-[3/1] sm:aspect-auto sm:h-full sm:min-h-[200px]" />
-      <div className="flex flex-col gap-2.5 p-4 sm:justify-center sm:gap-3 sm:px-6 sm:py-5">
-        <div className="flex flex-col gap-0.5">
-          <h2 id="explore-featured" className="text-[20px] leading-tight font-semibold text-fg sm:text-[22px]">
-            {/* The whole card opens the profile; the button below opens it with the start sheet. */}
-            <a
-              href={routeHref(templateEntryRoute(template))}
-              className="outline-none after:absolute after:inset-0 after:rounded-card focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-accent"
-            >
-              {card.name}
-            </a>
-          </h2>
-          {role && <p className="text-[14px] leading-snug text-accent-2">{role}</p>}
-        </div>
-        {text && (
-          <p lang={lang} className="line-clamp-2 font-story text-[15px] text-prose sm:line-clamp-3">
-            {text}
-          </p>
-        )}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-          <a
-            href={routeHref(templateEntryRoute(template, true))}
-            onClick={() => track("story_start_clicked", { source: "template" })}
-            className="relative z-10 inline-flex h-11 items-center justify-center rounded-full bg-accent px-5 text-[15px] font-semibold text-on-accent transition-colors duration-150 hover:bg-accent-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          >
-            Bước vào câu chuyện
-          </a>
-          {template.vibes.length > 0 && (
-            <p className="text-[14px] text-muted">{template.vibes.map(vibeLabel).join(", ")}</p>
-          )}
-        </div>
-      </div>
-    </section>
+    <TextField
+      ref={input}
+      label={SEARCH_COPY.label}
+      aria-label={SEARCH_COPY.label}
+      hideLabel
+      type="search"
+      icon={<IconSearch />}
+      value={value}
+      onChange={onChange}
+      placeholder={SEARCH_COPY.placeholder}
+      enterKeyHint="search"
+      autoComplete="off"
+      spellCheck={false}
+      className="w-full sm:max-w-[560px]"
+      inputClassName="rounded-full bg-surface-2 pr-12 [&::-webkit-search-cancel-button]:appearance-none"
+      trailing={
+        value ? (
+          <IconButton
+            label={SEARCH_COPY.clear}
+            icon={<IconX />}
+            noTooltip
+            onClick={() => {
+              onChange("");
+              input.current?.focus();
+            }}
+          />
+        ) : undefined
+      }
+    />
   );
 }
 
-function HeroSkeleton() {
+/**
+ * F46: "Nhân vật hot" on top of Khám phá (where the big featured card used to be): the first three of the
+ * leaderboard and "Xem bảng xếp hạng". A ranked list, not a grid: its characters still have their cell below.
+ * It is the way to #/explore/hot, so it stays with an empty or unloaded board; hidden only while searching.
+ */
+function HotStrip({ board, query }: { board: HotBoard | null; query: string }) {
+  const view = hotStripView(board, { query });
+  if (view === null) return null;
+  const rows = view.rows.map(hotRow);
   return (
-    <div
-      aria-hidden="true"
-      className="overflow-hidden rounded-card border border-edge bg-surface sm:grid sm:grid-cols-[minmax(0,240px)_minmax(0,1fr)]"
-    >
-      <Skeleton className="aspect-[3/1] rounded-none sm:aspect-auto sm:h-full sm:min-h-[200px]" height="auto" />
-      <div className="flex flex-col gap-3 p-4 sm:justify-center sm:px-6 sm:py-5">
-        <Skeleton shape="text" width="40%" height={22} />
-        <Skeleton shape="text" width="55%" height={14} />
-        <Skeleton shape="text" lines={3} height={13} />
-        <Skeleton shape="pill" width={190} height={44} />
+    <section aria-labelledby="explore-hot" className="flex flex-col gap-2 sm:max-w-[720px]">
+      <div className="flex items-center justify-between gap-3">
+        <h2 id="explore-hot" className="text-[18px] leading-tight font-semibold text-fg">
+          {HOT_COPY.title}
+        </h2>
+        <a
+          href={routeHref({ name: "hot" })}
+          className="-mr-2 inline-flex min-h-11 items-center rounded-full px-2 text-[14px] font-semibold text-accent transition-colors duration-150 hover:text-accent-strong focus-visible:outline-2 focus-visible:outline-accent"
+        >
+          {HOT_COPY.seeAll}
+        </a>
       </div>
-    </div>
+      {rows.length > 0 && (
+        <ol aria-label={HOT_COPY.title} className="divide-y divide-line overflow-hidden rounded-card bg-surface">
+          {rows.map((row) => (
+            <HotRowLink key={row.key} row={row} compact />
+          ))}
+        </ol>
+      )}
+      {view.empty && (
+        <p data-hot-strip-empty className="rounded-card bg-surface px-4 py-3 text-[14px] leading-snug text-muted">
+          {view.empty}
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -127,6 +130,23 @@ function ItemCard({ item }: { item: ExploreItem }) {
   );
 }
 
+function StripSkeleton() {
+  return (
+    <ul aria-hidden="true" className="divide-y divide-line overflow-hidden rounded-card bg-surface sm:max-w-[720px]">
+      {Array.from({ length: 3 }, (_, i) => (
+        <li key={i} className="flex min-h-14 items-center gap-3 px-3 py-1.5 sm:px-4">
+          <Skeleton shape="text" width={24} height={14} />
+          <Skeleton shape="circle" width={44} height={44} />
+          <span className="flex flex-1 flex-col gap-2">
+            <Skeleton shape="text" width="50%" height={14} />
+            <Skeleton shape="text" width="30%" height={12} />
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function GridSkeleton() {
   return (
     <ul aria-hidden="true" className={GRID}>
@@ -145,10 +165,10 @@ function GridSkeleton() {
 }
 
 /**
- * Khám phá (DESIGN.md page 2, docs/design-impl.md §6.4): the featured template with its scene
- * picture, vibe filters, and a compact 4:3 grid of the user's characters plus templates not installed yet.
- * Tapping a character (or the featured card) opens its profile ("#/character/..."); the featured
- * card's "Bước vào câu chuyện" opens the profile with the persona sheet already open.
+ * Khám phá (DESIGN.md page 2, docs/design-impl.md §6.4, wiki/screens/explore.md): "Tìm nhân vật" (F47), the
+ * "Nhân vật hot" strip (F46, in place of the old featured card), vibe filters, and a compact 4:3 grid of the user's
+ * characters plus templates not installed yet, then other accounts' public characters. Every character has
+ * exactly one cell. Tapping a character opens its profile ("#/character/...").
  */
 export function ExplorePage() {
   const [cards, setCards] = useState<CardSummary[] | null>(null);
@@ -159,6 +179,10 @@ export function ExplorePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [vibe, setVibe] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const settledQuery = useDebounced(query);
+  /** F46: the first rows of the leaderboard; null when it could not be read (no strip then). */
+  const [hot, setHot] = useState<HotBoard | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -186,19 +210,39 @@ export function ExplorePage() {
   }, [load]);
 
   useEffect(() => {
+    let alive = true;
+    api
+      .getHotBoard(3)
+      .then((b) => alive && setHot(b))
+      .catch(() => alive && setHot(null));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
     track("explore_viewed");
   }, []);
 
   const items = useMemo(() => (cards && templates ? buildItems(cards, templates) : []), [cards, templates]);
   const vibes = useMemo(() => (templates ? buildVibes(items, templates) : []), [items, templates]);
-  const shown = useMemo(() => filterByVibe(items, vibe), [items, vibe]);
-  const featured = useMemo(() => (templates ? featuredTemplate(templates) : null), [templates]);
-  // The hero's character is not listed again in the grid (unless a vibe filter is on).
-  const grid = useMemo(() => withoutHero(shown, featured, vibe), [shown, featured, vibe]);
+  const shown = useMemo(() => filterItems(items, { query: settledQuery, vibe }), [items, settledQuery, vibe]);
   const sharedAll = useMemo(() => sharedItems(shared, me?.handle ?? null), [shared, me?.handle]);
-  const sharedShown = useMemo(() => filterByVibe(sharedAll, vibe), [sharedAll, vibe]);
+  const sharedShown = useMemo(
+    () => filterItems(sharedAll, { query: settledQuery, vibe }),
+    [sharedAll, settledQuery, vibe],
+  );
+  const searching = queryWords(settledQuery).length > 0;
+  const filtered = searching || vibe !== null;
+  const nothingFound = searching && shown.length === 0 && sharedShown.length === 0;
 
   const ready = cards !== null && templates !== null;
+
+  // F47: explore_searched {has_results} once per distinct settled search (never the typed words).
+  const searchTracker = useRef(createSearchTracker((props) => track("explore_searched", props)));
+  useEffect(() => {
+    if (ready) searchTracker.current.settled(settledQuery, !nothingFound);
+  }, [ready, settledQuery, nothingFound]);
 
   return (
     <div className={cx(SHELL_CONTAINER, "flex flex-col gap-5 pt-5 sm:gap-7 sm:pt-8")}>
@@ -206,6 +250,8 @@ export function ExplorePage() {
         <h1 className="text-[24px] leading-tight font-semibold text-fg">Khám phá</h1>
         <p className="text-[15px] leading-snug text-muted">Chạm một nhân vật để xem hồ sơ của họ.</p>
       </div>
+
+      <SearchBox value={query} onChange={setQuery} />
 
       {error && !ready ? (
         <div role="alert" className="flex flex-col items-start gap-3 rounded-card border border-edge bg-surface p-5">
@@ -218,12 +264,12 @@ export function ExplorePage() {
       ) : !ready ? (
         <div aria-busy="true" className="flex flex-col gap-6 sm:gap-8">
           <span className="sr-only">Đang tải nhân vật…</span>
-          <HeroSkeleton />
+          <StripSkeleton />
           <GridSkeleton />
         </div>
       ) : (
         <>
-          {featured && <Hero template={featured} imageUrl={heroImageUrl(featured, cards ?? [])} />}
+          <HotStrip board={hot} query={query} />
 
           <section aria-labelledby="explore-all" className="flex flex-col gap-4">
             <div className="flex items-baseline justify-between gap-3">
@@ -231,7 +277,7 @@ export function ExplorePage() {
                 Nhân vật
               </h2>
               <span className="text-[14px] text-muted tabular-nums">
-                {vibe === null ? items.length : `${shown.length} / ${items.length}`}
+                {filtered ? `${shown.length} / ${items.length}` : items.length}
               </span>
             </div>
 
@@ -280,7 +326,16 @@ export function ExplorePage() {
                   </Button>
                 }
               />
-            ) : shown.length === 0 ? (
+            ) : nothingFound ? (
+              <EmptyState
+                text={noResultsText(settledQuery)}
+                action={
+                  <Button size="sm" onClick={() => setQuery("")}>
+                    {SEARCH_COPY.clear}
+                  </Button>
+                }
+              />
+            ) : shown.length === 0 && searching ? null : shown.length === 0 ? (
               <EmptyState
                 text={`Chưa có nhân vật nào mang nét “${vibeLabel(vibe ?? "")}”.`}
                 action={
@@ -289,13 +344,13 @@ export function ExplorePage() {
                   </Button>
                 }
               />
-            ) : grid.length > 0 ? (
+            ) : (
               <ul className={GRID}>
-                {grid.map((item) => (
+                {shown.map((item) => (
                   <ItemCard key={item.key} item={item} />
                 ))}
               </ul>
-            ) : null}
+            )}
           </section>
 
           {/* Phase 4b: other accounts' public characters. No section at all when there are none. */}
@@ -307,7 +362,7 @@ export function ExplorePage() {
                     Nhân vật được chia sẻ
                   </h2>
                   <span className="text-[14px] text-muted tabular-nums">
-                    {vibe === null ? sharedAll.length : `${sharedShown.length} / ${sharedAll.length}`}
+                    {filtered ? `${sharedShown.length} / ${sharedAll.length}` : sharedAll.length}
                   </span>
                 </div>
                 <p className="text-[14px] leading-snug text-muted">Người khác trên Lyris này chia sẻ. Story bạn bắt đầu là của riêng bạn.</p>

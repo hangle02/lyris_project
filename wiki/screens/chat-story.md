@@ -35,6 +35,7 @@ Từ 640px: header gộp thành một hàng. Từ 1024px: hàng header rộng 96
 - **Lỗi:** banner có câu dễ hiểu, "Chi tiết" và "Thử lại".
 - **Suy nghĩ đang ẩn** ("Đọc suy nghĩ" tắt): không có thẻ suy nghĩ. Lượt chỉ có suy nghĩ thì hiện "Lượt này chỉ có suy nghĩ của <tên>."
 - **Không tìm thấy story:** trang riêng "Không tìm thấy story", có nút về danh sách. **Không mở được:** "Chưa mở được story" + "Thử lại".
+- **Hết coin** (Kế hoạch, [F42](../features/F42-vi-coin.md); thành viên còn dưới 6 coin): ô nhập `disabled`, nút gửi và "+" khoá. Thay chỗ banner trên ô nhập là khối **"Bạn đã hết coin"**, dòng "Mỗi câu trả lời cần 6 coin." và hai nút **"Nạp coin"** (mở [Nạp coin](top-up.md)) và **"Nhiệm vụ"** (mở [Nhiệm vụ](missions.md)). "Tạo lại câu trả lời" khoá với lý do "Cần 6 coin để tạo lại." Chữ đang gõ được giữ. Server trả 402 `coins_required` (vd tab khác vừa tiêu hết) thì cũng chuyển sang trạng thái này. Có coin lại thì ô nhập mở, không cần tải lại. Chủ máy không bao giờ thấy trạng thái này.
 
 ## Tính năng
 
@@ -45,5 +46,6 @@ Từ 640px: header gộp thành một hàng. Từ 1024px: hàng header rộng 96
 - [DM và Story chung dòng thời gian](../features/F12-dm-story-chung-dong-thoi-gian.md)
 - [Dùng chung máy](../features/F32-dung-chung-may.md)
 - [Ẩn chữ kỹ thuật](../features/F27-an-chu-ky-thuat.md)
+- [Ví coin và tiêu coin khi chat](../features/F42-vi-coin.md) (Kế hoạch)
 
 Chi tiết: [DESIGN.md](../../DESIGN.md) mục 6, [design-impl.md §6.2 và §15](../../docs/design-impl.md), [phase3.md](../../docs/phase3.md), [auth.md §5.5](../../docs/auth.md) (hàng đợi).

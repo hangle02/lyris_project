@@ -127,6 +127,22 @@ def _check_public_cards(resp: httpx.Response, w: World) -> None:
     assert "story_count" not in body[0]
 
 
+def _check_hot(resp: httpx.Response, w: World) -> None:
+    body = resp.json()
+    assert set(body) == {"updated_at", "ranked", "items"}
+    ids = {it["card_id"] for it in body["items"]}
+    assert not ids & {w.a_private, w.b_copy}  # không nhân vật riêng tư, không bản sao
+    for it in body["items"]:
+        assert set(it) == {"rank", "card_id", "name", "avatar_url", "creator_handle", "players"}
+    assert PUBLIC_SECRET not in resp.text and PRIVATE_NAME not in resp.text
+
+
+def _hot(w: World) -> list[Call]:
+    """F46: lần gọi đầu mỗi giờ tính bảng (ghi DB, như checkin); tính trước để lời gọi của B chỉ đọc."""
+    w.app.state.coins.refresh_hot(force=True)
+    return [Call("/api/explore/hot", {200}, {}, _check_hot), Call("/api/explore/hot?limit=3", {200}, {}, _check_hot)]
+
+
 def _check_profile(resp: httpx.Response, w: World) -> None:
     body = resp.json()
     assert [c["id"] for c in body["cards"]] == [w.a_public]
@@ -259,6 +275,27 @@ SWEEP: dict[tuple[str, str], Case] = {
     ("POST", "/api/admin/accounts/{account_id}/reset-password"): _owner_only("/api/admin/accounts/{w.a_id}/reset-password"),
     ("POST", "/api/admin/accounts/{account_id}/disable"): _owner_only("/api/admin/accounts/{w.a_id}/disable"),
     ("POST", "/api/admin/accounts/{account_id}/enable"): _owner_only("/api/admin/accounts/{w.a_id}/enable"),
+    # ---- coin (F42): ví, quà đăng nhập, lịch sử chỉ của người gọi; cộng/trừ coin chỉ chủ máy
+    ("POST", "/api/admin/accounts/{account_id}/coins"): _owner_only(
+        "/api/admin/accounts/{w.b_id}/coins", json={"delta": 5, "reason": "tự cộng", "request_id": "sweep-b-0001"}
+    ),
+    ("GET", "/api/coins/wallet"): OWN,
+    ("POST", "/api/coins/checkin"): OWN,
+    ("GET", "/api/coins/history"): OWN,
+    # ---- nạp coin (F43): gói chung, nhập mã chỉ cộng cho người gọi; mã nạp và nhật ký chỉ chủ máy
+    ("GET", "/api/coins/packs"): Skip("bảng gói chung, không có dữ liệu tài khoản"),
+    ("POST", "/api/coins/redeem"): OWN,
+    ("GET", "/api/admin/coins/codes"): _owner_only("/api/admin/coins/codes"),
+    ("POST", "/api/admin/coins/codes"): _owner_only("/api/admin/coins/codes", json={"amount": 5, "expires_days": 7}),
+    ("POST", "/api/admin/coins/codes/{code_id}/revoke"): _owner_only("/api/admin/coins/codes/1/revoke"),
+    ("GET", "/api/admin/coins/log"): _owner_only("/api/admin/coins/log"),
+    # ---- nhiệm vụ ngày (F45): tiến độ và thưởng chỉ của người gọi. A là chủ máy nên không có lượt xem quảng cáo;
+    # ad_id của tài khoản khác → 404 ở test_coins_missions.py::test_ad_claim_needs_15_server_seconds.
+    ("GET", "/api/coins/missions"): OWN,
+    ("POST", "/api/coins/missions/{mission}/claim"): OWN,
+    ("POST", "/api/coins/ads/start"): OWN,
+    ("POST", "/api/coins/ads/{ad_id}/claim"): Skip("A (chủ máy) không có lượt xem; thành viên khác → 404 ở test_coins_missions.py"),
+    ("POST", "/api/coins/ads/{ad_id}/cancel"): Skip("A (chủ máy) không có lượt xem; thành viên khác → 404 ở test_coins_missions.py"),
     ("GET", "/api/admin/invites"): _owner_only("/api/admin/invites"),
     ("GET", "/api/admin/analytics/summary"): _owner_only("/api/admin/analytics/summary"),
     ("GET", "/api/admin/analytics/export.csv"): _owner_only("/api/admin/analytics/export.csv"),
@@ -340,6 +377,7 @@ SWEEP: dict[tuple[str, str], Case] = {
     ],
     ("GET", "/api/cards/{card_id}/public"): _public_read("/public"),
     ("GET", "/api/public-cards"): _list("/api/public-cards", _check_public_cards),
+    ("GET", "/api/explore/hot"): _hot,
     ("GET", "/api/cards/{card_id}/lore"): _cards("/lore"),
     ("POST", "/api/cards/{card_id}/lore"): _cards("/lore", json=LORE_IN),
     ("POST", "/api/cards/{card_id}/lore/import"): _cards(
@@ -382,7 +420,7 @@ async def world(tmp_path_factory: pytest.TempPathFactory) -> AsyncIterator[World
 
 async def test_sweep_covers_every_route() -> None:
     assert SWEEP.keys() == ROUTE_RULES.keys()
-    assert len(SWEEP) == 100
+    assert len(SWEEP) == 116  # 100 + 4 route coin (F42) + 6 nạp coin (F43) + 5 nhiệm vụ (F45) + bảng Nhân vật hot (F46)
     # Mọi route "Chủ" đều được quét bằng thành viên.
     for route, rule in ROUTE_RULES.items():
         if rule == "owner":

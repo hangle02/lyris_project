@@ -1,6 +1,6 @@
 # Điều khoản sử dụng Lyris
 
-Phiên bản: 2026-11-15
+Phiên bản: 2026-11-16
 
 Chào mừng bạn đến với Lyris, nơi bạn cùng các nhân vật AI viết nên những story. Khi tạo tài khoản hoặc tiếp tục dùng Lyris, bạn đồng ý với các điều khoản dưới đây và với [Chính sách quyền riêng tư](privacy.md).
 
@@ -51,16 +51,28 @@ Thấy một câu trả lời của AI không phù hợp, hãy báo cáo nó nga
 - Quản trị viên của máy chủ Lyris có thể tạm khoá tài khoản vi phạm các điều khoản này. Khi bị tạm khoá, bạn không đăng nhập được và nhân vật công khai của bạn bị ẩn; dữ liệu vẫn còn.
 - Bạn có thể xoá tài khoản bất cứ lúc nào trong Tài khoản. Việc xoá diễn ra ngay và không hoàn tác được (chi tiết ở Chính sách quyền riêng tư). Quản trị viên chỉ xoá được tài khoản của mình khi không còn thành viên nào khác.
 
-## 7. Dịch vụ
+## 7. Coin
+
+- Coin là đơn vị ảo để dùng các tính năng trong Lyris (mỗi câu trả lời của nhân vật tốn 6 coin). Coin **không phải tiền**, không có giá trị tiền tệ, **không đổi ra tiền**, không rút được, **không chuyển** hay bán cho người khác, và không sinh lãi.
+- Giá, quà và nhiệm vụ có thể thay đổi; thay đổi được báo trước trong ứng dụng.
+- **Chế độ thử:** Lyris **chưa bán coin** và chưa thu tiền của ai. Coin có được từ quà tạo tài khoản, quà đăng nhập mỗi ngày, nhiệm vụ, thưởng sáng tác và **mã nạp**. Không có hoàn tiền vì không có khoản thanh toán nào. Ở chế độ thử, mã nạp chỉ **được tặng, không bán**: không ai được bán mã nạp hay coin của Lyris.
+- **Coin của chế độ thử khi Lyris ra mắt:** mọi số dư sẽ được **đặt lại về 0**. Lyris báo trong ứng dụng ít nhất **30 ngày** trước ngày đặt lại.
+- Xoá tài khoản thì coin còn lại **mất** và không lấy lại được. Coin có được do lạm dụng (tài khoản ảo, lách nhiệm vụ) có thể bị người quản lý thu hồi.
+- Tài khoản quản lý (người vận hành máy chủ) không tốn coin.
+- Thưởng sáng tác không phải tiền công hay hợp đồng, không có chia sẻ doanh thu. Không có phần thưởng ngẫu nhiên (hộp quà, quay số).
+- Quảng cáo mẫu trong nhiệm vụ không gửi dữ liệu cho bên quảng cáo nào.
+- Khi có thanh toán thật, người dưới 18 tuổi cần cha mẹ hoặc người giám hộ đồng ý trước khi mua coin.
+
+## 8. Dịch vụ
 
 - Lyris được cung cấp "như hiện có". Chúng tôi cố gắng để ứng dụng chạy ổn định nhưng không cam kết lúc nào cũng hoạt động, không lỗi, hay giữ dữ liệu vĩnh viễn. Hãy tải dữ liệu của bạn về nếu nó quan trọng với bạn.
 - Trong phạm vi pháp luật cho phép, chúng tôi không chịu trách nhiệm về thiệt hại gián tiếp phát sinh từ việc dùng Lyris hay từ nội dung do AI viết ra.
 
-## 8. Thay đổi điều khoản
+## 9. Thay đổi điều khoản
 
 Khi điều khoản thay đổi đáng kể, chúng tôi đổi số phiên bản ở đầu trang và Lyris sẽ hỏi bạn đồng ý lại một lần. Không đồng ý thì bạn có thể tải dữ liệu và xoá tài khoản.
 
-## 9. Luật áp dụng và liên hệ
+## 10. Luật áp dụng và liên hệ
 
 Các điều khoản này theo pháp luật Việt Nam. Câu hỏi, khiếu nại hoặc yêu cầu: **[ĐIỀN EMAIL LIÊN HỆ]**.
 
@@ -68,7 +80,7 @@ Các điều khoản này theo pháp luật Việt Nam. Câu hỏi, khiếu nạ
 
 ## English
 
-Version: 2026-11-15
+Version: 2026-11-16
 
 Welcome to Lyris, where you write stories together with AI characters. By creating an account or continuing to use Lyris, you agree to these terms and to the [Privacy Policy](privacy.md).
 
@@ -119,15 +131,27 @@ If an AI reply is inappropriate, report it from the story (pick a reason, option
 - The administrator of the Lyris server can disable accounts that break these terms. A disabled account cannot sign in and its public characters are hidden; its data is kept.
 - You can delete your account at any time in Account. Deletion is immediate and cannot be undone (details in the Privacy Policy). The administrator can delete their own account only when no other members remain.
 
-### 7. The service
+### 7. Coins
+
+- Coins are a virtual unit for using features in Lyris (each character reply costs 6 coins). Coins are **not money**, have no monetary value, **cannot be exchanged for money** or withdrawn, **cannot be transferred** or sold to anyone else, and earn no interest.
+- Prices, gifts and missions may change; changes are announced in the app in advance.
+- **Test mode:** Lyris **does not sell coins** yet and takes no payment from anyone. Coins come from the sign-up gift, the daily sign-in gift, missions, creator rewards and **top-up codes**. There are no refunds because there is no payment. In test mode, top-up codes are only **given, never sold**: nobody may sell Lyris top-up codes or coins.
+- **Test-mode coins at launch:** all balances will be **reset to 0**. Lyris will announce this in the app at least **30 days** before the reset date.
+- If you delete your account, your remaining coins are **lost** and cannot be recovered. Coins obtained through abuse (fake accounts, gaming missions) may be taken back by the administrator.
+- The administrator account does not spend coins.
+- Creator rewards are not wages or a contract, and there is no revenue sharing. There are no random rewards (loot boxes, spins).
+- The sample ad in missions sends no data to any advertiser.
+- When real payments exist, people under 18 need a parent's or guardian's consent before buying coins.
+
+### 8. The service
 
 - Lyris is provided "as is". We try to keep it running well but do not promise that it is always available, error-free, or that data is kept forever. Download your data if it matters to you.
 - To the extent permitted by law, we are not liable for indirect damages arising from using Lyris or from AI-written content.
 
-### 8. Changes
+### 9. Changes
 
 When these terms change materially, we update the version at the top and Lyris asks you to accept them again once. If you do not agree, you can download your data and delete your account.
 
-### 9. Governing law and contact
+### 10. Governing law and contact
 
 These terms are governed by the laws of Vietnam. Questions, complaints or requests: **[ĐIỀN EMAIL LIÊN HỆ]**.

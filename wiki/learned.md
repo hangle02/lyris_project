@@ -330,3 +330,28 @@ Harness và các agent ghi thêm bài học mới ở cuối trang; bài mới n
 - **Vì sao:** Muốn mọi dòng "có kịch bản" cho verify chạy được, nên sửa dòng cho vừa máy thay vì để tính năng chờ.
 - **Luật rút ra:** Dòng gốc giữ nguyên lời; phần máy chấm được thành dòng Model thật RIÊNG. Dòng gốc chưa đủ bằng chứng thì không nhắc id kịch bản (tính năng ở 🟡, `promote --gate` từ chối) và hỏi PO. Ngưỡng phải phủ đúng chữ của dòng ("khoảng 4-5 giây" → trung vị ≤ 5, không chỉ mức trần). So khớp cụm theo nguyên từ; mỗi regex cấm có test với nhiều cách nói thật (cả câu phải bắt lẫn câu không được bắt).
 - **Nguồn:** rà soát đối kháng TASK A 2026-11-14; `harness/kinds.py`, `harness/checks.py`, `backend/tests/test_run_eval_kinds.py`; [kich-ban-model-that](decisions/kich-ban-model-that.md), [nguong-ttft-f14](decisions/nguong-ttft-f14.md)
+
+### 2026-11-14 App của chủ dự án chạy `--reload` nên code đang build (kể cả migration) chạy trên DB thật
+
+- **Sai:** Lúc build F42, app ở cổng 8000 (`uvicorn --reload`) tự nạp code đang sửa và áp migration `0012_coins.sql` lên `data/lyris.db`: mọi thành viên thật được +300 (`backfill_grant`, sổ chỉ thêm nên không gỡ được), `LEGAL_VERSION` đổi nên mọi người gặp lại màn đồng ý Điều khoản, và suốt lúc build app thật chạy code F42→F45 còn dở. Không gọi cổng 8000 không có nghĩa là không đụng DB thật.
+- **Vì sao:** `--reload` theo dõi file `.py` của `backend/`; lần nạp lại kế tiếp chạy `migrate()` trên DB thật. Luật "không bật/tắt/gọi 8000" chỉ chặn việc gọi, không chặn việc app tự nạp code.
+- **Luật rút ra:** Trước khi thêm migration hay đổi `LEGAL_VERSION`, báo chủ dự án (họ sao lưu `data/lyris.db` hoặc tắt app); migration chỉ thêm, không đổi số dư/dữ liệu người dùng nếu chưa hỏi; chép `.sql` trước `.py`. Ghi rõ trong báo cáo mọi thay đổi app thật sẽ nhận khi nạp lại.
+- **Nguồn:** báo cáo build F42 và rà soát sản phẩm 2026-11-14; `backend/lyris/db/migrations/0012_coins.sql`, `0013_coin_ledger_no_delete.sql`
+
+### 2026-11-14 Agent lỡ dùng Python hệ thống và đọc `data/`
+
+- **Sai:** Agent F44 và F45 mỗi agent gọi `/usr/bin/python3` một lần (heredoc rỗng); agent F42 thử `sqlite3 -readonly data/lyris.db` (bị chặn). Không có hậu quả, nhưng trái luật.
+- **Vì sao:** Thói quen gõ `python3`/`sqlite3` để kiểm nhanh; script mới có shebang `#!/usr/bin/env python3`.
+- **Luật rút ra:** Python chỉ qua `backend/.venv/bin/python`, kể cả kiểm nhanh; script trong `environment/` không có shebang và tự thoát nếu `sys.prefix` không phải `backend/.venv`. Muốn biết DB thật ở migration nào thì hỏi chủ dự án, không đọc `data/`.
+- **Nguồn:** báo cáo build F42/F44/F45 và rà soát sản phẩm 2026-11-14; `environment/seed-creator-players.py`
+
+### 2026-11-14 Chèn import bằng script làm hỏng file đang được app `--reload` nạp
+
+- **Sai:** Lúc build F44/F46, một script chèn `from lyris.coins.hot import …` vào sau dòng `from lyris…` cuối cùng của
+  `backend/lyris/db/repo.py`; dòng đó là đầu một khối import nhiều dòng (`from lyris.state.fold import (`), nên file lỗi cú
+  pháp khoảng nửa phút. App của chủ dự án chạy `--reload` đã nạp lại đúng lúc đó (lần nạp lỗi, rồi nạp lại khi sửa).
+- **Vì sao:** Tìm "dòng import cuối" bằng `startswith("from lyris")` không biết dòng đó mở ngoặc.
+- **Luật rút ra:** Sửa import bằng Edit với chuỗi cũ khớp chính xác (thấy cả khối), không chèn theo số dòng. Sau mỗi lần sửa file
+  `.py` của `backend/lyris/`, chạy ngay `backend/.venv/bin/python -c "import lyris.api.app"` trước khi làm tiếp.
+- **Nguồn:** build F44/F46/F47 2026-11-14; `backend/lyris/db/repo.py`
+

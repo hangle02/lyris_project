@@ -23,11 +23,20 @@ Tạo và sửa toàn bộ card nhân vật, rồi chat thử ngay (kể cả kh
    - **Dùng nhân vật**: "Mở story mới", "Nhân bản", "Xuất JSON", "Xuất PNG" (Character Card V2).
    - **Xoá nhân vật**: viền đỏ, nói rõ số story đang dùng nhân vật. Hỏi lại trước khi xoá.
 4. **Tab Chat thử**: một cuộc trò chuyện nháp với card đang sửa, dòng "Không lưu gì". Chọn persona để chat.
+   *Kế hoạch ([F42](../features/F42-vi-coin.md)):* mỗi câu trả lời chat thử của thành viên tốn 6 coin như chat thật (tạm chọn); hết coin thì ô nhập chat thử khoá với cùng khối "Bạn đã hết coin", "Nạp coin", "Nhiệm vụ". Chủ máy không tốn coin.
 5. **Tab Xem trước** (nâng cao): prompt gửi cho model và ước lượng token.
 
 Từ 1024px: không còn tab trên cùng. Form bên trái, bảng phụ rộng 440px bên phải (500px từ 1280px) luôn hiện "Chat thử". Bật Công cụ nâng cao thì bảng phụ có hai tab "Xem trước prompt" và "Chat thử".
 
 Công tắc "Công khai": bật rồi phải bấm Lưu mới chia sẻ ("Bấm Lưu để chia sẻ."). Khi đã lưu công khai, có nút **"Người khác thấy gì"** mở [hộp xem trước](public-preview.md).
+
+*[F44](../features/F44-thuong-sang-tac.md) (làm lại 2026-11-14 22:15, thay dòng "Mốc tiếp theo" cũ):* nhân vật đã lưu công khai có một khối nhỏ dưới công tắc "Công khai", ngăn bằng một vạch mảnh:
+- dòng đậm **"12 người chơi · Hạng 7 Nhân vật hot"**; chưa có trên bảng: **"3 người chơi · Chưa có trên bảng Nhân vật hot"**;
+- dòng thưởng: **"Bậc thưởng tiếp theo: top 50 (+200 coin)"** (bậc tiếp theo theo hạng hiện tại); đạt đủ ba bậc: **"Đã nhận đủ thưởng xếp hạng"**; tài khoản quản lý và khi coin tắt: "Bậc tiếp theo: top 50" (không có coin);
+- bảng chưa có nhân vật của đủ N người tạo (có coin): **"Thưởng top 10 chỉ có khi bảng có nhân vật của ít nhất 10 người tạo khác nhau (hiện có 1)."** (`prose`), để người tạo hạng 1 trên bảng nhỏ biết vì sao chưa có coin;
+- có thưởng đang chờ (trần 600 coin mỗi 7 ngày): **"Thưởng đang chờ: +300 coin (tối đa 600 coin mỗi 7 ngày)"**;
+- câu nhỏ `muted`: "Người chơi là tài khoản khác đã trò chuyện với nhân vật này ít nhất 3 câu trả lời, ở 2 ngày khác nhau. Bảng xếp hạng cập nhật mỗi giờ."
+Nhân vật riêng tư không có khối này. Không còn chữ "Mốc tiếp theo".
 
 ## Trạng thái
 
@@ -48,6 +57,7 @@ Công tắc "Công khai": bật rồi phải bấm Lưu mới chia sẻ ("Bấm 
 - [Ma trận cảm xúc](../features/F09-ma-tran-cam-xuc.md) (cảm xúc ban đầu)
 - [Sổ thế giới](../features/F17-so-the-gioi.md)
 - [Nhân vật công khai](../features/F31-nhan-vat-cong-khai.md)
+- [Thưởng sáng tác theo mốc](../features/F44-thuong-sang-tac.md)
 - [Văn phong và xưng hô](../features/F03-van-phong-xung-ho.md)
 - [Ẩn chữ kỹ thuật](../features/F27-an-chu-ky-thuat.md) (xem trước prompt chỉ trong Công cụ nâng cao)
 

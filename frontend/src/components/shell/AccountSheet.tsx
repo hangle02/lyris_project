@@ -4,6 +4,9 @@ import { api, downloadAccountData, errorMessage, errorTechnical } from "../../ap
 import { useAdvancedTools } from "../../hooks/useAdvancedTools";
 import { accountDeleted, signOut, useAuthAccount } from "../../hooks/useAuth";
 import { setAccount } from "../../hooks/useAccount";
+import { refreshWallet, useWallet } from "../../hooks/useWallet";
+import { COIN_COPY } from "../../lib/coinCopy";
+import { formatCoins, noteWalletFrom } from "../../lib/coins";
 import { PasswordField } from "../../pages/auth/AuthLayout";
 import {
   ABOUT_TEXT,
@@ -32,7 +35,7 @@ import type { ImageCredit } from "../../pages/explore/logic";
 import { GENDER_LABELS } from "../../lib/storyOptions";
 import { Avatar } from "../Avatar";
 import { Wordmark } from "../brand";
-import { IconCheck, IconChevronLeft, IconDownload } from "../icons";
+import { IconCheck, IconChevronLeft, IconCoin, IconDownload } from "../icons";
 import { Badge, Button, Disclosure, EmptyState, ErrorDetails, InlineAlert, Meter, Modal, Select, Skeleton, Spinner, Toggle } from "../ui";
 import type { BadgeTone } from "../ui";
 import { cx } from "../ui/logic";
@@ -159,6 +162,46 @@ function AccountSection({
         )}
       </div>}
     </Section>
+  );
+}
+
+/**
+ * F42 (docs/coins.md §10.4): the "Coin" row under the account block: balance and "Mở ví coin" for a
+ * member; one line for the owner (never charged); nothing while coins are off on this server.
+ */
+function CoinSection({ onLeave }: { onLeave: () => void }) {
+  const { wallet } = useWallet();
+  useEffect(() => {
+    refreshWallet();
+  }, []);
+  if (!wallet || !wallet.enabled) return null;
+  const owner = wallet.unlimited;
+  return (
+    <section aria-label={COIN_COPY.accountRow} className="flex items-center gap-3 rounded-card border border-line px-4 py-3">
+      <IconCoin className="shrink-0 text-[22px] text-accent-2" />
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="text-[13px] leading-snug text-muted">{COIN_COPY.accountRow}</span>
+        {owner ? (
+          <span className="text-[14px] leading-snug text-fg">{COIN_COPY.ownerNote}</span>
+        ) : (
+          <span className="text-[16px] leading-snug font-semibold text-fg tabular-nums">{formatCoins(wallet.balance)}</span>
+        )}
+      </span>
+      {!owner && (
+        <Button
+          size="sm"
+          variant="secondary"
+          className="shrink-0"
+          onClick={() => {
+            noteWalletFrom("account");
+            onLeave();
+            navigate("#/coins");
+          }}
+        >
+          {COIN_COPY.openWallet}
+        </Button>
+      )}
+    </section>
   );
 }
 
@@ -898,6 +941,7 @@ export function AccountSheet({ open, onClose, healthLevel, accountState, persona
                 go("password");
               }}
             />
+            <CoinSection onLeave={onClose} />
             <PersonaSection state={personaState} onLeave={onClose} />
             <PrivacySection state={accountState} onDelete={() => go("delete")} />
             {machineLine && (

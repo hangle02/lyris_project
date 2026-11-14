@@ -262,3 +262,14 @@ test("navigation guards run before route subscribers; a cancelling guard stops t
     else delete g.window;
   }
 });
+
+test("F46: #/explore/hot is the Nhân vật hot board; the Khám phá tab stays lit there", () => {
+  assert.deepEqual(parseRoute("#/explore/hot"), { name: "hot" });
+  assert.deepEqual(parseRoute("#/explore/hot/"), { name: "hot" });
+  assert.deepEqual(parseRoute("explore/hot"), { name: "hot" });
+  assert.deepEqual(parseRoute("#/explore/hot/2"), HUB);
+  assert.deepEqual(parseRoute("#/explore/cold"), HUB);
+  assert.equal(routeHref({ name: "hot" }), "#/explore/hot");
+  assert.deepEqual(parseRoute(routeHref({ name: "hot" })), { name: "hot" });
+  assert.equal(tabOf({ name: "hot" }), "explore");
+});
