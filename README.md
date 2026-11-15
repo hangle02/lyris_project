@@ -82,7 +82,7 @@ The same problems seen from the user's side: what progress people "hire" Lyris t
 
 **Job statements**
 
-The two core jobs come from the team's customer personas, written by Huynh Quoc Toi ([original, in English](wiki/raw/2026-11-15-chan-dung-khach-hang.md)).
+The two core jobs come from the team's customer personas.
 
 | Who | Job statement |
 |---|---|
@@ -819,7 +819,7 @@ Cùng các vấn đề trên, nhìn từ phía người dùng: họ "thuê" Lyri
 
 **Câu phát biểu công việc**
 
-Hai công việc chính lấy từ chân dung khách hàng của nhóm, do Huỳnh Quốc Tới viết ([bản gốc, tiếng Anh](wiki/raw/2026-11-15-chan-dung-khach-hang.md)).
+Hai công việc chính lấy từ chân dung khách hàng của nhóm.
 
 | Ai | Câu phát biểu |
 |---|---|
