@@ -9,7 +9,30 @@
 
 **English** · [Tiếng Việt](#tiếng-việt)
 
-[Demo video](#demo-video) · [Problem](#the-problem) · [Jobs to be done](#jobs-to-be-done) · [Target users](#target-users) · [Core features](#core-features) · [Launch and revenue](#launch-channel-and-business-model) · [Build and run](#build-run-and-access) · [Launch and deploy](#launch-and-deploy) · [Roadmap](#roadmap-hosted-lyris) · [Limitations](#limitations-and-future-evaluation) · [Tracking plan](#tracking-plan) · [Privacy and compliance](#privacy-and-compliance) · [AI-native workflow](#ai-native-workflow-how-we-built-lyris-with-claude) · [Harness](#harness-based-on-aperos-mini-harness) · [Team](#team)
+### For reviewers: assignment checklist
+
+Where each part of the brief is answered (English half; the Vietnamese half has the same sections and its own [checklist](#dành-cho-người-chấm-đối-chiếu-đề-bài)).
+
+| Brief | Where to look |
+|---|---|
+| **Deliverable 1:** full source code | `backend/` (FastAPI + SQLite), `frontend/` (React + Vite), [Repository map](#repository-map) |
+| **Deliverable 2:** name and one-paragraph pitch | [Pitch](#pitch) |
+| Problem, target users | [The problem](#the-problem), [Target users](#target-users), [Positioning and why now](#positioning-and-why-now) |
+| Core features | [Core loop and out of scope](#core-loop-and-out-of-scope), [Core features](#core-features) |
+| Launch channel, users and revenue | [Launch channel and business model](#launch-channel-and-business-model), [Unit economics](#unit-economics-estimates-to-validate), [Launch plan](#launch-plan-first-90-days-proposed) |
+| How to build, run or access | [Try it as a reviewer](#try-it-as-a-reviewer), [Build, run and access](#build-run-and-access) |
+| AI-native workflow (how we used Claude, what worked and what didn't) | [AI-native workflow](#ai-native-workflow-how-we-built-lyris-with-claude), [Harness](#harness-based-on-aperos-mini-harness) |
+| Team members, roles and contributions | [Team](#team) |
+| **Deliverable 3:** tracking plan | [docs/tracking-plan.md](docs/tracking-plan.md) (57 events; summary under [Tracking plan](#tracking-plan)) |
+| **Deliverable 4:** demo video (2–3 min) | [Demo video](#demo-video) (2:22), [Screenshots](#screenshots) |
+| Criterion: product thinking | [The problem](#the-problem), [Jobs to be done](#jobs-to-be-done), [Core loop and out of scope](#core-loop-and-out-of-scope), [Unit economics](#unit-economics-estimates-to-validate) |
+| Criterion: execution | [Evidence](#evidence) (last full `verify.sh` run, bot checks, real-model runs), [Screenshots](#screenshots) |
+| Criterion: AI-native process | [By the numbers](#by-the-numbers), [Lifecycle of a feature](#lifecycle-of-a-feature), [One feature end to end](#one-feature-end-to-end-f47-character-search) |
+| Criterion: publish readiness | [Tracking plan](#tracking-plan), [Privacy and compliance](#privacy-and-compliance) (16+ (Terms); safe content on by default; 18+ mode later behind a toggle and 18+ confirmation), [docs/compliance.md](docs/compliance.md) (Vietnamese) |
+| Criterion: documentation and teamwork | This README, [Team](#team), [Shared Claude accounts](#shared-claude-accounts) |
+| Ownership and publishing | [Ownership and publishing](#ownership-and-publishing), [Handover to Apero](#handover-to-apero) |
+
+[Demo video](#demo-video) · [Problem](#the-problem) · [Jobs to be done](#jobs-to-be-done) · [Target users](#target-users) · [Core loop](#core-loop-and-out-of-scope) · [Core features](#core-features) · [Launch and revenue](#launch-channel-and-business-model) · [Build and run](#build-run-and-access) · [Launch and deploy](#launch-and-deploy) · [Roadmap](#roadmap-hosted-lyris) · [Limitations](#limitations-and-future-evaluation) · [Tracking plan](#tracking-plan) · [Privacy and compliance](#privacy-and-compliance) · [AI-native workflow](#ai-native-workflow-how-we-built-lyris-with-claude) · [Harness](#harness-based-on-aperos-mini-harness) · [Team](#team) · [Ownership](#ownership-and-publishing)
 
 **Labels used in this README:** **Built** = code and tests in this repository today. **Planned** = what we expect Lyris to have; not built yet. Exact per-feature status (✅ passing `verify.sh`, 🟡 built and waiting for verification, ⏳ planned) is in the [Harness tally](#harness-based-on-aperos-mini-harness).
 
@@ -19,15 +42,29 @@
 
 ### Pitch
 
-Lyris is a Vietnamese-first AI roleplay app. You pick a character, or write your own in the Studio, step into a story with them, and talk. The AI narrates and plays the character. You alone control your persona. The character remembers what happened, including what you said by text message. Their feelings toward you rise and fall with what you do, and they know only what their world allows them to know. Friends can join with an invite code and get their own private stories.
+**Lyris is a Vietnamese-first AI roleplay app for readers of Vietnamese romance web fiction who want to live inside a story, not only read it.** You pick a character, or write your own in the Studio, and step into a story where the AI narrates and plays the character while you alone control your own persona. Lyris keeps you the author (the AI never writes your lines), uses the right Vietnamese forms of address for each character and story, and gives every character a memory and feelings that rise and fall with what you do; writers can turn their characters and worlds into ones readers can talk to. Chatting costs coins: every account gets free coins on sign-up and every day, and more come in packs from 10.000đ (test mode today, no real money yet). The submitted version (built) runs on one machine with a local open model and invite-only accounts; after the course Lyris goes to the open web as a hosted app, then to Google Play and the App Store (planned, see [Roadmap](#roadmap-hosted-lyris)).
 
-**Where it is going.** The submitted version (built) runs on one machine with a local open model and invite-only accounts. After the course, Lyris becomes a public hosted app on the web, the App Store and Google Play, with coins sold through the stores and Vietnamese payment gateways (planned, designed in [docs/server.md](docs/server.md); see [Roadmap](#roadmap-hosted-lyris)).
+**Launch channel:** the open web (a PWA served over HTTPS), starting as an invite-only beta released in waves; Google Play and the App Store come later (planned). See [Launch plan](#launch-plan-first-90-days-proposed).
 
 ### Demo video
 
-**Demo video (2–3 minutes, core flow):** [watch on Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
+**Demo video (2:22, core flow):** [watch on Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
 
-Script with timestamps, actions and voice-over: [docs/demo-script.md](docs/demo-script.md).
+- **Length and language:** 2 minutes 22 seconds; no voice-over, a music track with on-screen captions in Vietnamese and an English line under each caption.
+- **How it was made:** the app scenes are animated re-creations of the real app screens, and all their text is what the app and the model actually produced in a recorded session ([docs/demo-video-plan.md](docs/demo-video-plan.md), Vietnamese). For real app screens, see [Screenshots](#screenshots).
+- A voice-over script for the same flow: [docs/demo-script.md](docs/demo-script.md) (Vietnamese).
+
+### Screenshots
+
+Captured by the browser bot (`node environment/bot.mjs --look`) at phone width (390 px) on the test server with a scripted fake model, so the chat text is test data. More: [docs/assets/screenshots/](docs/assets/screenshots/).
+
+| Explore: search and the "Nhân vật hot" (hot characters) strip | A Story turn | Character profile |
+|---|---|---|
+| <img src="docs/assets/screenshots/explore-search-and-hot-strip-light.png" alt="Explore screen with the character search box and the hot characters strip, light theme" width="240"> | <img src="docs/assets/screenshots/story-turn-light.png" alt="Story mode: italic narration, dialogue cards and a blurred thought card" width="240"> | <img src="docs/assets/screenshots/character-profile-light.png" alt="Read-only character profile with the Step into the story button" width="240"> |
+| **Hot characters ranking (dark theme)** | **Coin wallet (dark theme)** | **Daily missions** |
+| <img src="docs/assets/screenshots/hot-characters-ranking-dark.png" alt="Top 100 hot characters ranking, dark theme" width="240"> | <img src="docs/assets/screenshots/coin-wallet-dark.png" alt="Coin wallet with balance, top-up and missions buttons, dark theme" width="240"> | <img src="docs/assets/screenshots/daily-missions-light.png" alt="Daily missions screen" width="240"> |
+
+Also in the folder: the login screen (`login-light.png`) and Explore in the dark theme (`explore-search-and-hot-strip-dark.png`).
 
 ### The problem
 
@@ -104,9 +141,10 @@ References: see [References](#references) at the end of this README.
 
 ### Target users
 
-- **Readers of Vietnamese romance web fiction** (ngôn tình, đam mỹ, cổ trang, vườn trường) who want to *live inside* a story rather than read it. Mobile-first, mostly evenings.
-- **Writers and character creators** who build characters and whole worlds (side characters, places, secrets, plot hooks) and want them played faithfully.
-- **Self-hosting enthusiasts** with a capable machine who value privacy over a subscription.
+- **Primary: readers of Vietnamese romance web fiction** (ngôn tình, đam mỹ, cổ trang, vườn trường) who want to *live inside* a story rather than read it. Mobile-first, mostly evenings. Persona: Linh, below.
+- **Secondary: writers and character creators** who build characters and whole worlds (side characters, places, secrets, plot hooks) and want them played faithfully. Persona: Minh, below.
+- **Age: 16+** (stated in the Terms; accepting them at sign-up confirms it, with no birth-date field). Safe content is on by default for everyone; an 18+ mode, if it ever comes, sits behind turning off the "Nội dung an toàn" toggle and an 18+ confirmation.
+- **Not a revenue segment:** **Self-hosting enthusiasts** with a capable machine can still run Lyris themselves (self-hosting stays possible and free, with coins switched off by `LYRIS_COINS=0`), but the business plan does not count on them.
 
 #### Customer personas (hypotheses to validate)
 
@@ -122,9 +160,31 @@ Two personas drawn from the [launch-channel](#launch-channel-and-business-model)
 | **Likely to pay for** | Coins to keep chatting; personalization and early access to new features (planned) | Mostly earns coins through creator rewards; may top up for Studio test chats |
 | **Signal to validate** | First story with 3+ turns, D7 retention, turns per day | Characters published, players per public character |
 
+#### Positioning and why now
+
+- **WHIF**, in one line: a hosted AI character roleplay app with community sharing that the team used before building Lyris; the project started as "an app like WHIF" ([original message](wiki/raw/2026-11-12-plan-goc.md)).
+- **Against WHIF:** the gap we documented is player agency. In the team's own use, WHIF sometimes continued the player's actions for them and answered off the scene ([original message](wiki/raw/2026-11-12-quyen-cua-nguoi-choi.md), Vietnamese). Lyris answers with the [input conventions](#core-features) and a closing instruction to continue from the player's exact turn.
+- **Against Character.AI and Talkie:** we have not run or documented a side-by-side test of these apps, so this README makes no claims about their Vietnamese or their handling of the player's role.
+- **What Lyris bets on (built):** Vietnamese forms of address set per character and per story; the player always stays the author; memory and six emotions that rise and fall; worlds where every lore entry says who knows it; creator rewards from the "Nhân vật hot" (hot characters) ranking.
+- **Why now:** an open ~12B model now runs on a 24 GB laptop with a first token in about 5 s on long stories after prefill (measured during development, see [What worked](#what-worked)), so a Vietnamese-first roleplay app does not depend on a paid model API, and the AI companion category already has paying users (Perez, 2025).
+
+### Core loop and out of scope
+
+Lyris v1 is one loop, and every step is a tracked event ([tracking plan](docs/tracking-plan.md)):
+
+1. **Discover:** Explore with search, vibe filters and the hot characters ranking (`explore_viewed`).
+2. **Step in:** "Bước vào câu chuyện" (Step into the story): pick a persona, Story or DM, language and forms of address (`story_started`).
+3. **Write a turn** with the input conventions below (`message_sent`).
+4. **The character replies** for 6 coins (`reply_completed`); emotions, memory and scene update in the background.
+5. **Come back another day** to the same story, picked up where it stopped (`story_resumed`); opening the app each day adds 60 free coins.
+
+**North Star:** weekly engaged stories (stories with 3+ player turns in a week). A smaller **writer loop** feeds it: Studio → make a character public → other people play it → it climbs the "Nhân vật hot" ranking → creator coin rewards (`character_published`, `creator_rank_reached`).
+
+**Out of scope for v1** (planned or ideas, not built): 18+ content (later only behind the "Nội dung an toàn" toggle and an 18+ confirmation), phone calls and voice (the "Tender Moment" ideas), sending images, community feeds and comments, the story director, real payments, our own fine-tuned model, native iOS/Android apps and the multi-server hosted backend. They are listed under [Roadmap](#roadmap-hosted-lyris).
+
 ### Core features
 
-Everything in this table is **built** and covered by tests that `verification/verify.sh` runs. Planned features are under [Roadmap](#roadmap-hosted-lyris) and [Limitations](#limitations-and-future-evaluation).
+Everything in these tables is **built** and covered by tests that `verification/verify.sh` runs. Planned features are under [Roadmap](#roadmap-hosted-lyris) and [Limitations](#limitations-and-future-evaluation).
 
 **How you write a turn** (the player-agency mechanism):
 
@@ -135,22 +195,29 @@ Everything in this table is **built** and covered by tests that `verification/ve
 | `*"…"*` | A quotation or another person's words | Stays inside the narration, not as your dialogue |
 | `((…))` | A hidden direction to the AI, e.g. `((he is jealous but hides it))` | The character follows it in its own voice and never repeats it; in the chat it shows as a small chip |
 
+**Core loop**
+
 | Area | What it does |
 |---|---|
+| **Explore and profile** | A "Tìm nhân vật" (find a character) search box, a "Nhân vật hot" (hot characters) ranking strip with the full top-100 board at `#/explore/hot`, vibe filters ("Chữa lành" healing, "Tình đầu" first love…), equal-size character cards, and a read-only profile with "Bước vào câu chuyện" (Step into the story). |
 | **Story and DM modes** | Story mode reads like a novel: italic narration, speech in dialogue cards, and the character's inner thoughts as blurred cards you tap to read. DM mode looks like a messaging app. Both share one timeline, so a name given by text is known in the story. |
 | **Player stays the author** | The AI plays the characters and the world and never writes your dialogue, actions or decisions. A closing instruction in every prompt makes it continue directly from what you just wrote, without jumping scenes. |
 | **Six-emotion relationship** | Affection, trust, attraction, possessiveness, fear and aversion (0–100) rise *and fall* with your actions. Jealousy lowers trust, an apology lowers aversion, and small talk barely moves anything. The numbers become acting directions for the character and never appear in the prompt as raw numbers. |
 | **Memory** | Rolling scene summaries, long-term memories and facts. Search is by keyword, plus by meaning when an embedding model is present. Regenerating, editing or deleting a turn rolls the state back correctly. |
+| **Coins** | A coin wallet with a chip in the header, 6 coins per character reply, a "Nạp coin" (top up) screen in test mode, "Nhiệm vụ" (daily missions) and creator rewards from the hot characters ranking. Details under [Revenue](#revenue-model). |
+
+**Supporting**
+
+| Area | What it does |
+|---|---|
 | **Lorebook** | Each character can carry a world: side characters, places and lore entries, imported from a Markdown `world.md`. Entries are triggered by Vietnamese-aware keywords, with diacritics preserved. Each entry says who knows it: everyone, only certain characters, or only you. Spoilers that only you know never reach the model. |
 | **Character Studio** | Create and edit characters, draft one with AI from a one-line idea, set signature lines, set forms of address, upload an avatar, and import or export Character Card V2. |
-| **Explore and profile** | A "Tìm nhân vật" character search box and a "Nhân vật hot" ranking strip in place of the old featured character, with the full top-100 board at `#/explore/hot` (F46/F47); vibe filters ("Chữa lành", "Tình đầu"…), equal-size character cards, and a read-only profile with "Bước vào câu chuyện". |
 | **On-demand helpers** | A "+" menu in the composer: reply suggestions (only when tapped), an event timeline, and image sending (shell). |
 | **Accounts** | Owner and invited members, invite codes, password login with scrypt and HttpOnly sessions, an owner-only admin page, and fully private stories. Characters can be made public; others then play their own private copy. |
 | **Fast on modest hardware** | Prompt-cache-aware prompt layout and a background "prefill" of the next turn cut the first-token wait on long stories from ~30–47 s to ~5 s on a 12B model. |
-| **No technical noise** | No model names, tokens or server status in the UI. Waiting shows typing dots. Technical settings live behind "Nâng cao". |
-| **Safety and privacy** | Safe content by default (no sexual content; romance and jealousy stay non-explicit; nothing sexual involving minors, ever). "Báo cáo" on every AI reply and on every public character's profile (the owner can hide a reported character), Terms and Privacy Policy with recorded consent, self-service data export and account deletion, and an opt-out for anonymous usage data. |
-| **Coins** | A coin wallet with a chip in the header, 6 coins per character reply, a "Nạp coin" top-up screen (test mode), daily missions and creator rewards from the "Nhân vật hot" ranking. Details under [Revenue](#revenue-model). |
-| **Usage analytics** | 57 tracked events with no user text, an owner "Số liệu" page (DAU/WAU/MAU, funnel, D1/D7) and CSV/JSONL export; optional PostHog forwarding. |
+| **No technical noise** | No model names, tokens or server status in the UI. Waiting shows typing dots. Technical settings live behind "Nâng cao" (Advanced). |
+| **Safety and privacy** | For users aged 16+ (Terms). Safe content by default (no sexual content; romance and jealousy stay non-explicit; nothing sexual involving minors, ever). "Báo cáo" (Report) on every AI reply and on every public character's profile (the owner can hide a reported character), Terms and Privacy Policy with recorded consent, self-service data export and account deletion, and an opt-out for anonymous usage data. |
+| **Usage analytics** | 57 tracked events with no user text, an owner "Số liệu" (Analytics) page (DAU/WAU/MAU, funnel, D1/D7) and CSV/JSONL export; optional PostHog forwarding. |
 
 ### Launch channel and business model
 
@@ -158,32 +225,32 @@ Everything in this table is **built** and covered by tests that `verification/ve
 
 | Channel | Audience | Where | How we execute | Why it should work |
 |---|---|---|---|---|
-| **1. Community discovery** | Readers of Vietnamese romance web fiction (ngôn tình, đam mỹ, cổ trang, vườn trường) | Vietnamese Facebook groups, TikTok book and roleplay communities, Discord servers, Wattpad reading communities | Introduce Lyris as Vietnamese-first; short clips of story mode with the hand-written worlds that already ship (Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương): stepping into a story, talking, keeping control of your own persona. For Wattpad readers: another way to live character-driven fiction. | These communities already love fictional characters and relationship-driven stories. |
+| **1. Community discovery** | Readers of Vietnamese romance web fiction (ngôn tình, đam mỹ, cổ trang, vườn trường) | Vietnamese Facebook groups, TikTok book and roleplay communities, Discord servers, Wattpad reading communities | Introduce Lyris as Vietnamese-first; short clips of story mode with the hand-written worlds in [`worlds/`](worlds/) (Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương; imported in two steps, see [Try it as a reviewer](#try-it-as-a-reviewer)): stepping into a story, talking, keeping control of your own persona. For Wattpad readers: another way to live character-driven fiction. | These communities already love fictional characters and relationship-driven stories. |
 | **2. Creator-led discovery** | Writers and character creators | Wattpad writing communities, Vietnamese Facebook writing groups, TikTok creators, roleplay communities | Character Studio and the Lorebook for writers; publish public characters and share them with followers; the "Nhân vật hot" ranking and creator coin rewards (built) give a reason to promote. Later: collaborations with Vietnamese web-fiction authors, including Wattpad writers, only with the rights holders' permission. | Every writer brings characters, worlds and their own readers. |
 | **3. Referral and sharing** | Existing users | Inside the app | Invite codes (built): every invited member gets their own private stories. Referral coin rewards are planned (see Revenue). | A natural reason to bring friends along. |
 
 #### Distribution
 
-- **Submitted version (built):** a web app, installable as a PWA, served from one machine on the home LAN (a single-server HTTPS setup is documented in [docs/deploy.md](docs/deploy.md), not yet run on a real server). Sign-up is by invite code, released in waves to match capacity (about two replies generated at once per 12B model).
-- **Public launch (planned, after the course):** hosted Lyris on the web, the **App Store** and **Google Play**, with open sign-up (email, Sign in with Apple, Google) and real coin payments (Apple IAP, Google Play Billing, VNPay/MoMo). Design: [Roadmap](#roadmap-hosted-lyris) and [docs/server.md](docs/server.md).
+- **Submitted version (built):** a web app served from one machine; at home it runs over the LAN on plain HTTP, and it becomes installable as a PWA when served over HTTPS (a single-server HTTPS setup is documented in [docs/deploy.md](docs/deploy.md) (Vietnamese), not yet run on a real server). Sign-up is by invite code, released in waves on purpose: each wave is opened only when the numbers say the machine and the product can take more people (about two replies generated at once per 12B model).
+- **Public launch (planned, after the course):** hosted Lyris on the web, the **App Store** and **Google Play**, with open sign-up (email, Sign in with Apple, Google) and real coin payments (Apple IAP, Google Play Billing, VNPay/MoMo). Design: [Roadmap](#roadmap-hosted-lyris) and [docs/server.md](docs/server.md) (Vietnamese).
 
 #### Revenue model
 
-**Freemium + in-app purchases + subscription + advertising + creator economy.** Chatting costs coins. Every account gets free coins and can earn more; paying buys more coins and, later, extras. Inputs are already measured by the [tracking plan](#tracking-plan): messages per active user per day, compute per turn and every coin event.
+**Main stream: coins.** Chatting costs coins. Every account gets free coins and can earn more; paying buys coin packs, through Apple In-App Purchase and Google Play Billing in the apps and VNPay/MoMo on the web (planned; test mode today). **Later (not built):** a subscription, ads for free users, premium personalization and more creator incentives (table below). Inputs are already measured by the [tracking plan](#tracking-plan): messages per active user per day, compute per turn and every coin event.
 
-**Built now** (design: [docs/coins.md](docs/coins.md); features F42–F47; test mode, no real money changes hands yet):
+**Built now** (design: [docs/coins.md](docs/coins.md) (Vietnamese); features F42–F47; test mode, no real money changes hands yet):
 - **An account is required to chat.** A new account gets **300 coins**; every day you open the app adds **60** (a daily check-in; 360 on day one).
 - **Pay per reply:** every character reply costs **6 coins**: a sent turn, "Tạo lại câu trả lời" (regenerate), DM and Studio test chat. Reply suggestions and AI character drafting are free. A reply that fails or never starts costs nothing. Out of coins, the message box locks and offers "Nạp coin" (top up) and "Nhiệm vụ" (missions).
 - **Coin packs with tiered bonuses:** 100 coins for 10.000đ · 550 (500 + 50 bonus) for 50.000đ · 1.200 (1.000 + 200 bonus) for 100.000đ · 2.500 (2.000 + 500 bonus) for 200.000đ. Until launch the "Nạp coin" screen runs in test mode: prices are expected launch prices and nothing is sold; the operator gives away one-time top-up codes or adds coins by hand, with a reason. Test-mode coins reset to 0 at launch.
 - **Earning coins without paying:**
   - **Missions:** up to 30 coins a day: watch a 15-second sample ad (+5, three times; a placeholder for rewarded ads, no ad network yet), chat with 3 different characters (+10), send 20 turns (+5).
-  - **Creation:** when your public character enters the top 100, top 50 or top 10 of the "Nhân vật hot" (hot characters) ranking, you get +100, +200 or +300 coins, once per tier per character (jumping straight into the top 10 pays all three, 600). The ranking counts all-time players (other accounts who really played it) and refreshes every hour. Your first public character earns +50 once, after it has been public for 24 hours and someone else has played it. A player counts after 3 paid replies on 2 different days; ranking rewards are capped at 600 coins per creator per 7 days (the rest waits, it is not lost), and the machine owner earns none.
+  - **Creation:** when your public character enters the top 100, top 50 or top 10 of the "Nhân vật hot" (hot characters) ranking, you get +100, +200 or +300 coins, once per tier per character (jumping straight into the top 10 pays all three, 600). A top-N tier pays only once the board holds characters from at least N different creators, so a small board cannot be filled by one person. The ranking counts all-time players (other accounts who really played it) and refreshes every hour. Your first public character earns +50 once, after it has been public for 24 hours and someone else has played it. A player counts after 3 paid replies on 2 different days; ranking rewards are capped at 600 coins per creator per 7 days (the rest waits, it is not lost), and the machine owner earns none.
 
   This rewards the creators who bring players in.
 - **Self-hosting stays free:** the machine owner never spends coins, and a self-hoster can switch coins off entirely (`LYRIS_COINS=0`).
 - **Coins are not money:** no cash-out, no transfers between users, lost when an account is deleted.
 
-**Planned** (what we expect Lyris to have; not built):
+**Later** (what we expect Lyris to have; not built):
 
 | Stream | What we expect |
 |---|---|
@@ -196,9 +263,56 @@ Everything in this table is **built** and covered by tests that `verification/ve
 | **Creator economy** | On top of the built ranking rewards: performance-based incentives by how much players engage with public characters; creators promoting their characters and inviting readers. |
 | **Retention** | On top of the built daily coins and missions: 7-day chat-streak rewards and rewards for finishing story arcs and milestones. |
 
-**Store rules.** In the iOS and Android apps, every digital purchase (coins, subscriptions, personalization, early access) must go through Apple In-App Purchase or Google Play Billing, and every receipt is verified on the server into the same coin ledger ([docs/server.md §11](docs/server.md#11-thanh-toán-po-5a)). Auto top-up and subscriptions therefore follow the stores' purchase-confirmation and auto-renewal rules; VNPay/MoMo are used on the web only. Real ads in the apps need App Tracking Transparency and privacy labels.
+**Store rules.** In the iOS and Android apps, every digital purchase (coins, subscriptions, personalization, early access) must go through Apple In-App Purchase or Google Play Billing, and every receipt is verified on the server into the same coin ledger ([docs/server.md §11](docs/server.md#11-thanh-toán-po-5a), Vietnamese). Auto top-up and subscriptions therefore follow the stores' purchase-confirmation and auto-renewal rules; VNPay/MoMo are used on the web only. Real ads in the apps need App Tracking Transparency and privacy labels.
+
+#### Unit economics (estimates, to validate)
+
+Reference prices and a design load of 10,000 monthly users (~2.7 million replies a month), from [docs/server.md §8.7 and §15.3](docs/server.md#153-chi-phí-hằng-tháng-giá-tham-khảo-phải-xin-báo-giá) (Vietnamese). None of this is measured yet; the load test planned in F53 replaces the assumptions before any GPU contract.
+
+| Item | Estimate |
+|---|---|
+| Cost of one reply on the hosted plan | GPU ~26–45đ; all infrastructure ~35–65đ |
+| Price of one reply (6 coins) | 600đ (100-coin pack) down to 480đ (2,500-coin pack) |
+| Left after store or gateway fees (Apple 15 % or 30 %, gateways ~1–3 %), before tax | ~340–590đ |
+| Left after tax (to be confirmed by an accountant) | ~300–530đ, so a paid reply covers about 4.5–15× its infrastructure cost |
+| Free allowance, the acquisition cost | 300 coins on sign-up, then 60 a day plus up to 30 from missions: up to 15 free replies a day, about 0.5–1k đ of infrastructure per fully active free user per day |
+| Fixed monthly cost of the hosted plan | ~$3,000–6,700, about 80–175 million đ |
+| Break-even at 10,000 monthly users | ~8,000–17,500đ net revenue per monthly user, e.g. 5 % of users paying 160,000–350,000đ a month on average |
+
+Paid turns are profitable; the real question is how many users convert and how generous the free allowance can be. The tracking plan already records the coin funnel (`coins_insufficient` → `topup_viewed` → `topup_pack_selected` → `topup_code_redeemed`), which is how we will test it.
+
+#### Launch plan: first 90 days (proposed)
+
+A proposal for after the course; dates, wave sizes and the GPU budget are product-owner decisions that are still open ([docs/server.md §20](docs/server.md#20-câu-hỏi-cho-po), Vietnamese).
+
+| Step | What happens | Code needed | When to move on |
+|---|---|---|---|
+| **1. Invite-only web beta** (weeks 1–4) | Run today's app on one rented NVIDIA GPU server behind HTTPS, following [docs/deploy.md](docs/deploy.md) (Vietnamese). Reference price for one L40S: $0.9–1.6 an hour, about $650–1,150 a month if it runs all the time ([docs/server.md §15.3](docs/server.md#153-chi-phí-hằng-tháng-giá-tham-khảo-phải-xin-báo-giá)). Invite codes go out in waves through the [launch channels](#launch-channels); coins stay in test mode. | None: it runs on today's code. The deploy guide itself has not been run on a real server yet. | Open the next wave only while fewer than 20 % of replies wait in a queue (`waited` on `reply_completed`, [docs/deploy.md §9](docs/deploy.md#9-sức-chứa-ước-tính)) |
+| **2. Measure and adjust** (weeks 5–8) | Weekly review of weekly engaged stories, the activation funnel, D1/D7 and the coin funnel; tune free coins and missions; collect reports and feedback. | None (the "Số liệu" page and CSV/JSONL export exist) | The first targets in [tracking plan §5.3](docs/tracking-plan.md#53-first-targets-for-round-2), e.g. activation ≥ 50 % of invited sign-ups |
+| **3. Prepare the hosted version** (weeks 9–12) | Phases G0–G1 of [docs/server.md §18](docs/server.md#18-kế-hoạch-chuyển-đổi-theo-giai-đoạn-bắt-đầu-sau-15112026) (Vietnamese): tag the submitted version, open Apple/Google developer and payment merchant accounts, split interfaces in the code. | G1 code (interfaces for F50–F52) | `verify.sh` green in the self-host mode |
+
+After the 90 days: Postgres, Redis and vLLM (G2–G4, F50–F53), a closed web beta at scale (G5), open sign-up and VNPay/MoMo (G6, F57, F61), then the iOS and Android apps with in-app purchases (G7, F55, F56). None of these is coded yet.
 
 ### Build, run and access
+
+#### Try it as a reviewer
+
+There is no public URL for Lyris in this repository: it needs a machine with a GPU or Apple Silicon to run the model. Three ways to see it:
+
+> **Want to try it right away?** Lyris runs its own AI model on the host machine, so the setup is a little unusual. Contact the team at **lethuhang.cv@gmail.com** and we will help you get started, or give you access to a running instance with an invite code.
+
+1. **No install:** watch the [demo video](#demo-video) and look at the [screenshots](#screenshots) and the [evidence](#evidence) of the last full test run.
+2. **Look around without a model** (any machine with Python 3.12, `uv` and Node 22): build a demo database with sample characters and stories, then run the production-like server on spare ports. Browsing works; new AI replies need Ollama.
+   ```bash
+   (cd backend && uv sync)
+   backend/.venv/bin/python scripts/make_demo_db.py /tmp/lyris-demo/lyris.db /tmp/lyris-demo/avatars
+   LYRIS_DB_PATH=/tmp/lyris-demo/lyris.db LYRIS_AVATARS_DIR=/tmp/lyris-demo/avatars \
+     LYRIS_API_PORT=8064 LYRIS_WEB_PORT=8065 bash scripts/serve.sh
+   ```
+   Open http://localhost:8065 and enter the setup code that the terminal prints.
+3. **Full app on a 16 GB machine:** follow [Steps](#steps) below with a smaller model, `ollama pull gemma4:e4b`, then `LYRIS_CHAT_MODEL=gemma4:e4b bash scripts/dev.sh`. Expect weaker replies: `gemma4:12b` is the model we built and evaluated Lyris on.
+
+**Load the four hand-written worlds** (they are in [`worlds/`](worlds/), not in the seed data): Studio → "Nhập card" (Import card) → choose `worlds/<name>/card.json` → save; then, in that character's Lorebook, "Nhập từ file" (Import from file) → `worlds/<name>/world.md`, check the preview and import.
 
 #### Hardware for local AI
 
@@ -231,8 +345,9 @@ ollama pull bge-m3              # optional: memory search by meaning
 #   OLLAMA_FLASH_ATTENTION=1  OLLAMA_KV_CACHE_TYPE=q8_0  OLLAMA_NUM_PARALLEL=2
 #   On macOS, scripts/ollama-env.sh installs these as a LaunchAgent.
 
-# 2. Backend dependencies
-cd backend && uv sync && cd ..
+# 2. Dependencies
+(cd backend && uv sync)
+(cd frontend && npm ci)         # dev.sh also runs npm install if node_modules is missing
 
 # 3. Run backend (127.0.0.1:8000) and frontend (port 5173) together
 bash scripts/dev.sh
@@ -240,9 +355,16 @@ bash scripts/dev.sh
 
 - **First run:** the terminal prints a one-time **setup code** in a box ("Lyris: đặt mật khẩu cho tài khoản chủ máy"). Open http://localhost:5173, paste the code and choose the owner password. If the box is gone, run `bash scripts/lyris-admin.sh setup-code`.
 - **Phone or other devices on the same Wi-Fi:** open the LAN address that `dev.sh` prints (`http://<computer-ip>:5173`) and log in. Use `LYRIS_LAN=0` to keep the app on this computer only.
-- **Security note:** over plain Wi-Fi the connection is **not encrypted**, so use it only on a network you trust. Remote access over HTTPS (Tailscale, F37) is planned; a public server must run behind HTTPS with `LYRIS_COOKIE_SECURE=1` ([docs/deploy.md](docs/deploy.md)).
+- **Security note:** over plain Wi-Fi the connection is **not encrypted**, so use it only on a network you trust. Remote access over HTTPS (Tailscale, F37) is planned; a public server must run behind HTTPS with `LYRIS_COOKIE_SECURE=1` ([docs/deploy.md](docs/deploy.md), Vietnamese).
 - **Inviting someone:** go to Tài khoản → Quản lý tài khoản → Tạo mã mời, and send the code. The invited member signs up with it and gets their own private stories and coin wallet.
 - **Forgot the owner password:** run `bash scripts/lyris-admin.sh reset-password <handle>`.
+
+#### Troubleshooting
+
+- **"Cổng 8000 đang bị chiếm" (port in use):** `dev.sh` needs ports 8000 and 5173 free; stop whatever uses them, or use `scripts/serve.sh` with `LYRIS_API_PORT` and `LYRIS_WEB_PORT`.
+- **No reply, or a message that the model is missing:** check that Ollama is running and that `ollama list` shows the model in `LYRIS_CHAT_MODEL` (default `gemma4:12b`).
+- **The first reply is slow:** the first turn after start reads the whole story (tens of seconds); later turns are faster thanks to prefill.
+- **Machine check:** `node environment/doctor.mjs` lists what is missing (Python virtual environment, `node_modules`, Chrome for the bot).
 
 #### Production-like run on one machine
 
@@ -252,7 +374,7 @@ bash scripts/serve.sh      # builds frontend/dist, runs uvicorn without --reload
 LYRIS_API_PORT=8064 LYRIS_WEB_PORT=8065 LYRIS_DB_PATH=/tmp/lyris-demo/lyris.db bash scripts/serve.sh   # other ports and DB
 ```
 
-Use it for demos and home use. For the public launch (HTTPS, Caddy, systemd, backups), follow [docs/deploy.md](docs/deploy.md).
+Use it for demos and home use. For the public launch (HTTPS, Caddy, systemd, backups), follow [docs/deploy.md](docs/deploy.md) (Vietnamese).
 
 #### Configuration (environment variables)
 
@@ -271,18 +393,21 @@ Use it for demos and home use. For the public launch (HTTPS, Caddy, systemd, bac
 | `LYRIS_APP_VERSION` | package version | Version tag attached to every usage event. |
 | `LYRIS_CONTACT` | `lethuhang.cv@gmail.com` (set by `scripts/dev.sh` / `scripts/serve.sh`) | The operator's support email (or an `https://` page). The login page then offers "Xin mã mời" and "Quên mật khẩu?" links, and the legal texts show it in place of the contact placeholder. |
 
-All variables, with production values: [docs/deploy.md §6](docs/deploy.md#6-biến-môi-trường).
+All variables, with production values: [docs/deploy.md §6](docs/deploy.md#6-biến-môi-trường) (Vietnamese).
 
 #### Tests
 
-Run from the repository root (each line runs in its own subshell, so they can be pasted in order):
+Run from the repository root after the [Steps](#steps) above (each line runs in its own subshell, so they can be pasted in order):
 
 ```bash
-(cd backend && .venv/bin/pytest -q)                                  # ~1,650 tests
-(cd frontend && npm test && npm run typecheck && npm run build)      # ~465 tests
+(cd frontend && npm ci)                                              # once, if node_modules is missing
+(cd backend && .venv/bin/pytest -q)                                  # 1,649 passed, 113 skipped in the last full run
+(cd frontend && npm test && npm run typecheck && npm run build)      # 468 tests in the last full run
 backend/.venv/bin/python harness/run_eval.py --model gemma4:12b        # model-behaviour scenarios (needs Ollama)
 bash verification/verify.sh                                           # the harness judge: all of the above + the browser bot (see Harness below)
 ```
+
+Almost all of the 113 skipped backend tests are route and id combinations that do not apply in the two-account data-isolation sweep (`backend/tests/test_isolation_sweep.py`). The last full run is saved in [docs/evidence/verify-2026-11-14.json](docs/evidence/verify-2026-11-14.json).
 
 #### Repository map
 
@@ -296,27 +421,28 @@ bash verification/verify.sh                                           # the harn
 | `verification/` | Harness ③: `verify.sh` (the judge) and `plan-check.sh` |
 | `memory/` | Harness ④: `features.json` (feature state), `features.mjs`, `progress.md`, `po-questions.md` |
 | `training/` | LoRA fine-tuning experiments (planned phase) |
-| `docs/` | Phase designs (`plan.md`, `phase1–4.md`, `auth.md`, `design-impl.md`), [coins](docs/coins.md), [hosted server and App Store plan](docs/server.md), [tracking plan](docs/tracking-plan.md), [compliance](docs/compliance.md), [deploy](docs/deploy.md), [demo script](docs/demo-script.md), legal texts (`legal/terms.md`, `legal/privacy.md`) |
+| `docs/` | In Vietnamese: phase designs (`plan.md`, `phase1–4.md`, `auth.md`, `design-impl.md`), [coins](docs/coins.md), [hosted server and App Store plan](docs/server.md), [compliance](docs/compliance.md), [deploy](docs/deploy.md), [demo script](docs/demo-script.md). In English: the [tracking plan](docs/tracking-plan.md) and the [evidence](docs/evidence/) of test runs. Both languages: legal texts (`legal/terms.md`, `legal/privacy.md`). Screenshots in `assets/screenshots/`. |
 | `scripts/` | `dev.sh` (development), `serve.sh` (production-like run), `lyris-admin.sh` (setup code, password reset), `ollama-env.sh` (macOS Ollama settings) |
-| `wiki/` | Harness ①, the source of truth: original ideas (`raw/`), feature pages `features/F01…F47` (app) and `F50…F62` (hosted plan) with "Done when" and "Tests", screens, decisions, lessons learned |
+| `wiki/` | Harness ①, the source of truth: original ideas (`raw/`), feature pages `features/F01…F48` (app) and `F50…F62` (hosted plan) with "Done when" and "Tests", screens, decisions, lessons learned |
 | `DESIGN.md` | Design system and UI/UX specification |
 
 ### Launch and deploy
 
-- **Submitted version (built):** web app, installable PWA, running on one machine at home over LAN; a single-server HTTPS deployment (Caddy, systemd) is documented in [docs/deploy.md](docs/deploy.md) but not yet run on a real server. One machine with an NVIDIA GPU (≥ 16 GB VRAM) or Apple Silicon (≥ 24 GB) runs Ollama and the backend.
+- **Submitted version (built):** web app running on one machine at home over the LAN (installable as a PWA once served over HTTPS); a single-server HTTPS deployment (Caddy, systemd) is documented in [docs/deploy.md](docs/deploy.md) (Vietnamese) but not yet run on a real server. One machine with an NVIDIA GPU (≥ 16 GB VRAM) or Apple Silicon (≥ 24 GB) runs Ollama and the backend.
 - **Public launch (planned):** the hosted app on the web, App Store and Google Play described in the [Roadmap](#roadmap-hosted-lyris).
-- **Production setup:** [docs/deploy.md](docs/deploy.md): Ollama service and model, uvicorn as a systemd service (no `--reload`, `--no-proxy-headers`, one process), Caddy serving `frontend/dist` and proxying `/api`, `LYRIS_COOKIE_SECURE=1`, nightly SQLite backups, updates (migrations run on restart), capacity (~2 replies at once per 12B model) and monitoring.
+- **Age and content at launch:** 16+ (Terms); safe content on by default; 18+ mode later behind a toggle and 18+ confirmation. With safe content on and no 18+ content, the App Store rating to weigh is 12+ or 17+; an 18+ mode would need the rating reviewed again (17+/18+) ([docs/compliance.md §5.2, §6](docs/compliance.md)).
+- **Production setup:** [docs/deploy.md](docs/deploy.md) (Vietnamese): Ollama service and model, uvicorn as a systemd service (no `--reload`, `--no-proxy-headers`, one process), Caddy serving `frontend/dist` and proxying `/api`, `LYRIS_COOKIE_SECURE=1`, nightly SQLite backups, updates (migrations run on restart), capacity (~2 replies at once per 12B model) and monitoring.
 - **Quick production-like run:** `bash scripts/serve.sh`.
 
 ### Roadmap: hosted Lyris
 
-The submitted version runs on one machine (SQLite + Ollama) and stays supported as the self-host mode. After the course submission, Lyris becomes a public hosted app on the web, the App Store and Google Play. The full design is in [docs/server.md](docs/server.md) (planned features F50–F62, nothing coded yet):
+The submitted version runs on one machine (SQLite + Ollama) and stays supported as the self-host mode. After the course submission, Lyris becomes a public hosted app on the web, the App Store and Google Play. The full design is in [docs/server.md](docs/server.md) (Vietnamese; planned features F50–F62, nothing coded yet):
 - **Scale target:** ~10k monthly users, a few hundred people chatting at once.
 - **Backend:** stateless FastAPI pods behind Cloudflare and a load balancer; Postgres (append-only coin ledger kept by triggers and row locks); Redis (session cache, distributed generation gate, resumable SSE); a Postgres-backed job queue; images on S3-compatible storage.
 - **AI:** own GPU servers running the same open model (`gemma4:12b`, later our own LoRA fine-tunes) on vLLM, with an 8192-token context, prefix caching and story-sticky routing.
 - **Mobile:** the existing React app wrapped with Capacitor plus native plugins (StoreKit 2, Play Billing, Sign in with Apple, push).
 - **Payments:** Apple IAP and Google Play Billing in the apps, VNPay/MoMo on the web; every receipt is verified on the server and recorded in the same coin ledger.
-- **Reviewed:** the design went through an architecture and App Store/Play review (23 points, accepted or rejected with reasons in [docs/server.md §21](docs/server.md#21-phản-biện-đã-áp-dụng-2026-11-14)): coin holds are fenced in Postgres, the Redis gate cannot leak capacity when a server dies, unsafe text is filtered before it is streamed, and the model keeps its voice when moving from Ollama to vLLM.
+- **Reviewed:** the design went through an architecture and App Store/Play review (23 points, accepted or rejected with reasons in [docs/server.md §21](docs/server.md#21-phản-biện-đã-áp-dụng-2026-11-14), Vietnamese): coin holds are fenced in Postgres, the Redis gate cannot leak capacity when a server dies, unsafe text is filtered before it is streamed, and the model keeps its voice when moving from Ollama to vLLM.
 - **Rollout after submission:** phases G0–G8 (prepare → interfaces → Postgres → Redis + stateless API → vLLM → S3 + observability + web beta → open sign-up + VNPay/MoMo → iOS/Android apps → import + own LoRA). Every phase must keep `verification/verify.sh` green in the self-host mode.
 
 **Other planned product features** (not built):
@@ -329,6 +455,7 @@ The submitted version runs on one machine (SQLite + Ollama) and stays supported 
 | Hosted coin economy with real payments (F56 Apple IAP / Google Play Billing, F57 VNPay/MoMo) | Same coin rules as the built test mode |
 | Community: comments, follows, sharing (F39) | Needs its own moderation and privacy plan |
 | Story director and "Khoảnh khắc" moments (F40) | The banner and tab exist; the backend does not generate them yet |
+| "Nội dung an toàn" (safe content) toggle and 18+ confirmation (F48) | Only once 18+ content exists: on by default; turning it off needs ticking "Tôi đã đủ 18 tuổi" (I am 18 or older); only the time is stored; the operator can take it back. Store age rating reviewed again then (17+/18+) |
 | Tender Moment: phone calls with the character, emotional character voices, ambient sounds, voice input | Idea stage, no design yet; also the first early-access feature in the [revenue model](#revenue-model) |
 | Premium personalization, multilingual characters, subscription, real ads, streaks | See [Revenue model](#revenue-model) |
 
@@ -356,15 +483,68 @@ Full plan: [docs/tracking-plan.md](docs/tracking-plan.md).
 ### Privacy and compliance
 
 - **Legal texts:** [Terms](docs/legal/terms.md) and [Privacy Policy](docs/legal/privacy.md) (Vietnamese and English), public in the app at `#/terms` and `#/privacy`; consent is required at sign-up and recorded with its version. The contact email comes from `LYRIS_CONTACT`; the run scripts set it to lethuhang.cv@gmail.com.
-- **Safe by default:** no sexual content; romance, jealousy and possessiveness stay non-explicit; sexual content involving minors is refused absolutely. The rule is in every story, texting and character-draft prompt.
+- **Age: 16+.** The Terms say Lyris is for people aged 16 or older (under-16s are children under Vietnam's Decree 13/2023); accepting the Terms at sign-up confirms it. No birth date is collected; an account found to belong to someone under 16 is deleted.
+- **Safe by default:** the "Nội dung an toàn" (safe content) setting is on for everyone: no sexual content; romance, jealousy and possessiveness stay non-explicit; sexual content involving minors is refused absolutely. The rule is in every story, texting and character-draft prompt.
 - **User controls:** "Báo cáo" on every AI reply (the reply text reaches the operator only if the reporter allows it) and "Báo cáo nhân vật" on public characters, never linked to the reporter; "Tải dữ liệu của tôi" (JSON export), "Xoá tài khoản", and the usage-data opt-out (which also stops recording on that browser after sign-out).
 - **A way in for open-web visitors:** sign-up is by invite code; the login page tells visitors without a code how to get one, and members who forgot their password how to reach the operator (`LYRIS_CONTACT`).
-- **Planned, not built:** a "mature mode" behind real age verification, and coin payments through a compliant payment provider.
-- **Checklist** against open-web, Google Play, App Store and Vietnam personal-data rules: [docs/compliance.md](docs/compliance.md).
+- **Planned, not built:** an 18+ mode later behind a toggle and 18+ confirmation (turning "Nội dung an toàn" off requires ticking "Tôi đã đủ 18 tuổi"; only the time is stored; F48), and coin payments through a compliant payment provider.
+- **Checklist** against open-web, Google Play, App Store and Vietnam personal-data rules: [docs/compliance.md](docs/compliance.md) (Vietnamese).
 
 ### AI-native workflow: how we built Lyris with Claude
 
-Our team built Lyris in about four days with **Claude Code** (Claude Opus). We wrote the vision, the design spec (`DESIGN.md`), the character worlds and every product decision. Claude wrote almost all of the code, tests and design docs. We directed and corrected it in plain Vietnamese.
+Our team built Lyris between 12 and 15 November 2026 with **Claude Code** (Claude Opus): the brief came out on 12 November, the entries in `wiki/raw/` run from 12 to 15 November and those in `wiki/log.md` from 12 to 14 November, and the last commits are from 15 November. We wrote the vision, the design spec (`DESIGN.md`), the character worlds and every product decision. Claude wrote almost all of the code, tests and design docs. We directed and corrected it in plain Vietnamese.
+
+#### By the numbers
+
+Counted from the repository on 15 November 2026.
+
+| | Count | Source |
+|---|---|---|
+| Built features passing `verify.sh` | **42 of 42** ✅, 0 🟡, 0 ⛔ (plus 18 planned at that run; F48 added as planned on 2026-11-15) | `node memory/features.mjs brief` |
+| Feature pages with "Done when" and "Tests" | 60 | [`wiki/features/`](wiki/features/) |
+| Dated original messages from the product owner | 32 | [`wiki/raw/`](wiki/raw/) |
+| Decision pages, each with its reason | 71 | [`wiki/decisions/`](wiki/decisions/) |
+| Lessons (Wrong · Why · Rule · Source) | 50 | [`wiki/learned.md`](wiki/learned.md) |
+| Open questions for the product owner (most with a tentative choice, marked "tạm chọn") | 33 | [`memory/po-questions.md`](memory/po-questions.md) |
+| Real-model behaviour scenarios | 22 | [`harness/scenarios/`](harness/scenarios/) |
+| Last full `verify.sh` run (2026-11-14, 16:47 UTC) | backend 1,649 passed (113 skipped), frontend 468, typecheck and build green, bot 113/113, 0 regressions | [docs/evidence/verify-2026-11-14.json](docs/evidence/verify-2026-11-14.json) |
+| Real bugs the browser bot found that unit tests had missed | 2 (see [Harness](#harness-based-on-aperos-mini-harness)) | [`wiki/learned.md`](wiki/learned.md), [`wiki/log.md`](wiki/log.md) |
+
+#### Lifecycle of a feature
+
+```mermaid
+flowchart TD
+    A["Product owner's message<br/>saved verbatim in wiki/raw/ (environment/raw.mjs)"] --> B["/plan: Claude asks back with<br/>multiple-choice questions (e.g. 1A 2C 3A)"]
+    B --> C["Feature page wiki/features/FNN<br/>Done when: Unit / Bot / Model thật + Tests"]
+    C --> D["verification/plan-check.sh:<br/>is the wiki complete enough to build?"]
+    D --> E["/build: Claude writes the tests first and runs them red"]
+    E --> F["Claude writes the code until they pass"]
+    F --> G["Claim: features.mjs claim FNN (🟡 built, not proven)"]
+    G --> H["verification/verify.sh: pytest, npm test, typecheck, build,<br/>browser bot (+ real model with --real-model)"]
+    H -->|green| I["✅ passing, logged in wiki/log.md"]
+    H -->|red, up to 3 times| E
+    H -->|third red| J["⛔ blocked: lesson in wiki/learned.md,<br/>question in memory/po-questions.md"]
+```
+
+#### Claude at each stage
+
+| Stage | What Claude did | Evidence in the repo | Who decided |
+|---|---|---|---|
+| Ideation | Reviewed and rewrote the original plan; ran the Phase 0 model bake-off; read the Apero brief as a checklist and listed what was missing for launch | [`wiki/raw/2026-11-12-plan-goc.md`](wiki/raw/2026-11-12-plan-goc.md) → [`docs/plan.md`](docs/plan.md) (Vietnamese); [`wiki/learned.md`](wiki/learned.md) (model choice); [`wiki/log.md`](wiki/log.md) (launch-readiness review, 2026-11-14) | Product owner |
+| Specs | Turned each message into feature pages with "Done when" lines, decision pages and design docs; asked multiple-choice questions where the wiki was unclear | [`wiki/features/`](wiki/features/), [`wiki/decisions/`](wiki/decisions/), [`DESIGN.md`](DESIGN.md) → [`docs/design-impl.md`](docs/design-impl.md) (Vietnamese), [`memory/po-questions.md`](memory/po-questions.md) | Product owner answers; Claude marks "(tạm chọn)" (tentative) choices |
+| Code | Backend, frontend and migrations, test-first | `backend/lyris/`, `frontend/src/` | Claude, inside the rules in [`environment/rules.md`](environment/rules.md) |
+| Test | Unit tests, a browser bot on a fake LLM, real-model scenarios | `backend/tests/`, [`environment/e2e.mjs`](environment/e2e.mjs), [`harness/scenarios/`](harness/scenarios/) | `verify.sh` alone marks ✅ |
+| Iterate | Adversarial reviews with verifiers, design look-loops scored a–e at 390 px, lessons after mistakes | [`wiki/log.md`](wiki/log.md), [`memory/progress.md`](memory/progress.md) (design scores), [`wiki/learned.md`](wiki/learned.md), [docs/server.md §21](docs/server.md#21-phản-biện-đã-áp-dụng-2026-11-14) (23-point review, Vietnamese) | Product owner on taste; `verify.sh` on correctness |
+
+#### One feature end to end: F47 character search
+
+1. **Idea.** Answering Claude's questions about the creator rewards, the product owner chose "1A 2C 3A 4A 5A" and asked for a search bar on Explore ([`wiki/raw/2026-11-14-f44-bang-xep-hang-tra-loi.md`](wiki/raw/2026-11-14-f44-bang-xep-hang-tra-loi.md)).
+2. **Plan.** `/plan` reworked F44, added F46 (the hot characters ranking) and F47 (search), and logged it ([`wiki/log.md`](wiki/log.md): "/plan F44 làm lại theo câu trả lời 1A 2C 3A 4A 5A").
+3. **Spec.** [`wiki/features/F47-tim-nhan-vat.md`](wiki/features/F47-tim-nhan-vat.md): four Unit lines and three Bot lines (diacritic-free matching, 250 ms debounce, no typed text in analytics, fits one line at 390 px), each named under "Tests".
+4. **Tests, then code.** [`frontend/src/pages/explore/search.test.ts`](frontend/src/pages/explore/search.test.ts) and three bot checks in [`environment/e2e.mjs`](environment/e2e.mjs), then [`frontend/src/pages/explore/search.ts`](frontend/src/pages/explore/search.ts).
+5. **Claim and look.** `F47 🟡 claimed`, then a design score of a5 b5 c5 d5 e5 at 390 px in both themes ([`memory/progress.md`](memory/progress.md)).
+6. **Review.** An adversarial review changed matching to the start of words ("ha" finds "Hạ Vy" but not every name containing "thành"); the choice went to the product owner as an open question ([`memory/po-questions.md`](memory/po-questions.md)) and the "Done when" line was updated.
+7. **Verified.** `verify.sh` green: "F47 ✅ passing (Tìm nhân vật ở Khám phá)" in [`wiki/log.md`](wiki/log.md).
 
 #### How the work was organised
 
@@ -378,11 +558,23 @@ Our team built Lyris in about four days with **Claude Code** (Claude Opus). We w
    - a fix stage with regression tests;
    - an end-to-end smoke test on a copy of real data.
 
-   Phase 4 (lorebook) used 22 agents and Phase 4b (accounts) 23, about two hours each.
+   The big phases (Phase 4 lorebook, Phase 4b accounts) each ran as one such pipeline of sub-agents. The pipeline scripts and agent logs were not kept in the repo; what they produced is: the design docs (`docs/phase4.md`, `docs/auth.md`), the fixes and tests, and the lessons in `wiki/learned.md`.
 3. **Measure on the real model, not in theory.** Claims about speed and model behaviour were tested on the local model with timing tables and Ollama cache logs. Before/after scenario tables covered cases such as forgetting a birthday, jealousy and apologies.
-4. **Persistent memory of preferences.** Claude keeps short memory notes of standing rules (reply in Vietnamese, say "story" not "câu chuyện", hide technical UI, no quotes in dialogue cards, equal-size grid cards). Corrections then stick across sessions.
+4. **Persistent memory of preferences.** Claude keeps short memory notes of standing rules (reply in Vietnamese, say "story" not "câu chuyện", hide technical UI, no quotes in dialogue cards, equal-size grid cards). Corrections then stick across sessions. Those notes live on the developer's machine; the same rules are in the repo in [`CLAUDE.md`](CLAUDE.md) and [`environment/rules.md`](environment/rules.md) (Vietnamese), with permissions in `.claude/settings.json`, and the UI wording rules are checked by a test (`frontend/src/copyWords.test.ts`).
 5. **A wiki as the source of truth.** `wiki/` keeps our original messages verbatim (`raw/`), a page per feature with a *Done when* checklist checked against the code, a page per decision with its reason, and `learned.md` for mistakes not to repeat.
-6. **A launch-readiness pass against the brief.** Before submission we gave Claude the Apero assignment brief and asked whether Lyris would pass. The gap analysis found what was missing for a public launch: no event tracking, no Terms or Privacy Policy, no consent, no in-app reporting, no account deletion or data export, and no deploy guide, demo script or team section. We made the product decisions (store events locally and in PostHog with no user text; safe content by default with no age gate yet; mature mode only as a plan), then ran one scripted workflow: backend tracking → backend compliance → frontend → documentation → review and fixes, each stage with the same hard rules and the full test suites green at the end.
+6. **A launch-readiness pass against the brief.** Before submission we gave Claude the Apero assignment brief and asked whether Lyris would pass. The gap analysis found what was missing for a public launch: no event tracking, no Terms or Privacy Policy, no consent, no in-app reporting, no account deletion or data export, and no deploy guide, demo script or team section. We made the product decisions (store events locally and in PostHog with no user text; safe content by default with no age gate yet; mature mode only as a plan; on 2026-11-15 the age policy became 16+ in the Terms, with an 18+ toggle and self-confirmation planned as F48), then ran one scripted workflow: backend tracking → backend compliance → frontend → documentation → review and fixes, each stage with the same hard rules and the full test suites green at the end.
+
+#### Shared Claude accounts
+
+Following the brief's rule on shared accounts, we used one Claude Code project for this repository only. Its context and knowledge base are files inside the repo (`CLAUDE.md`, `environment/rules.md`, `wiki/`), so nothing is mixed with other teams' projects, and we did not open, edit or delete any other team's projects or files.
+
+#### Development history
+
+The GitHub repository was first committed on 14 November 2026, so the git history is short (a few large commits). The day-by-day history is in the repo itself:
+- [`wiki/raw/`](wiki/raw/): the product owner's original messages, verbatim and dated, from 12 November;
+- [`wiki/log.md`](wiki/log.md): every `/plan`, every harness change and every feature that `verify.sh` moved to ✅;
+- [`memory/progress.md`](memory/progress.md): claims, notes, red and green runs and design scores;
+- [`wiki/learned.md`](wiki/learned.md) and [`memory/po-questions.md`](memory/po-questions.md): mistakes turned into rules, and the questions still open.
 
 #### What worked
 
@@ -394,7 +586,7 @@ Our team built Lyris in about four days with **Claude Code** (Claude Opus). We w
 
   Adversarial verifiers filtered out false alarms, so fix stages worked only on confirmed defects.
 - **Measuring beat guessing.** Reading Ollama's prefix-cache logs showed exactly why long stories were slow, and led to the "raw prefill" fix: first-token time on window shifts dropped from 26–30 s to about 5 s. A suspected slow-prompt regression (68 s per extraction) turned out to be the machine running at half speed; the fix that followed still cut extraction to about 15 s.
-- **Tests as the contract.** About 1,650 backend and 465 frontend tests, including a route-by-route data-isolation sweep across two accounts and a check that no typed text ever reaches analytics. Large refactors such as adding login to every route stayed safe.
+- **Tests as the contract.** 1,649 passing backend and 468 frontend tests in the last full run, including a route-by-route data-isolation sweep across two accounts and a check that no typed text ever reaches analytics. Large refactors such as adding login to every route stayed safe.
 - **Checking ourselves against the brief.** Reading the assignment as a checklist, rather than only building features, surfaced launch work (tracking, consent, deletion, reporting) that a feature-by-feature plan had left for "later".
 - **Design docs before code.** Contracts written first let backend and frontend agents work without stepping on each other. A "critique" pass on the design was much cheaper than fixing code later.
 
@@ -412,7 +604,7 @@ Our team built Lyris in about four days with **Claude Code** (Claude Opus). We w
 - **Prompting can't fix everything in a 12B model.** DM replies kept ending with "ngủ sớm đi", and the character sometimes contradicted the lore or forgot a text-message plan. Prompt changes and validation rules reduced these but did not remove them. That is the case for the planned LoRA fine-tune.
 - **Shared hardware got in the way.** Real-model tests share one local GPU with our own chatting. We had to stop the app during measurements, and long workflows were paused and resumed several times. One measurement was wrong because the machine was under memory pressure.
 - **Agents slip on the rules.** Agents occasionally broke house rules, such as calling the system Python instead of the project's virtual environment, or echoing a temporary secret into a log. Explicit hard rules in every agent prompt, plus a review stage, contained this.
-- **Cost.** Thorough multi-agent phases are token-heavy (millions of tokens per phase). They pay off for security-sensitive or cross-cutting work; small UI fixes are faster done directly.
+- **Cost.** Thorough multi-agent phases use far more tokens than direct edits (we did not keep per-phase token counts). They pay off for security-sensitive or cross-cutting work; small UI fixes are faster done directly.
 - **Some things cannot be verified by an agent.** The production Caddy setup was written from documentation, not run on a server; the demo video and the parallel-generation speed on a GPU need a person and real hardware. These are marked as such in the docs instead of being claimed as done.
 
 ### Harness (based on Apero's mini-harness)
@@ -421,12 +613,26 @@ Lyris is built and checked with a harness adapted from Apero's teaching *mini-ha
 
 | Part | Folder | What it holds |
 |---|---|---|
-| ① Wiki | `wiki/` | One page per feature: `features/F01-…` to `F47-…` for the app and `F50-…` to `F62-…` for the hosted plan. Each page has "Done when" lines of three kinds (`Unit:`, `Bot:`, `Model thật:`) and a "Tests" list naming the tests that prove them. Also screens, decisions, `learned.md`, `log.md` and `plan-checklist.md`. `raw/` keeps the owner's original messages and is never edited. |
-| ② Environment | `environment/` | `rules.md`, the AI's working rules (pulled in by `CLAUDE.md`), and `doctor.mjs`, a machine check. Also the browser bot: `bot.mjs` drives headless Chrome over the DevTools Protocol (no extra dependencies), `e2e.mjs` holds 112 named checks, and `fake-server.py` runs the real backend with a scripted fake LLM and a temporary database on ports 8066/8067. The bot never touches `data/`, Ollama or ports 8000/5173. |
+| ① Wiki | `wiki/` | One page per feature: `features/F01-…` to `F48-…` for the app and `F50-…` to `F62-…` for the hosted plan. Each page has "Done when" lines of three kinds (`Unit:`, `Bot:`, `Model thật:`) and a "Tests" list naming the tests that prove them. Also screens, decisions, `learned.md`, `log.md` and `plan-checklist.md`. `raw/` keeps the owner's original messages and is never edited. |
+| ② Environment | `environment/` | `rules.md`, the AI's working rules (pulled in by `CLAUDE.md`), and `doctor.mjs`, a machine check. Also the browser bot: `bot.mjs` drives headless Chrome over the DevTools Protocol (no extra dependencies), `e2e.mjs` holds 113 named checks, and `fake-server.py` runs the real backend with a scripted fake LLM and a temporary database on ports 8066/8067. The bot never touches `data/`, Ollama or ports 8000/5173. |
 | ③ Verification | `verification/` | `verify.sh`, the judge, and `plan-check.sh`, which checks that the wiki is complete enough to build. |
 | ④ Memory | `memory/` | `features.json` holds only the state of each feature and is written by `features.mjs`, never by hand. Also `progress.md` and `po-questions.md`. |
 
 `harness/` is separate: it holds the model bake-off and the behaviour scenarios on the real model (`run_eval.py`). `verify.sh --real-model` calls it.
+
+**How Lyris adapted the mini-harness.** The core loop is the mini-harness one (claim 🟡 → only the judge marks ✅ → 3 reds → ⛔ with a lesson; the wiki is the source of truth). On top of it, this repo has these Lyris-specific rules and tools:
+
+| Area | Lyris version | Where |
+|---|---|---|
+| "Done when" lines | Three kinds: `Unit:`, `Bot:` and `Model thật:` (real model); a real-model line must name a scenario id, or the promotion is refused | [`environment/rules.md`](environment/rules.md), [`harness/scenarios/`](harness/scenarios/) |
+| UI checks | A browser bot driving headless Chrome over the DevTools Protocol, with no extra dependencies, against the real backend and a scripted fake LLM on ports 8066/8067 with a scratch database | `environment/bot.mjs`, `environment/e2e.mjs`, `environment/fake-server.py` |
+| Fair red counts | Tooling failures (busy port, missing Chrome) are recorded as `infra` and do not count as a red run | `environment/bot.mjs`, [`wiki/log.md`](wiki/log.md) |
+| Regressions | A ✅ feature drops back to ⏳ when its tests go red in a later run, or when its "Done when" or "Tests" change | `memory/features.mjs`, [`wiki/log.md`](wiki/log.md) |
+| Design | A look-loop: the bot takes screenshots at 390 px in both themes and Claude scores them a–e before claiming | `node environment/bot.mjs --look`, [`memory/progress.md`](memory/progress.md) |
+| Guard rails | Claude may not edit `memory/features.json`, `wiki/raw/`, `verification/` or `data/`, nor promote features by hand; `wiki/raw/` only grows through `environment/raw.mjs` | `.claude/settings.json`, [`environment/rules.md`](environment/rules.md) |
+| Hardening | The harness itself went through an adversarial review on 2026-11-14 (automatic ⛔ on the third red, `reopen` keeps the red count, bot timeouts and dialog logging) | [`wiki/log.md`](wiki/log.md) |
+
+What was hard: a full `verify.sh` run takes 3–5 minutes, and real-model lines need the GPU free of anyone chatting.
 
 **Claude Code commands** (`.claude/commands/`):
 - `/plan`: a new idea becomes wiki pages and a feature plan. The raw message is saved with `environment/raw.mjs`, then the command runs `plan-check`.
@@ -456,12 +662,21 @@ node memory/features.mjs list                  # the tally
 
 Exit codes: 0 green, 1 red, 3 green with features still 🟡.
 
-**Tally on 2026-11-14** (latest runs: backend 1,646 passed, frontend 465, bot 112/112): **✅ 37 · 🟡 5 · ⏳ 18 · ⛔ 0.**
-- ✅ passing (including the real-model scenarios): F01–F21, F24–F36, F42, F43, F45.
-- 🟡 built, waiting for the next full `verify.sh`: F22, F23, F44, F46, F47 (Explore search, the "Nhân vật hot" ranking and the reworked creator rewards).
-- ⏳ planned: F37–F41 (iPhone over Tailscale, sending images, community, story director, model fine-tuning) and F50–F62 (hosted server and App Store, after the course).
+**Tally on 2026-11-14** (last full `verify.sh` run at 16:47 UTC: backend 1,649 passed and 113 skipped, frontend 468, typecheck and build green, bot 113/113, no regressions): **✅ 42 · 🟡 0 · ⏳ 18 · ⛔ 0.**
+- ✅ passing: F01–F36 and F42–F47, including machine-checked real-model scenarios for the features that have "Model thật" lines (judge off: machine rules only, see [Evidence](#evidence)).
+- ⏳ planned: F37–F41 (iPhone over Tailscale, sending images, community, story director, model fine-tuning) and F50–F62 (hosted server and App Store, after the course). F48 (safe-content toggle and 18+ confirmation) was added as planned on 2026-11-15, after this run.
 
-The bot found a real bug on its first pass. The character editor validated the card after cleaning, and cleaning keeps only 3 "Lời nói đặc trưng" lines, so a 4th line was dropped silently instead of blocking the save. It is fixed and covered by a unit test (`saveProblems`).
+The bot found two real bugs that unit tests had missed:
+- On its first pass: the character editor validated the card after cleaning, and cleaning keeps only 3 "Lời nói đặc trưng" (signature lines), so a 4th line was dropped silently instead of blocking the save. It is fixed and covered by a unit test (`saveProblems`).
+- After the harness review: in the character editor, leaving with unsaved changes through a real link or the Back button did not ask first, because the guard ran after the router. It is fixed in the router and covered by a bot check and `frontend/src/lib/router.test.ts`.
+
+#### Evidence
+
+`reports/` and `harness/results/` are git-ignored, so copies of the latest results are committed in [`docs/evidence/`](docs/evidence/):
+- [verify-2026-11-14.json](docs/evidence/verify-2026-11-14.json): the last full `verify.sh` run (suites, bot, promoted features, no regressions).
+- [bot-checks.md](docs/evidence/bot-checks.md): all 113 bot checks with their results.
+- [real-model-eval.md](docs/evidence/real-model-eval.md): the real-model runs on `gemma4:12b`, scenario by scenario (judge off, so only machine rules were scored).
+- Screenshots: [docs/assets/screenshots/](docs/assets/screenshots/) (see [Screenshots](#screenshots)).
 
 ### Team
 
@@ -469,29 +684,89 @@ The bot found a real bug on its first pass. The character editor validated the c
 |---|---|---|---|
 | **Le Thu Hang** | 240116 | Product owner, lead builder | Product vision and every product decision; built the app with Claude Code (wiki as source of truth, harness, verification); hands-on QA; demo video |
 | Nguyen Ngoc Anh Thu | 240065 | Research, tester | Problem statement, market data and research review, Jobs to be done, personas; app testing and bug reports |
-| Nguyen Thi Hai An | 240032 | Content and design, tester | Sample characters and worlds, character art, UI feedback; app testing and bug reports |
+| Nguyen Thi Hai An | 240032 | Content and design, tester | Sample characters, character worlds and descriptions, UI feedback; app testing and bug reports |
 | Nguyen Anh Hong | 240169 | Business | Revenue model and coin pricing, launch channels |
-| Huynh Quoc Toi | 240193 | Tracking and QA | Tracking plan, privacy and terms review, app testing |
+| Huynh Quoc Toi | 240193 | Tracking and QA | Tracking plan review, privacy and terms review, app testing |
+
+### Ownership and publishing
+
+We have read the brief: if Lyris passes Apero's gating, it will be published under Apero's name and the copyright will belong to Apero. For that reason the repository carries no open-source licence. Third-party parts keep their own licences, all listed in [wiki/design/credits.md](wiki/design/credits.md) (Vietnamese):
+- background photos of the sample characters from Wikimedia Commons (CC BY-SA 4.0, CC BY 4.0, CC0, CC BY-SA 3.0), cropped;
+- the fonts Cormorant Garamond, Plus Jakarta Sans and Be Vietnam Pro, self-hosted under the SIL Open Font License 1.1;
+- icons drawn after Lucide's shapes (ISC licence);
+- the chat model (`gemma4:12b`) is not in the repository: the operator downloads it through Ollama under the model's own terms.
+
+Two assets need attention before any public use: the avatars of the four hand-written characters live only in the owner's local data and have no recorded source yet ([credits §4](wiki/design/credits.md)), and the demo video's soundtrack is a copyrighted song ([docs/demo-video-plan.md](docs/demo-video-plan.md), Vietnamese), so it must be replaced for any public or commercial use.
+
+### Handover to Apero
+
+What Apero (or any operator) needs to run Lyris for real users:
+
+| Need | Why | Where it is described |
+|---|---|---|
+| A GPU machine: NVIDIA with ≥ 16 GB VRAM, or Apple Silicon with ≥ 24 GB | Runs Ollama, the model and the backend | [Launch and deploy](#launch-and-deploy), [docs/deploy.md](docs/deploy.md) (Vietnamese) |
+| A domain with HTTPS (Caddy) and `LYRIS_COOKIE_SECURE=1` | Secure sign-in cookies; makes the PWA installable | [docs/deploy.md §5](docs/deploy.md#5-ra-mắt-open-web-caddy--systemd-linux) (Vietnamese) |
+| An operator contact (`LYRIS_CONTACT`) | Shown on the login page and in the Terms and Privacy Policy | [Configuration](#configuration-environment-variables) |
+| A PostHog project key (`LYRIS_POSTHOG_KEY`), or the CSV/JSONL export | Round 2 data | [docs/tracking-plan.md](docs/tracking-plan.md) |
+| A legal entity for Apple Developer, Google Play Console, VNPay/MoMo and e-invoices | Real payments and store releases | [memory/po-questions.md](memory/po-questions.md), [docs/server.md §11](docs/server.md#11-thanh-toán-po-5a) (Vietnamese) |
+| Before opening the doors | Run the pre-launch checklist; test-mode coins reset to 0 at launch | [docs/deploy.md §10](docs/deploy.md#10-kiểm-trước-khi-mở-cửa) (Vietnamese), [Revenue model](#revenue-model) |
 
 ---
 
 ## Tiếng Việt
 
-[Video demo](#video-demo) · [Vấn đề](#vấn-đề) · [Công việc cần làm](#công-việc-cần-làm-jobs-to-be-done) · [Người dùng mục tiêu](#người-dùng-mục-tiêu) · [Tính năng chính](#tính-năng-chính) · [Ra mắt và doanh thu](#kênh-ra-mắt-và-mô-hình-doanh-thu) · [Cài đặt và chạy](#cài-đặt-chạy-và-truy-cập) · [Ra mắt và triển khai](#ra-mắt-và-triển-khai) · [Lộ trình](#lộ-trình-lyris-trên-máy-chủ) · [Giới hạn](#giới-hạn-và-đánh-giá-tiếp-theo) · [Theo dõi sự kiện](#kế-hoạch-theo-dõi-sự-kiện) · [Quyền riêng tư](#quyền-riêng-tư-và-tuân-thủ) · [Quy trình cùng AI](#quy-trình-làm-việc-cùng-ai-nhóm-đã-xây-lyris-cùng-claude-thế-nào) · [Harness](#harness-theo-mẫu-mini-harness-của-apero) · [Nhóm](#nhóm)
+### Dành cho người chấm: đối chiếu đề bài
+
+Mỗi phần của đề bài được trả lời ở đâu trong nửa tiếng Việt.
+
+| Đề bài | Xem ở |
+|---|---|
+| **Sản phẩm 1:** toàn bộ mã nguồn | `backend/` (FastAPI + SQLite), `frontend/` (React + Vite), [Repository map](#repository-map) |
+| **Sản phẩm 2:** tên và đoạn giới thiệu | [Giới thiệu](#giới-thiệu) |
+| Vấn đề, người dùng mục tiêu | [Vấn đề](#vấn-đề), [Người dùng mục tiêu](#người-dùng-mục-tiêu), [Định vị và vì sao là lúc này](#định-vị-và-vì-sao-là-lúc-này) |
+| Tính năng chính | [Vòng lặp chính và ngoài phạm vi](#vòng-lặp-chính-và-ngoài-phạm-vi), [Tính năng chính](#tính-năng-chính) |
+| Kênh ra mắt, cách có người dùng và doanh thu | [Kênh ra mắt và mô hình doanh thu](#kênh-ra-mắt-và-mô-hình-doanh-thu), [Kinh tế đơn vị](#kinh-tế-đơn-vị-ước-tính-cần-kiểm-chứng), [Kế hoạch ra mắt](#kế-hoạch-ra-mắt-90-ngày-đầu-đề-xuất) |
+| Cách build, chạy, truy cập | [Dùng thử cho người chấm](#dùng-thử-cho-người-chấm), [Cài đặt, chạy và truy cập](#cài-đặt-chạy-và-truy-cập) |
+| Quy trình AI-native (dùng Claude thế nào, điều làm tốt và chưa tốt) | [Quy trình cùng AI](#quy-trình-làm-việc-cùng-ai-nhóm-đã-xây-lyris-cùng-claude-thế-nào), [Harness](#harness-theo-mẫu-mini-harness-của-apero) |
+| Thành viên, vai trò, đóng góp | [Nhóm](#nhóm) |
+| **Sản phẩm 3:** kế hoạch tracking | [docs/tracking-plan.md](docs/tracking-plan.md) (tiếng Anh, 57 sự kiện; tóm tắt ở [Kế hoạch theo dõi sự kiện](#kế-hoạch-theo-dõi-sự-kiện)) |
+| **Sản phẩm 4:** video demo (2–3 phút) | [Video demo](#video-demo) (2:22), [Ảnh chụp màn hình](#ảnh-chụp-màn-hình) |
+| Tiêu chí: tư duy sản phẩm | [Vấn đề](#vấn-đề), [Công việc cần làm](#công-việc-cần-làm-jobs-to-be-done), [Vòng lặp chính](#vòng-lặp-chính-và-ngoài-phạm-vi), [Kinh tế đơn vị](#kinh-tế-đơn-vị-ước-tính-cần-kiểm-chứng) |
+| Tiêu chí: thực thi | [Bằng chứng](#bằng-chứng) (lần `verify.sh` đầy đủ gần nhất, check của bot, lần chạy model thật), [Ảnh chụp màn hình](#ảnh-chụp-màn-hình) |
+| Tiêu chí: quy trình AI-native | [Con số](#con-số), [Vòng đời một tính năng](#vòng-đời-một-tính-năng), [Một tính năng từ đầu đến cuối](#một-tính-năng-từ-đầu-đến-cuối-f47-tìm-nhân-vật) |
+| Tiêu chí: sẵn sàng phát hành | [Kế hoạch theo dõi sự kiện](#kế-hoạch-theo-dõi-sự-kiện), [Quyền riêng tư và tuân thủ](#quyền-riêng-tư-và-tuân-thủ) (16+ (Điều khoản); nội dung an toàn bật sẵn; chế độ 18+ sau này nằm sau nút gạt và xác nhận 18+), [docs/compliance.md](docs/compliance.md) |
+| Tiêu chí: tài liệu và làm việc nhóm | README này, [Nhóm](#nhóm), [Tài khoản Claude dùng chung](#tài-khoản-claude-dùng-chung) |
+| Quyền sở hữu và phát hành | [Quyền sở hữu và phát hành](#quyền-sở-hữu-và-phát-hành), [Bàn giao cho Apero](#bàn-giao-cho-apero) |
+
+[Video demo](#video-demo) · [Vấn đề](#vấn-đề) · [Công việc cần làm](#công-việc-cần-làm-jobs-to-be-done) · [Người dùng mục tiêu](#người-dùng-mục-tiêu) · [Vòng lặp chính](#vòng-lặp-chính-và-ngoài-phạm-vi) · [Tính năng chính](#tính-năng-chính) · [Ra mắt và doanh thu](#kênh-ra-mắt-và-mô-hình-doanh-thu) · [Cài đặt và chạy](#cài-đặt-chạy-và-truy-cập) · [Ra mắt và triển khai](#ra-mắt-và-triển-khai) · [Lộ trình](#lộ-trình-lyris-trên-máy-chủ) · [Giới hạn](#giới-hạn-và-đánh-giá-tiếp-theo) · [Theo dõi sự kiện](#kế-hoạch-theo-dõi-sự-kiện) · [Quyền riêng tư](#quyền-riêng-tư-và-tuân-thủ) · [Quy trình cùng AI](#quy-trình-làm-việc-cùng-ai-nhóm-đã-xây-lyris-cùng-claude-thế-nào) · [Harness](#harness-theo-mẫu-mini-harness-của-apero) · [Nhóm](#nhóm) · [Quyền sở hữu](#quyền-sở-hữu-và-phát-hành)
 
 **Nhãn dùng trong README:** **Đã có** = code và test có trong repo này. **Kế hoạch** = điều nhóm muốn Lyris sẽ có, chưa làm. Trạng thái chính xác của từng tính năng (✅ qua `verify.sh`, 🟡 đã làm và chờ chấm, ⏳ kế hoạch) ở [bảng đếm Harness](#harness-theo-mẫu-mini-harness-của-apero).
 
 ### Giới thiệu
 
-Lyris là app nhập vai với nhân vật AI, ưu tiên tiếng Việt. Bạn chọn một nhân vật (hoặc tự viết trong Studio), bước vào một story với nhân vật đó và trò chuyện. AI dẫn truyện và đóng vai nhân vật, còn persona của bạn chỉ bạn điều khiển. Nhân vật nhớ những gì đã xảy ra, kể cả điều bạn nhắn tin. Cảm xúc của họ với bạn tăng hay giảm theo việc bạn làm, và họ chỉ biết những gì thế giới của họ cho phép. Bạn bè vào bằng mã mời và có story riêng tư của mình.
+**Lyris là app nhập vai với nhân vật AI, ưu tiên tiếng Việt, dành cho độc giả truyện mạng lãng mạn tiếng Việt muốn sống trong câu chuyện chứ không chỉ đọc.** Bạn chọn một nhân vật (hoặc tự viết trong Studio) rồi bước vào một story: AI dẫn truyện và đóng vai nhân vật, còn persona của bạn chỉ bạn điều khiển. Lyris để bạn làm tác giả (AI không bao giờ viết lời thay bạn), xưng hô tiếng Việt đúng theo từng nhân vật và từng story, cho mỗi nhân vật trí nhớ và cảm xúc tăng giảm theo việc bạn làm; người viết biến nhân vật và thế giới của mình thành người độc giả trò chuyện được. Chat tốn coin: tài khoản nào cũng được coin miễn phí khi đăng ký và mỗi ngày, muốn thêm thì mua gói từ 10.000đ (hiện là chế độ thử, chưa có tiền thật). Bản nộp bài (đã có) chạy trên một máy với model mở chạy local và tài khoản theo lời mời; sau môn học, Lyris lên web mở dưới dạng app chạy trên máy chủ, rồi tới Google Play và App Store (kế hoạch, xem [Lộ trình](#lộ-trình-lyris-trên-máy-chủ)).
 
-**Hướng đi.** Bản nộp bài (đã có) chạy trên một máy với model mở chạy local và tài khoản theo lời mời. Sau môn học, Lyris thành app công khai trên web, App Store và Google Play, coin bán qua cửa hàng và cổng thanh toán Việt Nam (kế hoạch, thiết kế ở [docs/server.md](docs/server.md); xem [Lộ trình](#lộ-trình-lyris-trên-máy-chủ)).
+**Kênh ra mắt:** web mở (PWA chạy qua HTTPS), bắt đầu bằng bản beta theo lời mời, phát mã theo đợt; Google Play và App Store đến sau (kế hoạch). Xem [Kế hoạch ra mắt](#kế-hoạch-ra-mắt-90-ngày-đầu-đề-xuất).
 
 ### Video demo
 
-**Video demo (2–3 phút, luồng chính):** [xem trên Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
+**Video demo (2:22, luồng chính):** [xem trên Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
 
-Kịch bản (thời điểm, thao tác, lời đọc): [docs/demo-script.md](docs/demo-script.md).
+- **Độ dài và ngôn ngữ:** 2 phút 22 giây; không có lời đọc, nền nhạc kèm chữ trên màn hình bằng tiếng Việt và một dòng tiếng Anh dưới mỗi câu.
+- **Cách làm:** các cảnh app là hình dựng lại có chuyển động theo đúng giao diện app thật, và mọi chữ trong đó là nội dung app và model đã thật sự trả ra trong một lần quay ([docs/demo-video-plan.md](docs/demo-video-plan.md)). Màn hình app thật: xem [Ảnh chụp màn hình](#ảnh-chụp-màn-hình).
+- Kịch bản có lời đọc cho cùng luồng: [docs/demo-script.md](docs/demo-script.md).
+
+### Ảnh chụp màn hình
+
+Bot trình duyệt chụp (`node environment/bot.mjs --look`) ở bề ngang điện thoại (390 px), trên server test với model giả có kịch bản, nên chữ trong chat là dữ liệu test. Thêm ảnh: [docs/assets/screenshots/](docs/assets/screenshots/).
+
+| Khám phá: ô tìm và dải "Nhân vật hot" | Một lượt Story | Hồ sơ nhân vật |
+|---|---|---|
+| <img src="docs/assets/screenshots/explore-search-and-hot-strip-light.png" alt="Màn Khám phá có ô tìm nhân vật và dải Nhân vật hot, theme sáng" width="240"> | <img src="docs/assets/screenshots/story-turn-light.png" alt="Chế độ Story: dẫn truyện nghiêng, ô thoại và thẻ suy nghĩ làm mờ" width="240"> | <img src="docs/assets/screenshots/character-profile-light.png" alt="Hồ sơ nhân vật chỉ xem, có nút Bước vào câu chuyện" width="240"> |
+| **Bảng xếp hạng Nhân vật hot (theme tối)** | **Ví coin (theme tối)** | **Nhiệm vụ hôm nay** |
+| <img src="docs/assets/screenshots/hot-characters-ranking-dark.png" alt="Bảng top 100 Nhân vật hot, theme tối" width="240"> | <img src="docs/assets/screenshots/coin-wallet-dark.png" alt="Ví coin có số dư, nút Nạp coin và Nhiệm vụ, theme tối" width="240"> | <img src="docs/assets/screenshots/daily-missions-light.png" alt="Màn Nhiệm vụ hôm nay" width="240"> |
+
+Trong thư mục còn có màn đăng nhập (`login-light.png`) và Khám phá ở theme tối (`explore-search-and-hot-strip-dark.png`).
 
 ### Vấn đề
 
@@ -568,9 +843,10 @@ Cùng các vấn đề trên, nhìn từ phía người dùng: họ "thuê" Lyri
 
 ### Người dùng mục tiêu
 
-- **Người đọc truyện mạng tiếng Việt** (ngôn tình, đam mỹ, cổ trang, vườn trường) muốn *sống trong* câu chuyện thay vì chỉ đọc. Dùng điện thoại là chính, thường vào buổi tối.
-- **Người viết và tạo nhân vật**, dựng cả thế giới (nhân vật phụ, nơi chốn, bí mật, móc sự kiện) và muốn nhân vật được đóng đúng.
-- **Người thích tự chạy AI**, có máy đủ mạnh, coi trọng riêng tư hơn gói thuê bao.
+- **Nhóm chính: người đọc truyện mạng tiếng Việt** (ngôn tình, đam mỹ, cổ trang, vườn trường) muốn *sống trong* câu chuyện thay vì chỉ đọc. Dùng điện thoại là chính, thường vào buổi tối. Chân dung: Linh, bên dưới.
+- **Nhóm phụ: người viết và tạo nhân vật**, dựng cả thế giới (nhân vật phụ, nơi chốn, bí mật, móc sự kiện) và muốn nhân vật được đóng đúng. Chân dung: Minh, bên dưới.
+- **Tuổi: 16+** (ghi trong Điều khoản; đồng ý Điều khoản khi tạo tài khoản là xác nhận điều này, không có ô năm sinh). Nội dung an toàn bật sẵn cho mọi người; chế độ 18+, nếu sau này có, nằm sau việc tắt nút "Nội dung an toàn" và xác nhận 18+.
+- **Không phải nhóm mang doanh thu:** **Người thích tự chạy AI**, có máy đủ mạnh, vẫn tự chạy Lyris được (tự chạy vẫn làm được và miễn phí, tắt coin bằng `LYRIS_COINS=0`), nhưng kế hoạch kinh doanh không dựa vào nhóm này.
 
 #### Chân dung khách hàng (giả thuyết cần kiểm chứng)
 
@@ -586,9 +862,31 @@ Hai chân dung rút từ đối tượng của các [kênh ra mắt](#kênh-ra-m
 | **Có thể trả tiền cho** | Coin để chat tiếp; cá nhân hoá và quyền thử sớm tính năng mới (kế hoạch) | Chủ yếu kiếm coin qua thưởng sáng tác; có thể nạp để chat thử ở Studio |
 | **Tín hiệu cần kiểm** | Story đầu tiên có từ 3 lượt, D7, số lượt mỗi ngày | Số nhân vật đăng công khai, số người chơi mỗi nhân vật công khai |
 
+#### Định vị và vì sao là lúc này
+
+- **WHIF**, nói gọn: một app nhập vai với nhân vật AI chạy trên máy chủ, có phần cộng đồng chia sẻ, mà nhóm đã dùng trước khi làm Lyris; dự án bắt đầu từ ý "một app như WHIF" ([lời gốc](wiki/raw/2026-11-12-plan-goc.md)).
+- **So với WHIF:** khoảng trống nhóm đã ghi lại là quyền của người chơi. Theo trải nghiệm của chính nhóm, WHIF đôi khi viết tiếp hành động thay người chơi và trả lời lệch cảnh ([lời gốc](wiki/raw/2026-11-12-quyen-cua-nguoi-choi.md)). Lyris trả lời bằng [quy ước nhập lượt](#tính-năng-chính) và chỉ dẫn cuối prompt bảo tiếp nối đúng lượt người chơi.
+- **So với Character.AI và Talkie:** nhóm chưa chạy hay ghi lại một lần so sánh trực tiếp nào, nên README này không khẳng định gì về tiếng Việt hay cách các app đó giữ vai của người chơi.
+- **Lyris đặt cược vào (đã có):** xưng hô tiếng Việt đặt theo nhân vật và theo story; người chơi luôn là tác giả; trí nhớ và sáu chỉ số cảm xúc tăng giảm; thế giới có "ai biết" cho từng mục; thưởng coin cho người tạo theo bảng "Nhân vật hot".
+- **Vì sao là lúc này:** một model mở khoảng 12B giờ chạy được trên laptop 24 GB, chữ đầu tiên ở story dài tới trong khoảng 5 giây nhờ prefill (đo trong lúc làm, xem [Điều làm tốt](#điều-làm-tốt)), nên app nhập vai ưu tiên tiếng Việt không phải phụ thuộc API model trả phí; và mảng app bạn đồng hành AI đã có người trả tiền (Perez, 2025).
+
+### Vòng lặp chính và ngoài phạm vi
+
+Lyris v1 là một vòng lặp, và bước nào cũng là một sự kiện được theo dõi ([tracking plan](docs/tracking-plan.md)):
+
+1. **Tìm:** Khám phá có ô tìm, lọc theo cảm xúc và bảng "Nhân vật hot" (`explore_viewed`).
+2. **Bước vào:** "Bước vào câu chuyện": chọn persona, Story hay DM, ngôn ngữ và xưng hô (`story_started`).
+3. **Viết một lượt** theo quy ước nhập lượt bên dưới (`message_sent`).
+4. **Nhân vật trả lời**, tốn 6 coin (`reply_completed`); cảm xúc, trí nhớ và cảnh cập nhật ở nền.
+5. **Hôm khác quay lại** đúng story đó, đúng chỗ đang dừng (`story_resumed`); mỗi ngày mở app được thêm 60 coin miễn phí.
+
+**North Star:** số story "sống" mỗi tuần (story có từ 3 lượt người chơi trong tuần). Một **vòng của người viết** nhỏ hơn nuôi vòng này: Studio → bật công khai nhân vật → người khác chơi → nhân vật lên bảng "Nhân vật hot" → coin thưởng sáng tác (`character_published`, `creator_rank_reached`).
+
+**Ngoài phạm vi của v1** (kế hoạch hoặc ý tưởng, chưa làm): nội dung 18+ (sau này chỉ mở sau nút "Nội dung an toàn" và xác nhận 18+), gọi điện và giọng nói (nhóm ý tưởng "Tender Moment"), gửi ảnh, bảng tin và bình luận cộng đồng, đạo diễn story, thanh toán thật, model tự fine-tune, app iOS/Android native và backend nhiều máy chủ. Danh sách ở [Lộ trình](#lộ-trình-lyris-trên-máy-chủ).
+
 ### Tính năng chính
 
-Mọi thứ trong bảng này **đã có** và có test do `verification/verify.sh` chạy. Tính năng kế hoạch nằm ở [Lộ trình](#lộ-trình-lyris-trên-máy-chủ) và [Giới hạn](#giới-hạn-và-đánh-giá-tiếp-theo).
+Mọi thứ trong các bảng này **đã có** và có test do `verification/verify.sh` chạy. Tính năng kế hoạch nằm ở [Lộ trình](#lộ-trình-lyris-trên-máy-chủ) và [Giới hạn](#giới-hạn-và-đánh-giá-tiếp-theo).
 
 **Cách viết một lượt** (cơ chế giữ quyền người chơi):
 
@@ -599,21 +897,28 @@ Mọi thứ trong bảng này **đã có** và có test do `verification/verify.
 | `*"…"*` | Trích dẫn hoặc lời của người khác | Ở lại trong dẫn truyện, không thành lời thoại của bạn |
 | `((…))` | Chỉ đạo ngầm cho AI, vd. `((anh ấy ghen nhưng giấu))` | Nhân vật làm theo bằng giọng của mình và không nhắc lại; trong chat hiện thành một chip nhỏ |
 
+**Vòng lặp chính**
+
 | Mảng | Làm gì |
 |---|---|
+| **Khám phá và hồ sơ** | Ô "Tìm nhân vật", dải "Nhân vật hot" với bảng đầy đủ top 100 ở `#/explore/hot`, lọc theo cảm xúc ("Chữa lành", "Tình đầu"…), lưới thẻ đều nhau, hồ sơ chỉ xem với nút "Bước vào câu chuyện". |
 | **Chế độ Story và DM** | Story đọc như tiểu thuyết: dẫn truyện chữ nghiêng, lời thoại trong ô thoại, suy nghĩ của nhân vật trong thẻ làm mờ, chạm để đọc. DM giống app nhắn tin. Hai chế độ chung một dòng thời gian: xưng tên qua tin nhắn thì trong story nhân vật vẫn biết. |
 | **Người chơi là tác giả** | AI đóng nhân vật và thế giới, không bao giờ viết lời, hành động hay quyết định thay bạn. Chỉ dẫn cuối mọi prompt bảo AI tiếp nối đúng từ điều bạn vừa viết, không nhảy cảnh. |
 | **Sáu chỉ số cảm xúc** | Thương mến, tin cậy, rung động, chiếm hữu, sợ mất, chán ghét (0–100) tăng *và giảm* theo việc bạn làm. Ghen thì tin cậy giảm, xin lỗi thì chán ghét giảm, chuyện thường ngày hầu như không đổi gì. Chỉ số được đổi thành chỉ dẫn diễn xuất cho nhân vật, không bao giờ đưa con số thô vào prompt. |
 | **Trí nhớ** | Tóm tắt cảnh theo đợt, ký ức dài hạn và các điều đã biết. Tìm theo từ khoá, và theo nghĩa nếu máy có model embedding. Tạo lại, sửa hay xoá một lượt thì trạng thái cũng lùi lại đúng. |
+| **Coin** | Ví coin có chip trên đầu trang, 6 coin mỗi câu trả lời của nhân vật, màn "Nạp coin" (chế độ thử), "Nhiệm vụ" hằng ngày và thưởng sáng tác theo bảng "Nhân vật hot". Chi tiết ở [Mô hình doanh thu](#mô-hình-doanh-thu). |
+
+**Phần hỗ trợ**
+
+| Mảng | Làm gì |
+|---|---|
 | **Sổ thế giới (lorebook)** | Mỗi nhân vật mang theo thế giới riêng: nhân vật phụ, nơi chốn, các mục lore, nhập từ file Markdown `world.md`. Mục được gợi ra bằng từ khoá, so khớp đúng tiếng Việt và giữ dấu. Mỗi mục ghi rõ ai biết: mọi người, chỉ một số nhân vật, hay chỉ bạn. Spoiler chỉ bạn biết không bao giờ tới model. |
 | **Studio nhân vật** | Tạo và sửa nhân vật, AI viết nháp từ một dòng ý tưởng, lời nói đặc trưng, xưng hô, ảnh đại diện, nhập và xuất Character Card V2. |
-| **Khám phá và hồ sơ** | Ô "Tìm nhân vật" và dải "Nhân vật hot" thay cho nhân vật nổi bật trước đây, bảng đầy đủ top 100 ở `#/explore/hot` (F46/F47); lọc theo cảm xúc ("Chữa lành", "Tình đầu"…), lưới thẻ đều nhau, hồ sơ chỉ xem với nút "Bước vào câu chuyện". |
 | **Trợ giúp khi cần** | Nút "+" ở ô chat: gợi ý trả lời (chỉ khi bấm), dòng thời gian sự kiện, gửi hình ảnh (mới có khung). |
 | **Tài khoản** | Chủ máy và thành viên được mời, mã mời, đăng nhập bằng mật khẩu (scrypt, phiên HttpOnly), trang quản lý chỉ chủ máy thấy, story riêng tư hoàn toàn. Nhân vật có thể bật công khai; người khác chơi trên bản sao riêng của họ. |
 | **Nhanh trên máy vừa phải** | Prompt được sắp theo cách giữ được cache, và lượt sau được chuẩn bị trước ("prefill") khi bạn đang gõ. Thời gian chờ chữ đầu tiên ở story dài giảm từ khoảng 30–47 giây xuống khoảng 5 giây với model 12B. |
 | **Không chữ kỹ thuật** | Giao diện không có tên model, token hay trạng thái máy. Lúc chờ chỉ hiện ba chấm nhảy. Thiết lập kỹ thuật nằm trong "Nâng cao". |
-| **An toàn và quyền riêng tư** | Nội dung mặc định an toàn (không nội dung tình dục; tình cảm, ghen tuông kín đáo; tuyệt đối không gì tình dục với trẻ vị thành niên). "Báo cáo" trên mọi câu trả lời của AI và trên hồ sơ mọi nhân vật công khai (chủ máy ẩn được nhân vật bị báo cáo), Điều khoản và Chính sách có lưu lần đồng ý, tự tải dữ liệu và xoá tài khoản, tắt được chia sẻ dữ liệu sử dụng ẩn danh. |
-| **Coin** | Ví coin có chip trên đầu trang, 6 coin mỗi câu trả lời của nhân vật, màn "Nạp coin" (chế độ thử), nhiệm vụ hằng ngày và thưởng sáng tác theo bảng "Nhân vật hot". Chi tiết ở [Mô hình doanh thu](#mô-hình-doanh-thu). |
+| **An toàn và quyền riêng tư** | Dành cho người từ 16 tuổi (Điều khoản). Nội dung mặc định an toàn (không nội dung tình dục; tình cảm, ghen tuông kín đáo; tuyệt đối không gì tình dục với trẻ vị thành niên). "Báo cáo" trên mọi câu trả lời của AI và trên hồ sơ mọi nhân vật công khai (chủ máy ẩn được nhân vật bị báo cáo), Điều khoản và Chính sách có lưu lần đồng ý, tự tải dữ liệu và xoá tài khoản, tắt được chia sẻ dữ liệu sử dụng ẩn danh. |
 | **Số liệu sử dụng** | 57 sự kiện, không chứa chữ người dùng; trang "Số liệu" của chủ máy (DAU/WAU/MAU, phễu, D1/D7), xuất CSV/JSONL; tuỳ chọn gửi sang PostHog. |
 
 ### Kênh ra mắt và mô hình doanh thu
@@ -622,18 +927,18 @@ Mọi thứ trong bảng này **đã có** và có test do `verification/verify.
 
 | Kênh | Đối tượng | Ở đâu | Làm thế nào | Vì sao hợp |
 |---|---|---|---|---|
-| **1. Khám phá qua cộng đồng** | Độc giả truyện mạng lãng mạn tiếng Việt (ngôn tình, đam mỹ, cổ trang, vườn trường) | Nhóm Facebook Việt Nam, cộng đồng sách và nhập vai trên TikTok, máy chủ Discord, cộng đồng đọc trên Wattpad | Giới thiệu Lyris là app ưu tiên tiếng Việt; clip ngắn về chế độ Story với các thế giới viết tay đã có (Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương): bước vào story, trò chuyện, tự làm chủ persona. Với độc giả Wattpad: một cách khác để sống trong truyện xoay quanh nhân vật. | Các cộng đồng này vốn mê nhân vật hư cấu và truyện xoay quanh quan hệ. |
+| **1. Khám phá qua cộng đồng** | Độc giả truyện mạng lãng mạn tiếng Việt (ngôn tình, đam mỹ, cổ trang, vườn trường) | Nhóm Facebook Việt Nam, cộng đồng sách và nhập vai trên TikTok, máy chủ Discord, cộng đồng đọc trên Wattpad | Giới thiệu Lyris là app ưu tiên tiếng Việt; clip ngắn về chế độ Story với các thế giới viết tay trong [`worlds/`](worlds/) (Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương; nhập vào app qua hai bước, xem [Dùng thử cho người chấm](#dùng-thử-cho-người-chấm)): bước vào story, trò chuyện, tự làm chủ persona. Với độc giả Wattpad: một cách khác để sống trong truyện xoay quanh nhân vật. | Các cộng đồng này vốn mê nhân vật hư cấu và truyện xoay quanh quan hệ. |
 | **2. Khám phá nhờ tác giả** | Người viết và tạo nhân vật | Cộng đồng viết trên Wattpad, nhóm viết trên Facebook, nhà sáng tạo TikTok, cộng đồng nhập vai | Studio nhân vật và sổ thế giới cho người viết; đăng nhân vật công khai và chia sẻ với người theo dõi; bảng "Nhân vật hot" và coin thưởng sáng tác (đã có) cho tác giả lý do để quảng bá. Về sau: hợp tác với tác giả truyện mạng Việt Nam, kể cả tác giả Wattpad, chỉ khi có phép của người giữ bản quyền. | Mỗi tác giả mang theo nhân vật, thế giới và độc giả của mình. |
 | **3. Giới thiệu và chia sẻ** | Người dùng hiện có | Trong app | Mã mời (đã có): mỗi thành viên được mời có story riêng tư của mình. Thưởng coin khi giới thiệu bạn bè là kế hoạch (xem Doanh thu). | Lý do tự nhiên để rủ bạn bè. |
 
 #### Phân phối
 
-- **Bản nộp bài (đã có):** web app, cài được dạng PWA, chạy từ một máy trong mạng LAN ở nhà (cách chạy HTTPS trên một máy chủ đã viết ở [docs/deploy.md](docs/deploy.md), chưa chạy trên máy chủ thật). Đăng ký bằng mã mời phát theo đợt, khớp sức chứa (khoảng hai câu trả lời cùng lúc cho mỗi model 12B).
+- **Bản nộp bài (đã có):** web app chạy từ một máy; ở nhà nó chạy qua mạng LAN bằng HTTP thường, và cài được dạng PWA khi chạy qua HTTPS (cách chạy HTTPS trên một máy chủ đã viết ở [docs/deploy.md](docs/deploy.md), chưa chạy trên máy chủ thật). Đăng ký bằng mã mời phát theo đợt, có chủ đích: chỉ mở đợt tiếp khi số liệu cho thấy máy và sản phẩm nhận thêm người được (khoảng hai câu trả lời cùng lúc cho mỗi model 12B).
 - **Ra mắt công khai (kế hoạch, sau môn học):** Lyris trên máy chủ, có trên web, **App Store** và **Google Play**, đăng ký mở (email, Sign in with Apple, Google) và thanh toán coin thật (Apple IAP, Google Play Billing, VNPay/MoMo). Thiết kế: [Lộ trình](#lộ-trình-lyris-trên-máy-chủ) và [docs/server.md](docs/server.md).
 
 #### Mô hình doanh thu
 
-**Freemium + mua trong app + gói tháng + quảng cáo + kinh tế người sáng tạo.** Chat tốn coin. Tài khoản nào cũng được coin miễn phí và kiếm thêm được; trả tiền thì mua thêm coin và, về sau, các tiện ích khác. Đầu vào đã được [kế hoạch theo dõi sự kiện](#kế-hoạch-theo-dõi-sự-kiện) đo sẵn: số tin nhắn mỗi người mỗi ngày, chi phí tính toán mỗi lượt và mọi sự kiện coin.
+**Nguồn chính: coin.** Chat tốn coin. Tài khoản nào cũng được coin miễn phí và kiếm thêm được; trả tiền thì mua gói coin, qua Apple In-App Purchase và Google Play Billing trong app, VNPay/MoMo trên web (kế hoạch; hiện là chế độ thử). **Về sau (chưa làm):** gói tháng, quảng cáo cho người dùng miễn phí, cá nhân hoá cao cấp và thêm ưu đãi cho người sáng tạo (bảng bên dưới). Đầu vào đã được [kế hoạch theo dõi sự kiện](#kế-hoạch-theo-dõi-sự-kiện) đo sẵn: số tin nhắn mỗi người mỗi ngày, chi phí tính toán mỗi lượt và mọi sự kiện coin.
 
 **Đã có** (thiết kế: [docs/coins.md](docs/coins.md); tính năng F42–F47; chế độ thử, chưa có tiền thật):
 - **Phải có tài khoản mới chat được.** Tài khoản mới được **300 coin**; mỗi ngày mở app được thêm **60** (điểm danh hằng ngày; ngày đầu là 360).
@@ -641,13 +946,13 @@ Mọi thứ trong bảng này **đã có** và có test do `verification/verify.
 - **Gói coin có thưởng theo bậc:** 100 coin giá 10.000đ · 550 (500 + 50 thưởng) giá 50.000đ · 1.200 (1.000 + 200 thưởng) giá 100.000đ · 2.500 (2.000 + 500 thưởng) giá 200.000đ. Trước khi ra mắt, màn "Nạp coin" chạy chế độ thử: giá là giá dự kiến khi ra mắt, chưa bán gì; người quản lý tặng mã nạp dùng một lần hoặc cộng coin tay kèm lý do. Coin của chế độ thử về 0 khi ra mắt.
 - **Kiếm coin không cần trả tiền:**
   - **Làm nhiệm vụ:** tối đa 30 coin mỗi ngày: xem quảng cáo mẫu 15 giây (+5, ba lần; chỗ giữ cho quảng cáo có thưởng, chưa nối mạng quảng cáo), trò chuyện với 3 nhân vật khác nhau (+10), gửi 20 lượt (+5).
-  - **Sáng tác:** nhân vật công khai của bạn vào top 100, top 50, top 10 của bảng "Nhân vật hot" thì bạn được +100, +200, +300 coin, mỗi bậc một lần cho mỗi nhân vật (lên thẳng top 10 nhận đủ 600). Bảng xếp theo tổng số người chơi từ trước tới nay (tài khoản khác đã thật sự chơi), cập nhật mỗi giờ. Nhân vật công khai đầu tiên được +50 một lần, sau khi đã công khai đủ 24 giờ và có người khác chơi. Người chơi được đếm khi có 3 câu trả lời đã trả coin ở 2 ngày khác nhau; thưởng xếp hạng tối đa 600 coin mỗi người tạo trong 7 ngày (phần dư chờ, không mất); chủ máy không nhận.
+  - **Sáng tác:** nhân vật công khai của bạn vào top 100, top 50, top 10 của bảng "Nhân vật hot" thì bạn được +100, +200, +300 coin, mỗi bậc một lần cho mỗi nhân vật (lên thẳng top 10 nhận đủ 600). Bậc top N chỉ được trả khi bảng có nhân vật của ít nhất N người tạo khác nhau, để một người không tự lấp được bảng nhỏ. Bảng xếp theo tổng số người chơi từ trước tới nay (tài khoản khác đã thật sự chơi), cập nhật mỗi giờ. Nhân vật công khai đầu tiên được +50 một lần, sau khi đã công khai đủ 24 giờ và có người khác chơi. Người chơi được đếm khi có 3 câu trả lời đã trả coin ở 2 ngày khác nhau; thưởng xếp hạng tối đa 600 coin mỗi người tạo trong 7 ngày (phần dư chờ, không mất); chủ máy không nhận.
 
   Cách này thưởng cho những người mang người chơi tới.
 - **Tự chạy trên máy mình vẫn miễn phí:** chủ máy không bao giờ tốn coin, và người tự chạy có thể tắt hẳn coin (`LYRIS_COINS=0`).
 - **Coin không phải tiền:** không đổi ra tiền, không chuyển cho người khác, mất khi xoá tài khoản.
 
-**Kế hoạch** (điều nhóm muốn Lyris sẽ có; chưa làm):
+**Về sau** (điều nhóm muốn Lyris sẽ có; chưa làm):
 
 | Nguồn | Nhóm muốn có |
 |---|---|
@@ -662,7 +967,54 @@ Mọi thứ trong bảng này **đã có** và có test do `verification/verify.
 
 **Luật cửa hàng.** Trong app iOS và Android, mọi giao dịch số (coin, gói tháng, cá nhân hoá, thử sớm) phải đi qua Apple In-App Purchase hoặc Google Play Billing, và mọi biên nhận được server xác minh rồi ghi vào cùng một sổ coin ([docs/server.md §11](docs/server.md#11-thanh-toán-po-5a)). Vì vậy tự động nạp và gói tháng theo đúng luật xác nhận mua và tự gia hạn của cửa hàng; VNPay/MoMo chỉ dùng trên web. Quảng cáo thật trong app cần App Tracking Transparency và nhãn quyền riêng tư.
 
+#### Kinh tế đơn vị (ước tính, cần kiểm chứng)
+
+Giá tham khảo và tải thiết kế 10.000 người dùng mỗi tháng (khoảng 2,7 triệu câu trả lời mỗi tháng), lấy từ [docs/server.md §8.7 và §15.3](docs/server.md#153-chi-phí-hằng-tháng-giá-tham-khảo-phải-xin-báo-giá). Chưa có số nào được đo; bài tải dự kiến ở F53 sẽ thay các giả định này trước khi ký hợp đồng GPU.
+
+| Khoản | Ước tính |
+|---|---|
+| Chi phí một câu trả lời trên bản máy chủ | GPU khoảng 26–45đ; toàn bộ hạ tầng khoảng 35–65đ |
+| Giá bán một câu trả lời (6 coin) | 600đ (gói 100 coin) tới 480đ (gói 2.500 coin) |
+| Còn lại sau phí cửa hàng hay cổng thanh toán (Apple 15 % hoặc 30 %, cổng khoảng 1–3 %), trước thuế | khoảng 340–590đ |
+| Còn lại sau thuế (kế toán cần xác nhận) | khoảng 300–530đ, tức một lượt trả tiền bù được khoảng 4,5–15 lần chi phí hạ tầng của nó |
+| Lượng miễn phí, tức chi phí thu hút người dùng | 300 coin khi đăng ký, rồi 60 mỗi ngày cộng tối đa 30 từ nhiệm vụ: tối đa 15 câu trả lời miễn phí mỗi ngày, khoảng 0,5–1 nghìn đồng hạ tầng cho mỗi người dùng miễn phí dùng hết lượng mỗi ngày |
+| Chi phí cố định mỗi tháng của bản máy chủ | khoảng 3.000–6.700 USD, tức khoảng 80–175 triệu đồng |
+| Hoà vốn với 10.000 người dùng mỗi tháng | khoảng 8.000–17.500đ doanh thu ròng mỗi người dùng mỗi tháng, ví dụ 5 % người dùng trả trung bình 160.000–350.000đ mỗi tháng |
+
+Lượt trả tiền có lãi; câu hỏi thật là bao nhiêu người chuyển sang trả tiền và lượng miễn phí rộng tay tới đâu. Tracking plan đã ghi phễu nạp coin (`coins_insufficient` → `topup_viewed` → `topup_pack_selected` → `topup_code_redeemed`), và đó là cách nhóm sẽ kiểm.
+
+#### Kế hoạch ra mắt: 90 ngày đầu (đề xuất)
+
+Đề xuất cho giai đoạn sau môn học; ngày, quy mô mỗi đợt và ngân sách GPU là quyết định của product owner, hiện còn mở ([docs/server.md §20](docs/server.md#20-câu-hỏi-cho-po)).
+
+| Bước | Làm gì | Cần thêm code | Khi nào sang bước sau |
+|---|---|---|---|
+| **1. Beta web theo lời mời** (tuần 1–4) | Chạy app hiện tại trên một máy chủ GPU NVIDIA thuê, sau HTTPS, theo [docs/deploy.md](docs/deploy.md). Giá tham khảo một L40S: 0,9–1,6 USD mỗi giờ, khoảng 650–1.150 USD mỗi tháng nếu chạy liên tục ([docs/server.md §15.3](docs/server.md#153-chi-phí-hằng-tháng-giá-tham-khảo-phải-xin-báo-giá)). Mã mời phát theo đợt qua các [kênh ra mắt](#kênh-ra-mắt); coin vẫn ở chế độ thử. | Không: chạy được với code hiện tại. Riêng hướng dẫn triển khai chưa chạy thử trên máy chủ thật. | Chỉ mở đợt tiếp khi dưới 20 % câu trả lời phải xếp hàng (`waited` của `reply_completed`, [docs/deploy.md §9](docs/deploy.md#9-sức-chứa-ước-tính)) |
+| **2. Đo và chỉnh** (tuần 5–8) | Mỗi tuần xem số story "sống", phễu kích hoạt, D1/D7 và phễu nạp coin; chỉnh lượng coin miễn phí và nhiệm vụ; gom báo cáo và góp ý. | Không (đã có trang "Số liệu" và xuất CSV/JSONL) | Mục tiêu đầu ở [tracking plan §5.3](docs/tracking-plan.md#53-first-targets-for-round-2), ví dụ kích hoạt ≥ 50 % số người đăng ký bằng mã mời |
+| **3. Chuẩn bị bản máy chủ** (tuần 9–12) | Giai đoạn G0–G1 ở [docs/server.md §18](docs/server.md#18-kế-hoạch-chuyển-đổi-theo-giai-đoạn-bắt-đầu-sau-15112026): gắn tag bản nộp bài, mở tài khoản nhà phát triển Apple/Google và tài khoản merchant thanh toán, tách giao diện trong code. | Code G1 (giao diện cho F50–F52) | `verify.sh` xanh ở chế độ tự chạy |
+
+Sau 90 ngày: Postgres, Redis và vLLM (G2–G4, F50–F53), beta web đóng ở quy mô lớn (G5), đăng ký mở và VNPay/MoMo (G6, F57, F61), rồi app iOS và Android có mua trong app (G7, F55, F56). Chưa phần nào có code.
+
 ### Cài đặt, chạy và truy cập
+
+#### Dùng thử cho người chấm
+
+Repo này không có URL công khai của Lyris: app cần một máy có GPU hoặc Apple Silicon để chạy model. Ba cách để xem:
+
+> **Muốn dùng thử ngay?** Lyris tự chạy model AI trên máy chủ của nó nên cách cài hơi đặc biệt. Hãy liên hệ nhóm qua **lethuhang.cv@gmail.com**: nhóm sẽ hướng dẫn chi tiết, hoặc cấp mã mời để bạn vào một bản đang chạy.
+
+1. **Không cài gì:** xem [video demo](#video-demo), [ảnh chụp màn hình](#ảnh-chụp-màn-hình) và [bằng chứng](#bằng-chứng) của lần chạy test đầy đủ gần nhất.
+2. **Xem app mà không cần model** (máy nào có Python 3.12, `uv` và Node 22): tạo DB demo có sẵn nhân vật mẫu và story, rồi chạy bản kiểu production ở cổng khác. Duyệt app được; câu trả lời AI mới thì cần Ollama.
+   ```bash
+   (cd backend && uv sync)
+   backend/.venv/bin/python scripts/make_demo_db.py /tmp/lyris-demo/lyris.db /tmp/lyris-demo/avatars
+   LYRIS_DB_PATH=/tmp/lyris-demo/lyris.db LYRIS_AVATARS_DIR=/tmp/lyris-demo/avatars \
+     LYRIS_API_PORT=8064 LYRIS_WEB_PORT=8065 bash scripts/serve.sh
+   ```
+   Mở http://localhost:8065 và nhập mã thiết lập mà Terminal in ra.
+3. **App đầy đủ trên máy 16 GB:** làm theo [Các bước](#các-bước) bên dưới với model nhỏ hơn, `ollama pull gemma4:e4b`, rồi `LYRIS_CHAT_MODEL=gemma4:e4b bash scripts/dev.sh`. Câu trả lời sẽ kém hơn: Lyris được làm và đánh giá trên `gemma4:12b`.
+
+**Nạp bốn thế giới viết tay** (nằm trong [`worlds/`](worlds/), không có trong dữ liệu seed): Studio → "Nhập card" → chọn `worlds/<tên>/card.json` → lưu; rồi trong sổ thế giới của nhân vật đó, "Nhập từ file" → `worlds/<tên>/world.md`, xem trước rồi nhập.
 
 #### Phần cứng để chạy AI local
 
@@ -695,8 +1047,9 @@ ollama pull bge-m3              # tuỳ chọn: tìm ký ức theo nghĩa
 #   OLLAMA_FLASH_ATTENTION=1  OLLAMA_KV_CACHE_TYPE=q8_0  OLLAMA_NUM_PARALLEL=2
 #   Trên macOS, scripts/ollama-env.sh cài sẵn các biến này qua LaunchAgent.
 
-# 2. Thư viện backend
-cd backend && uv sync && cd ..
+# 2. Thư viện
+(cd backend && uv sync)
+(cd frontend && npm ci)         # dev.sh cũng tự npm install nếu thiếu node_modules
 
 # 3. Chạy backend (127.0.0.1:8000) và frontend (cổng 5173) cùng lúc
 bash scripts/dev.sh
@@ -707,6 +1060,13 @@ bash scripts/dev.sh
 - **Lưu ý bảo mật:** qua Wi-Fi thường, đường truyền **chưa được mã hoá**, nên chỉ dùng trong mạng mình tin. Truy cập từ xa qua HTTPS (Tailscale, F37) đang trong kế hoạch; máy chủ công khai phải chạy sau HTTPS với `LYRIS_COOKIE_SECURE=1` ([docs/deploy.md](docs/deploy.md)).
 - **Mời người khác:** vào Tài khoản → Quản lý tài khoản → Tạo mã mời, rồi gửi mã. Người được mời đăng ký bằng mã đó và có story riêng tư cùng ví coin của mình.
 - **Quên mật khẩu chủ máy:** chạy `bash scripts/lyris-admin.sh reset-password <handle>`.
+
+#### Khi gặp lỗi
+
+- **"Cổng 8000 đang bị chiếm":** `dev.sh` cần cổng 8000 và 5173 trống; tắt tiến trình đang dùng cổng, hoặc dùng `scripts/serve.sh` với `LYRIS_API_PORT` và `LYRIS_WEB_PORT`.
+- **Không có câu trả lời, hoặc báo thiếu model:** kiểm Ollama đang chạy và `ollama list` có model ghi trong `LYRIS_CHAT_MODEL` (mặc định `gemma4:12b`).
+- **Câu trả lời đầu tiên chậm:** lượt đầu sau khi mở app phải đọc cả story (vài chục giây); các lượt sau nhanh hơn nhờ prefill.
+- **Kiểm máy:** `node environment/doctor.mjs` liệt kê thứ còn thiếu (môi trường Python, `node_modules`, Chrome cho bot).
 
 #### Chạy kiểu production trên một máy
 
@@ -722,19 +1082,23 @@ Biến môi trường và sơ đồ thư mục: xem [Configuration](#configurati
 
 #### Chạy test
 
-Chạy từ thư mục gốc của repo (mỗi dòng chạy trong subshell riêng, dán lần lượt được):
+Chạy từ thư mục gốc của repo, sau [Các bước](#các-bước) ở trên (mỗi dòng chạy trong subshell riêng, dán lần lượt được):
 
 ```bash
-(cd backend && .venv/bin/pytest -q)                                  # ~1.650 test
-(cd frontend && npm test && npm run typecheck && npm run build)      # ~465 test
+(cd frontend && npm ci)                                              # một lần, nếu chưa có node_modules
+(cd backend && .venv/bin/pytest -q)                                  # lần chạy đầy đủ gần nhất: 1.649 qua, 113 bỏ qua
+(cd frontend && npm test && npm run typecheck && npm run build)      # lần chạy đầy đủ gần nhất: 468 test
 backend/.venv/bin/python harness/run_eval.py --model gemma4:12b        # kịch bản hành vi model (cần Ollama)
 bash verification/verify.sh                                           # giám khảo của harness: tất cả các dòng trên + bot trình duyệt (xem mục Harness)
 ```
 
+Gần như toàn bộ 113 test backend bị bỏ qua là các tổ hợp route và loại id không áp dụng trong bài quét tách dữ liệu hai tài khoản (`backend/tests/test_isolation_sweep.py`). Kết quả lần chạy đầy đủ gần nhất lưu ở [docs/evidence/verify-2026-11-14.json](docs/evidence/verify-2026-11-14.json).
+
 ### Ra mắt và triển khai
 
-- **Bản nộp bài (đã có):** web app, cài được dạng PWA, chạy trên một máy ở nhà qua LAN; triển khai HTTPS trên một máy chủ (Caddy, systemd) đã viết ở [docs/deploy.md](docs/deploy.md) nhưng chưa chạy trên máy chủ thật. Một máy có GPU NVIDIA (từ 16 GB VRAM) hoặc Apple Silicon (từ 24 GB) chạy Ollama và backend.
+- **Bản nộp bài (đã có):** web app chạy trên một máy ở nhà qua LAN (cài được dạng PWA khi chạy qua HTTPS); triển khai HTTPS trên một máy chủ (Caddy, systemd) đã viết ở [docs/deploy.md](docs/deploy.md) nhưng chưa chạy trên máy chủ thật. Một máy có GPU NVIDIA (từ 16 GB VRAM) hoặc Apple Silicon (từ 24 GB) chạy Ollama và backend.
 - **Ra mắt công khai (kế hoạch):** app trên máy chủ, có trên web, App Store và Google Play, như mô tả ở [Lộ trình](#lộ-trình-lyris-trên-máy-chủ).
+- **Tuổi và nội dung khi ra mắt:** 16+ (Điều khoản); nội dung an toàn bật sẵn; chế độ 18+ sau này nằm sau nút gạt và xác nhận 18+. Với nội dung an toàn bật sẵn và chưa có nội dung 18+, xếp hạng App Store cần cân nhắc là 12+ hoặc 17+; có chế độ 18+ thì phải xem lại xếp hạng (17+/18+) ([docs/compliance.md §5.2, §6](docs/compliance.md)).
 - **Cài production:** [docs/deploy.md](docs/deploy.md): Ollama và model, uvicorn chạy bằng systemd (không `--reload`, `--no-proxy-headers`, một tiến trình), Caddy phục vụ `frontend/dist` và proxy `/api`, `LYRIS_COOKIE_SECURE=1`, sao lưu SQLite mỗi đêm, cập nhật (migration tự chạy khi khởi động lại), sức chứa (~2 câu trả lời cùng lúc mỗi model 12B), theo dõi.
 - **Chạy nhanh kiểu production:** `bash scripts/serve.sh`.
 
@@ -759,6 +1123,7 @@ Bản nộp bài chạy trên một máy (SQLite + Ollama) và vẫn được gi
 | Kinh tế coin trên máy chủ với thanh toán thật (F56 Apple IAP / Google Play Billing, F57 VNPay/MoMo) | Cùng luật coin với chế độ thử đã có |
 | Cộng đồng: bình luận, theo dõi, chia sẻ (F39) | Cần kế hoạch kiểm duyệt và quyền riêng tư riêng |
 | Đạo diễn story và "Khoảnh khắc" (F40) | Đã có banner và tab; backend chưa sinh ra |
+| Nút "Nội dung an toàn" và xác nhận 18+ (F48) | Chỉ khi đã có nội dung 18+: bật sẵn; tắt phải tích "Tôi đã đủ 18 tuổi"; chỉ lưu thời điểm; người vận hành gỡ quyền được. Khi đó xem lại xếp hạng tuổi của cửa hàng (17+/18+) |
 | Tender Moment: gọi điện với nhân vật, giọng nhân vật có cảm xúc, âm thanh nền, nói bằng giọng mình | Mới là ý tưởng, chưa thiết kế; cũng là tính năng thử sớm đầu tiên trong [mô hình doanh thu](#mô-hình-doanh-thu) |
 | Cá nhân hoá cao cấp, nhân vật đa ngôn ngữ, gói tháng, quảng cáo thật, chuỗi ngày | Xem [Mô hình doanh thu](#mô-hình-doanh-thu) |
 
@@ -786,15 +1151,68 @@ Bản nộp bài chạy trên một máy (SQLite + Ollama) và vẫn được gi
 ### Quyền riêng tư và tuân thủ
 
 - **Văn bản:** [Điều khoản](docs/legal/terms.md) và [Chính sách quyền riêng tư](docs/legal/privacy.md) (tiếng Việt và tiếng Anh), mở công khai trong app ở `#/terms`, `#/privacy`; phải đồng ý khi tạo tài khoản, lưu kèm phiên bản. Email liên hệ lấy từ `LYRIS_CONTACT`; script chạy app đặt sẵn lethuhang.cv@gmail.com.
-- **Mặc định an toàn:** không nội dung tình dục; tình cảm, ghen tuông, chiếm hữu ở mức kín đáo; tuyệt đối từ chối mọi nội dung tình dục liên quan tới trẻ vị thành niên. Luật này có trong mọi prompt story, nhắn tin và AI viết nháp nhân vật.
+- **Tuổi: 16+.** Điều khoản ghi Lyris dành cho người từ đủ 16 tuổi (Nghị định 13/2023 coi người dưới 16 là trẻ em); đồng ý Điều khoản khi tạo tài khoản là xác nhận điều này. Không thu thập ngày sinh; tài khoản của người dưới 16 bị xoá khi phát hiện.
+- **Mặc định an toàn:** "Nội dung an toàn" bật sẵn cho mọi người: không nội dung tình dục; tình cảm, ghen tuông, chiếm hữu ở mức kín đáo; tuyệt đối từ chối mọi nội dung tình dục liên quan tới trẻ vị thành niên. Luật này có trong mọi prompt story, nhắn tin và AI viết nháp nhân vật.
 - **Người dùng tự quản:** "Báo cáo" trên mọi câu trả lời của AI (chữ của câu trả lời chỉ tới người quản lý nếu người báo cáo cho phép) và "Báo cáo nhân vật" trên nhân vật công khai, không bao giờ gắn với người báo cáo; "Tải dữ liệu của tôi", "Xoá tài khoản", tắt chia sẻ dữ liệu sử dụng (tắt rồi thì trình duyệt đó cũng không bị ghi sau khi đăng xuất).
 - **Lối vào cho người lạ trên web:** đăng ký bằng mã mời; trang đăng nhập chỉ cách xin mã, và cách liên hệ người quản lý khi quên mật khẩu (`LYRIS_CONTACT`).
-- **Kế hoạch, chưa làm:** "chế độ người lớn" có xác minh tuổi thật; thanh toán coin qua nhà cung cấp thanh toán tuân thủ quy định.
+- **Kế hoạch, chưa làm:** chế độ 18+ sau này nằm sau nút gạt và xác nhận 18+ (tắt "Nội dung an toàn" phải tích "Tôi đã đủ 18 tuổi"; chỉ lưu thời điểm; F48); thanh toán coin qua nhà cung cấp thanh toán tuân thủ quy định.
 - **Danh sách kiểm** theo web mở, Google Play, App Store và quy định dữ liệu cá nhân của Việt Nam: [docs/compliance.md](docs/compliance.md).
 
 ### Quy trình làm việc cùng AI: nhóm đã xây Lyris cùng Claude thế nào
 
-Nhóm làm Lyris trong khoảng bốn ngày cùng **Claude Code** (Claude Opus). Nhóm viết tầm nhìn, đặc tả thiết kế (`DESIGN.md`), các thế giới nhân vật và mọi quyết định sản phẩm. Claude viết gần như toàn bộ code, test và tài liệu thiết kế. Nhóm chỉ đạo và sửa bằng tiếng Việt thông thường.
+Nhóm làm Lyris từ ngày 12 tới 15/11/2026 cùng **Claude Code** (Claude Opus): đề bài ra ngày 12/11, các mục trong `wiki/raw/` trải từ 12 tới 15/11 và trong `wiki/log.md` từ 12 tới 14/11, commit cuối là ngày 15/11. Nhóm viết tầm nhìn, đặc tả thiết kế (`DESIGN.md`), các thế giới nhân vật và mọi quyết định sản phẩm. Claude viết gần như toàn bộ code, test và tài liệu thiết kế. Nhóm chỉ đạo và sửa bằng tiếng Việt thông thường.
+
+#### Con số
+
+Đếm từ repo ngày 15/11/2026.
+
+| | Số | Nguồn |
+|---|---|---|
+| Tính năng đã có qua `verify.sh` | **42 / 42** ✅, 0 🟡, 0 ⛔ (thêm 18 kế hoạch lúc chạy; F48 thêm vào kế hoạch ngày 15/11/2026) | `node memory/features.mjs brief` |
+| Trang tính năng có "Done when" và "Tests" | 60 | [`wiki/features/`](wiki/features/) |
+| Lời gốc có ngày của product owner | 32 | [`wiki/raw/`](wiki/raw/) |
+| Trang quyết định, mỗi trang kèm lý do | 71 | [`wiki/decisions/`](wiki/decisions/) |
+| Bài học (Sai · Vì sao · Luật rút ra · Nguồn) | 50 | [`wiki/learned.md`](wiki/learned.md) |
+| Câu hỏi còn mở cho product owner (phần lớn đã có cách "tạm chọn") | 33 | [`memory/po-questions.md`](memory/po-questions.md) |
+| Kịch bản hành vi trên model thật | 22 | [`harness/scenarios/`](harness/scenarios/) |
+| Lần `verify.sh` đầy đủ gần nhất (14/11/2026, 16:47 UTC) | backend 1.649 qua (113 bỏ qua), frontend 468, typecheck và build xanh, bot 113/113, không hồi quy | [docs/evidence/verify-2026-11-14.json](docs/evidence/verify-2026-11-14.json) |
+| Lỗi thật bot trình duyệt bắt được mà unit test đã bỏ sót | 2 (xem [Harness](#harness-theo-mẫu-mini-harness-của-apero)) | [`wiki/learned.md`](wiki/learned.md), [`wiki/log.md`](wiki/log.md) |
+
+#### Vòng đời một tính năng
+
+```mermaid
+flowchart TD
+    A["Lời product owner<br/>lưu nguyên văn ở wiki/raw/ (environment/raw.mjs)"] --> B["/plan: Claude hỏi lại bằng<br/>câu hỏi nhiều lựa chọn (vd. 1A 2C 3A)"]
+    B --> C["Trang tính năng wiki/features/FNN<br/>Done when: Unit / Bot / Model thật + Tests"]
+    C --> D["verification/plan-check.sh:<br/>wiki đủ để build chưa?"]
+    D --> E["/build: Claude viết test trước, chạy cho đỏ"]
+    E --> F["Claude viết code tới khi test xanh"]
+    F --> G["Claim: features.mjs claim FNN (🟡 đã làm, chưa chứng minh)"]
+    G --> H["verification/verify.sh: pytest, npm test, typecheck, build,<br/>bot trình duyệt (+ model thật với --real-model)"]
+    H -->|xanh| I["✅ đạt, ghi vào wiki/log.md"]
+    H -->|đỏ, tối đa 3 lần| E
+    H -->|đỏ lần thứ 3| J["⛔ bị chặn: bài học ở wiki/learned.md,<br/>câu hỏi ở memory/po-questions.md"]
+```
+
+#### Claude ở từng giai đoạn
+
+| Giai đoạn | Claude làm gì | Bằng chứng trong repo | Ai quyết |
+|---|---|---|---|
+| Ý tưởng | Rà và viết lại plan gốc; chạy bake-off chọn model ở Phase 0; đọc đề bài Apero như một danh sách kiểm và liệt kê phần còn thiếu để ra mắt | [`wiki/raw/2026-11-12-plan-goc.md`](wiki/raw/2026-11-12-plan-goc.md) → [`docs/plan.md`](docs/plan.md); [`wiki/learned.md`](wiki/learned.md) (chọn model); [`wiki/log.md`](wiki/log.md) (rà soát sẵn sàng ra mắt, 14/11) | Product owner |
+| Đặc tả | Biến mỗi lời nhắn thành trang tính năng có "Done when", trang quyết định và tài liệu thiết kế; hỏi câu nhiều lựa chọn khi wiki chưa rõ | [`wiki/features/`](wiki/features/), [`wiki/decisions/`](wiki/decisions/), [`DESIGN.md`](DESIGN.md) → [`docs/design-impl.md`](docs/design-impl.md), [`memory/po-questions.md`](memory/po-questions.md) | Product owner trả lời; Claude ghi "(tạm chọn)" |
+| Code | Backend, frontend và migration, viết test trước | `backend/lyris/`, `frontend/src/` | Claude, trong khuôn luật của [`environment/rules.md`](environment/rules.md) |
+| Test | Unit test, bot trình duyệt trên LLM giả, kịch bản model thật | `backend/tests/`, [`environment/e2e.mjs`](environment/e2e.mjs), [`harness/scenarios/`](harness/scenarios/) | Chỉ `verify.sh` được đánh ✅ |
+| Lặp lại | Rà soát đối kháng có người kiểm chứng, vòng nhìn giao diện chấm a–e ở 390 px, bài học sau mỗi lần sai | [`wiki/log.md`](wiki/log.md), [`memory/progress.md`](memory/progress.md) (điểm design), [`wiki/learned.md`](wiki/learned.md), [docs/server.md §21](docs/server.md#21-phản-biện-đã-áp-dụng-2026-11-14) (phản biện 23 điểm) | Product owner về gu; `verify.sh` về đúng sai |
+
+#### Một tính năng từ đầu đến cuối: F47 tìm nhân vật
+
+1. **Ý tưởng.** Khi trả lời các câu hỏi của Claude về thưởng sáng tác, product owner chọn "1A 2C 3A 4A 5A" và xin thêm thanh tìm kiếm ở Khám phá ([`wiki/raw/2026-11-14-f44-bang-xep-hang-tra-loi.md`](wiki/raw/2026-11-14-f44-bang-xep-hang-tra-loi.md)).
+2. **Kế hoạch.** `/plan` làm lại F44, thêm F46 (bảng "Nhân vật hot") và F47 (tìm kiếm), rồi ghi vào [`wiki/log.md`](wiki/log.md) ("/plan F44 làm lại theo câu trả lời 1A 2C 3A 4A 5A").
+3. **Đặc tả.** [`wiki/features/F47-tim-nhan-vat.md`](wiki/features/F47-tim-nhan-vat.md): bốn dòng Unit và ba dòng Bot (khớp không dấu, debounce 250 ms, không đưa chữ đã gõ vào số liệu, vừa một dòng ở 390 px), mỗi dòng có test ghi tên dưới "Tests".
+4. **Test rồi mới code.** [`frontend/src/pages/explore/search.test.ts`](frontend/src/pages/explore/search.test.ts) và ba check bot trong [`environment/e2e.mjs`](environment/e2e.mjs), sau đó mới tới [`frontend/src/pages/explore/search.ts`](frontend/src/pages/explore/search.ts).
+5. **Claim và nhìn.** `F47 🟡 claimed`, rồi điểm design a5 b5 c5 d5 e5 ở 390 px, cả hai theme ([`memory/progress.md`](memory/progress.md)).
+6. **Rà soát.** Một vòng rà soát đối kháng đổi cách khớp sang đầu từ ("ha" ra "Hạ Vy" nhưng không ra mọi tên có chữ "thành"); lựa chọn này được đưa thành câu hỏi mở cho product owner ([`memory/po-questions.md`](memory/po-questions.md)) và dòng "Done when" được sửa theo.
+7. **Đã chấm.** `verify.sh` xanh: "F47 ✅ passing (Tìm nhân vật ở Khám phá)" trong [`wiki/log.md`](wiki/log.md).
 
 #### Cách tổ chức công việc
 
@@ -808,11 +1226,23 @@ Nhóm làm Lyris trong khoảng bốn ngày cùng **Claude Code** (Claude Opus).
    - bước sửa kèm test chống lặp lỗi;
    - chạy thử từ đầu đến cuối trên bản sao dữ liệu thật.
 
-   Phase 4 (sổ thế giới) dùng 22 agent, Phase 4b (tài khoản) dùng 23, mỗi phase khoảng hai tiếng.
+   Các phase lớn (Phase 4 sổ thế giới, Phase 4b tài khoản) mỗi phase chạy thành một chuỗi agent phụ như vậy. Script của chuỗi và log của agent không được giữ trong repo; thứ còn lại là sản phẩm của chúng: tài liệu thiết kế (`docs/phase4.md`, `docs/auth.md`), các bản sửa kèm test, và bài học trong `wiki/learned.md`.
 3. **Đo trên model thật, không đoán.** Mọi nhận định về tốc độ và hành vi model đều được thử trên model local, kèm bảng thời gian và log cache của Ollama. Bảng so trước/sau có các tình huống như quên sinh nhật, ghen, xin lỗi.
-4. **Ghi nhớ sở thích lâu dài.** Claude giữ các ghi chú ngắn về quy tắc cố định (trả lời tiếng Việt, gọi "story" thay vì "câu chuyện", giấu chữ kỹ thuật, không để ngoặc trong ô thoại, thẻ lưới đều nhau). Nhờ vậy lời sửa được giữ qua các buổi làm việc.
+4. **Ghi nhớ sở thích lâu dài.** Claude giữ các ghi chú ngắn về quy tắc cố định (trả lời tiếng Việt, gọi "story" thay vì "câu chuyện", giấu chữ kỹ thuật, không để ngoặc trong ô thoại, thẻ lưới đều nhau). Nhờ vậy lời sửa được giữ qua các buổi làm việc. Các ghi chú đó nằm trên máy người làm; cùng các luật ấy có trong repo ở [`CLAUDE.md`](CLAUDE.md) và [`environment/rules.md`](environment/rules.md), quyền ở `.claude/settings.json`, còn luật chữ trên giao diện được một test tự kiểm (`frontend/src/copyWords.test.ts`).
 5. **Wiki là nguồn sự thật.** `wiki/` giữ nguyên văn tin nhắn gốc của nhóm (`raw/`), mỗi tính năng một trang kèm danh sách *Done when* đã đối chiếu với code, mỗi quyết định một trang kèm lý do, và `learned.md` ghi những lỗi không được lặp lại.
-6. **Rà soát sẵn sàng ra mắt theo đề bài.** Trước khi nộp, nhóm đưa đề bài của Apero cho Claude và hỏi Lyris có qua được không. Bản phân tích thiếu hụt chỉ ra những gì còn thiếu để ra mắt công khai: chưa theo dõi sự kiện, chưa có Điều khoản và Chính sách, chưa hỏi đồng ý, chưa báo cáo nội dung trong app, chưa xoá tài khoản hay xuất dữ liệu, chưa có hướng dẫn triển khai, kịch bản demo và mục nhóm. Nhóm chốt quyết định sản phẩm (lưu sự kiện trong app và gửi PostHog, không có chữ người dùng; nội dung mặc định an toàn, chưa có cổng tuổi; chế độ người lớn chỉ là kế hoạch), rồi chạy một workflow: theo dõi sự kiện ở backend → tuân thủ ở backend → frontend → tài liệu → soát và sửa; bước nào cũng theo cùng luật cứng và kết thúc khi mọi bộ test đều qua.
+6. **Rà soát sẵn sàng ra mắt theo đề bài.** Trước khi nộp, nhóm đưa đề bài của Apero cho Claude và hỏi Lyris có qua được không. Bản phân tích thiếu hụt chỉ ra những gì còn thiếu để ra mắt công khai: chưa theo dõi sự kiện, chưa có Điều khoản và Chính sách, chưa hỏi đồng ý, chưa báo cáo nội dung trong app, chưa xoá tài khoản hay xuất dữ liệu, chưa có hướng dẫn triển khai, kịch bản demo và mục nhóm. Nhóm chốt quyết định sản phẩm (lưu sự kiện trong app và gửi PostHog, không có chữ người dùng; nội dung mặc định an toàn, chưa có cổng tuổi; chế độ người lớn chỉ là kế hoạch; ngày 15/11/2026 đổi thành 16+ trong Điều khoản, nút 18+ và tự xác nhận để kế hoạch ở F48), rồi chạy một workflow: theo dõi sự kiện ở backend → tuân thủ ở backend → frontend → tài liệu → soát và sửa; bước nào cũng theo cùng luật cứng và kết thúc khi mọi bộ test đều qua.
+
+#### Tài khoản Claude dùng chung
+
+Theo luật của đề bài về tài khoản dùng chung, nhóm dùng một project Claude Code chỉ cho repo này. Ngữ cảnh và kho kiến thức của nó là các file trong repo (`CLAUDE.md`, `environment/rules.md`, `wiki/`), nên không trộn với project của nhóm khác, và nhóm không mở, sửa hay xoá project hay file nào của nhóm khác.
+
+#### Lịch sử phát triển
+
+Repo GitHub được commit lần đầu ngày 14/11/2026, nên lịch sử git ngắn (vài commit lớn). Lịch sử từng ngày nằm ngay trong repo:
+- [`wiki/raw/`](wiki/raw/): lời gốc của product owner, nguyên văn và có ngày, từ 12/11;
+- [`wiki/log.md`](wiki/log.md): mọi lần `/plan`, mọi thay đổi harness và mọi tính năng được `verify.sh` chuyển sang ✅;
+- [`memory/progress.md`](memory/progress.md): claim, ghi chú, các lần chạy đỏ và xanh, điểm design;
+- [`wiki/learned.md`](wiki/learned.md) và [`memory/po-questions.md`](memory/po-questions.md): lỗi đã thành luật, và các câu hỏi còn mở.
 
 #### Điều làm tốt
 
@@ -824,7 +1254,7 @@ Nhóm làm Lyris trong khoảng bốn ngày cùng **Claude Code** (Claude Opus).
 
   Người kiểm chứng loại bỏ các báo động giả, nên bước sửa chỉ làm trên lỗi đã xác nhận.
 - **Đo tốt hơn đoán.** Đọc log cache của Ollama cho thấy chính xác vì sao story dài bị chậm, dẫn tới cách sửa "raw prefill": thời gian chờ chữ đầu tiên ở lượt cắt bớt story giảm từ 26–30 giây xuống khoảng 5 giây. Một nghi ngờ prompt chậm đi (68 giây mỗi lần chấm cảm xúc) hoá ra là do máy đang chạy nửa tốc độ; dù vậy, bản sửa sau đó vẫn rút lần chấm xuống khoảng 15 giây.
-- **Test là hợp đồng.** Khoảng 1.650 test backend và 465 test frontend, gồm một bài quét từng route để chắc hai tài khoản không đọc được dữ liệu của nhau, và một bài kiểm không chữ nào người dùng gõ lọt vào số liệu. Nhờ vậy những thay đổi lớn như thêm đăng nhập vào mọi route vẫn an toàn.
+- **Test là hợp đồng.** Lần chạy đầy đủ gần nhất có 1.649 test backend qua và 468 test frontend, gồm một bài quét từng route để chắc hai tài khoản không đọc được dữ liệu của nhau, và một bài kiểm không chữ nào người dùng gõ lọt vào số liệu. Nhờ vậy những thay đổi lớn như thêm đăng nhập vào mọi route vẫn an toàn.
 - **Tự soát theo đề bài.** Đọc đề bài như một danh sách kiểm, thay vì chỉ làm từng tính năng, giúp lộ ra phần việc ra mắt (số liệu, đồng ý, xoá tài khoản, báo cáo) mà kế hoạch theo tính năng đã để "làm sau".
 - **Viết thiết kế trước code.** Hợp đồng viết trước giúp agent backend và frontend làm song song mà không giẫm chân nhau. Phản biện trên giấy rẻ hơn nhiều so với sửa code về sau.
 
@@ -842,7 +1272,7 @@ Nhóm làm Lyris trong khoảng bốn ngày cùng **Claude Code** (Claude Opus).
 - **Prompt không sửa được hết cho model 12B.** Tin nhắn DM cứ kết bằng "ngủ sớm đi", và nhân vật thỉnh thoảng nói trái lore hoặc quên hẹn đã nhắn. Sửa prompt và thêm luật kiểm tra giảm được nhưng không hết. Đó là lý do cho kế hoạch fine-tune LoRA.
 - **Dùng chung phần cứng gây vướng.** Test trên model thật dùng chung một GPU với lúc nhóm đang chat. Nhóm phải tắt app khi đo, và các workflow dài phải tạm dừng rồi chạy tiếp nhiều lần. Có một lần số đo sai vì máy đang thiếu RAM.
 - **Agent đôi khi trượt quy tắc.** Agent thỉnh thoảng phạm quy tắc chung, như gọi Python hệ thống thay vì môi trường riêng của project, hoặc in lại một mã bí mật tạm thời vào log. Ghi luật cứng trong prompt của mọi agent cộng với bước soát lỗi đã kiềm chế được.
-- **Chi phí.** Các phase nhiều agent rất tốn token (hàng triệu token mỗi phase). Đáng làm với phần nhạy cảm về bảo mật hoặc đụng nhiều nơi; sửa giao diện nhỏ thì làm trực tiếp nhanh hơn.
+- **Chi phí.** Các phase nhiều agent tốn token hơn hẳn sửa trực tiếp (nhóm không giữ số token của từng phase). Đáng làm với phần nhạy cảm về bảo mật hoặc đụng nhiều nơi; sửa giao diện nhỏ thì làm trực tiếp nhanh hơn.
 - **Có việc agent không tự kiểm được.** Cấu hình Caddy cho production được viết theo tài liệu, chưa chạy trên máy chủ thật; video demo và tốc độ sinh song song trên GPU cần người và phần cứng thật. Tài liệu ghi rõ những phần này thay vì nhận là đã xong.
 
 ### Harness (theo mẫu mini-harness của Apero)
@@ -851,12 +1281,26 @@ Lyris được làm và kiểm bằng một harness chuyển từ *mini-harness*
 
 | Phần | Thư mục | Chứa gì |
 |---|---|---|
-| ① Wiki | `wiki/` | Mỗi tính năng một trang: `features/F01-…` tới `F47-…` cho app và `F50-…` tới `F62-…` cho kế hoạch máy chủ. Mỗi trang có các dòng "Done when" thuộc ba loại (`Unit:`, `Bot:`, `Model thật:`) và danh sách "Tests" ghi tên các test chứng minh chúng. Ngoài ra có màn hình, quyết định, `learned.md`, `log.md` và `plan-checklist.md`. `raw/` giữ nguyên văn lời của chủ dự án và không bao giờ bị sửa. |
-| ② Environment | `environment/` | `rules.md`, luật làm việc của AI (`CLAUDE.md` kéo file này vào), và `doctor.mjs` để kiểm máy. Thêm bot trình duyệt: `bot.mjs` điều khiển Chrome headless qua DevTools Protocol (không thêm thư viện), `e2e.mjs` có 112 check có tên, `fake-server.py` chạy backend thật với LLM giả có kịch bản và DB tạm ở cổng 8066/8067. Bot không bao giờ đụng `data/`, Ollama hay cổng 8000/5173. |
+| ① Wiki | `wiki/` | Mỗi tính năng một trang: `features/F01-…` tới `F48-…` cho app và `F50-…` tới `F62-…` cho kế hoạch máy chủ. Mỗi trang có các dòng "Done when" thuộc ba loại (`Unit:`, `Bot:`, `Model thật:`) và danh sách "Tests" ghi tên các test chứng minh chúng. Ngoài ra có màn hình, quyết định, `learned.md`, `log.md` và `plan-checklist.md`. `raw/` giữ nguyên văn lời của chủ dự án và không bao giờ bị sửa. |
+| ② Environment | `environment/` | `rules.md`, luật làm việc của AI (`CLAUDE.md` kéo file này vào), và `doctor.mjs` để kiểm máy. Thêm bot trình duyệt: `bot.mjs` điều khiển Chrome headless qua DevTools Protocol (không thêm thư viện), `e2e.mjs` có 113 check có tên, `fake-server.py` chạy backend thật với LLM giả có kịch bản và DB tạm ở cổng 8066/8067. Bot không bao giờ đụng `data/`, Ollama hay cổng 8000/5173. |
 | ③ Verification | `verification/` | `verify.sh` là giám khảo; `plan-check.sh` kiểm wiki đã đủ để build chưa. |
 | ④ Memory | `memory/` | `features.json` chỉ giữ trạng thái của từng tính năng, do `features.mjs` ghi, không sửa tay. Thêm `progress.md` và `po-questions.md`. |
 
 `harness/` là chuyện khác: thư mục này chứa phần so model và các kịch bản hành vi trên model thật (`run_eval.py`). `verify.sh --real-model` gọi tới nó.
+
+**Lyris đã chuyển mini-harness thế nào.** Vòng lõi giữ đúng như mini-harness (claim 🟡 → chỉ giám khảo đánh ✅ → đỏ 3 lần → ⛔ kèm bài học; wiki là nguồn sự thật). Bên trên vòng đó, repo này có các luật và công cụ riêng của Lyris:
+
+| Mảng | Bản của Lyris | Ở đâu |
+|---|---|---|
+| Dòng "Done when" | Ba loại: `Unit:`, `Bot:` và `Model thật:`; dòng Model thật phải ghi id một kịch bản, không thì sổ từ chối chuyển ✅ | [`environment/rules.md`](environment/rules.md), [`harness/scenarios/`](harness/scenarios/) |
+| Kiểm giao diện | Bot trình duyệt điều khiển Chrome headless qua DevTools Protocol, không thêm thư viện, chạy trên backend thật với LLM giả có kịch bản ở cổng 8066/8067 và DB tạm | `environment/bot.mjs`, `environment/e2e.mjs`, `environment/fake-server.py` |
+| Đếm đỏ công bằng | Lỗi đồ nghề (cổng bận, thiếu Chrome) ghi là `infra` và không tính là một lần đỏ | `environment/bot.mjs`, [`wiki/log.md`](wiki/log.md) |
+| Hồi quy | Tính năng ✅ tự về ⏳ khi test của nó đỏ ở lần chạy sau, hoặc khi "Done when" hay "Tests" đổi | `memory/features.mjs`, [`wiki/log.md`](wiki/log.md) |
+| Design | Vòng nhìn: bot chụp màn hình 390 px cả hai theme, Claude chấm a–e trước khi claim | `node environment/bot.mjs --look`, [`memory/progress.md`](memory/progress.md) |
+| Rào chắn | Claude không được sửa `memory/features.json`, `wiki/raw/`, `verification/` hay `data/`, không được tự chuyển ✅; `wiki/raw/` chỉ thêm file mới qua `environment/raw.mjs` | `.claude/settings.json`, [`environment/rules.md`](environment/rules.md) |
+| Làm cứng | Chính harness đã qua một vòng rà soát đối kháng ngày 14/11/2026 (tự ⛔ ở lần đỏ thứ 3, `reopen` giữ số lần đỏ, bot có timeout và ghi mọi hộp thoại) | [`wiki/log.md`](wiki/log.md) |
+
+Điều khó: một lần `verify.sh` đầy đủ mất 3–5 phút, và dòng Model thật cần GPU không có ai đang chat.
 
 **Lệnh của Claude Code** (`.claude/commands/`):
 - `/plan`: biến một ý tưởng mới thành trang wiki và kế hoạch tính năng. Lời gốc được lưu bằng `environment/raw.mjs`, rồi lệnh chạy `plan-check`.
@@ -886,12 +1330,21 @@ node memory/features.mjs list                  # bảng đếm
 
 Mã thoát: 0 là xanh, 1 là đỏ, 3 là xanh nhưng còn tính năng 🟡.
 
-**Bảng đếm ngày 2026-11-14** (các lần chạy gần nhất: backend 1.646 test qua, frontend 465, bot 112/112): **✅ 37 · 🟡 5 · ⏳ 18 · ⛔ 0.**
-- ✅ đạt (kể cả kịch bản trên model thật): F01–F21, F24–F36, F42, F43, F45.
-- 🟡 đã làm, chờ lần `verify.sh` đầy đủ tiếp theo: F22, F23, F44, F46, F47 (tìm nhân vật ở Khám phá, bảng "Nhân vật hot" và thưởng sáng tác làm lại).
-- ⏳ kế hoạch: F37–F41 (iPhone qua Tailscale, gửi hình ảnh, cộng đồng, đạo diễn khoảnh khắc, tự train model) và F50–F62 (máy chủ và App Store, sau môn học).
+**Bảng đếm ngày 2026-11-14** (lần `verify.sh` đầy đủ gần nhất lúc 16:47 UTC: backend 1.649 test qua và 113 bỏ qua, frontend 468, typecheck và build xanh, bot 113/113, không hồi quy): **✅ 42 · 🟡 0 · ⏳ 18 · ⛔ 0.**
+- ✅ đạt: F01–F36 và F42–F47, kể cả kịch bản trên model thật được máy chấm cho các tính năng có dòng "Model thật" (tắt model chấm: chỉ chấm luật máy, xem [Bằng chứng](#bằng-chứng)).
+- ⏳ kế hoạch: F37–F41 (iPhone qua Tailscale, gửi hình ảnh, cộng đồng, đạo diễn khoảnh khắc, tự train model) và F50–F62 (máy chủ và App Store, sau môn học). F48 (nút "Nội dung an toàn" và xác nhận 18+) được thêm vào kế hoạch ngày 15/11/2026, sau lần chạy này.
 
-Ngay lượt chạy đầu, bot đã tìm ra một lỗi thật. Trình sửa nhân vật kiểm card sau khi làm sạch, mà bước làm sạch chỉ giữ 3 dòng "Lời nói đặc trưng", nên dòng thứ 4 bị bỏ âm thầm thay vì chặn lưu. Lỗi đã được sửa và có unit test (`saveProblems`).
+Bot đã tìm ra hai lỗi thật mà unit test bỏ sót:
+- Ngay lượt chạy đầu: trình sửa nhân vật kiểm card sau khi làm sạch, mà bước làm sạch chỉ giữ 3 dòng "Lời nói đặc trưng", nên dòng thứ 4 bị bỏ âm thầm thay vì chặn lưu. Lỗi đã được sửa và có unit test (`saveProblems`).
+- Sau vòng rà soát harness: ở trình sửa nhân vật, còn thay đổi chưa lưu mà rời trang bằng link thật hay nút Back thì app không hỏi lại, vì guard chạy sau router. Lỗi đã được sửa ở router và có check bot cùng `frontend/src/lib/router.test.ts`.
+
+#### Bằng chứng
+
+`reports/` và `harness/results/` không được đưa lên git, nên bản sao kết quả mới nhất được commit ở [`docs/evidence/`](docs/evidence/) (tiếng Anh):
+- [verify-2026-11-14.json](docs/evidence/verify-2026-11-14.json): lần `verify.sh` đầy đủ gần nhất (các bộ test, bot, tính năng được chuyển ✅, không hồi quy).
+- [bot-checks.md](docs/evidence/bot-checks.md): đủ 113 check của bot và kết quả.
+- [real-model-eval.md](docs/evidence/real-model-eval.md): các lần chạy trên model thật `gemma4:12b`, từng kịch bản (tắt model chấm, nên chỉ chấm luật máy).
+- Ảnh chụp màn hình: [docs/assets/screenshots/](docs/assets/screenshots/) (xem [Ảnh chụp màn hình](#ảnh-chụp-màn-hình)).
 
 ### Nhóm
 
@@ -899,15 +1352,38 @@ Ngay lượt chạy đầu, bot đã tìm ra một lỗi thật. Trình sửa nh
 |---|---|---|---|
 | **Lê Thu Hằng** | 240116 | Product owner, người làm chính | Tầm nhìn và mọi quyết định sản phẩm; xây app cùng Claude Code (wiki làm nguồn sự thật, harness, chấm tự động); dùng thử và báo lỗi; video demo |
 | Nguyễn Ngọc Anh Thư | 240065 | Nghiên cứu, kiểm thử | Phát biểu vấn đề, số liệu thị trường và nghiên cứu, Jobs to be done, chân dung khách hàng; dùng thử app và báo lỗi |
-| Nguyễn Thị Hải An | 240032 | Nội dung và thiết kế, kiểm thử | Nhân vật mẫu và thế giới, ảnh nhân vật, góp ý giao diện; dùng thử app và báo lỗi |
+| Nguyễn Thị Hải An | 240032 | Nội dung và thiết kế, kiểm thử | Nhân vật mẫu, thế giới nhân vật và phần mô tả, góp ý giao diện; dùng thử app và báo lỗi |
 | Nguyễn Anh Hồng | 240169 | Kinh doanh | Mô hình doanh thu và giá coin, kênh ra mắt |
-| Huỳnh Quốc Tới | 240193 | Số liệu và kiểm thử | Kế hoạch tracking, rà soát quyền riêng tư và điều khoản, kiểm thử app |
+| Huỳnh Quốc Tới | 240193 | Số liệu và kiểm thử | Rà soát kế hoạch tracking, rà soát quyền riêng tư và điều khoản, kiểm thử app |
+
+### Quyền sở hữu và phát hành
+
+Nhóm đã đọc đề bài: nếu Lyris qua vòng gating của Apero, app sẽ được phát hành dưới tên Apero và bản quyền thuộc về Apero. Vì vậy repo không gắn giấy phép mã nguồn mở. Phần của bên thứ ba giữ giấy phép riêng, liệt kê đủ ở [wiki/design/credits.md](wiki/design/credits.md):
+- ảnh bối cảnh của nhân vật mẫu lấy từ Wikimedia Commons (CC BY-SA 4.0, CC BY 4.0, CC0, CC BY-SA 3.0), đã cắt khung;
+- font Cormorant Garamond, Plus Jakarta Sans và Be Vietnam Pro, tự host theo SIL Open Font License 1.1;
+- icon vẽ theo đường nét của Lucide (giấy phép ISC);
+- model chat (`gemma4:12b`) không nằm trong repo: người vận hành tải qua Ollama theo điều khoản riêng của model.
+
+Hai tài sản cần xử lý trước khi dùng công khai: ảnh đại diện của bốn nhân vật viết tay chỉ nằm trong dữ liệu trên máy của chủ dự án và chưa ghi nguồn ([credits §4](wiki/design/credits.md)), và nhạc nền của video demo là một bài hát có bản quyền ([docs/demo-video-plan.md](docs/demo-video-plan.md)), nên phải thay khi dùng công khai hay thương mại.
+
+### Bàn giao cho Apero
+
+Những gì Apero (hay bất kỳ ai vận hành) cần để chạy Lyris cho người dùng thật:
+
+| Cần | Để làm gì | Mô tả ở đâu |
+|---|---|---|
+| Một máy có GPU: NVIDIA từ 16 GB VRAM, hoặc Apple Silicon từ 24 GB | Chạy Ollama, model và backend | [Ra mắt và triển khai](#ra-mắt-và-triển-khai), [docs/deploy.md](docs/deploy.md) |
+| Tên miền có HTTPS (Caddy) và `LYRIS_COOKIE_SECURE=1` | Cookie đăng nhập an toàn; PWA cài được | [docs/deploy.md §5](docs/deploy.md#5-ra-mắt-open-web-caddy--systemd-linux) |
+| Liên hệ của người vận hành (`LYRIS_CONTACT`) | Hiện ở trang đăng nhập, Điều khoản và Chính sách | [Configuration](#configuration-environment-variables) |
+| Khoá dự án PostHog (`LYRIS_POSTHOG_KEY`), hoặc file xuất CSV/JSONL | Dữ liệu cho Round 2 | [docs/tracking-plan.md](docs/tracking-plan.md) |
+| Một pháp nhân cho Apple Developer, Google Play Console, VNPay/MoMo và hoá đơn điện tử | Thanh toán thật và phát hành trên cửa hàng | [memory/po-questions.md](memory/po-questions.md), [docs/server.md §11](docs/server.md#11-thanh-toán-po-5a) |
+| Trước khi mở cửa | Chạy danh sách kiểm trước khi mở; coin của chế độ thử về 0 khi ra mắt | [docs/deploy.md §10](docs/deploy.md#10-kiểm-trước-khi-mở-cửa), [Mô hình doanh thu](#mô-hình-doanh-thu) |
 
 ---
 
 ## References
 
 - Perez, S. (2025, August). AI companion apps on track to pull in $120M in 2025. *TechCrunch* (Appfigures data).
-- Li, K., et al. (2024). Measuring and controlling instruction (in)stability in language model dialogs. *Conference on Language Modeling (COLM 2024)*. arXiv:2402.10962.
+- Li, K., et al. (2024). Measuring and controlling instruction (in)stability in language model dialogs. *Conference on Language Modeling (COLM 2024)*. [arXiv:2402.10962](https://arxiv.org/abs/2402.10962).
 - Truong, S. T., et al. (2024). Crossing linguistic horizons: Finetuning and comprehensive evaluation of Vietnamese large language models. *Findings of NAACL 2024*.
 - Maharana, A., et al. (2024). Evaluating very long-term conversational memory of LLM agents. *ACL 2024*.

@@ -208,6 +208,29 @@ Notes on the safety and account events:
 - `account_deleted` is skipped if the account had turned usage sharing off, and is stored detached like
   `content_reported` (no device, no session, local only).
 
+### 4.8 Planned for Round 2 (not built, not recorded)
+
+None of these events is in the registry or in `track.ts` today, so the app does not record them and the "57 events"
+count above does not include them. They exist so Round 2 can measure real revenue as soon as real payments or a real
+ad network are switched on. Adding any of them follows the rule in §10 (registry, client whitelist and a row in the
+tables above, in the same change, with enum/boolean/bounded-integer properties only).
+
+| Planned event | Status | Trigger | Properties (proposed) | Source of the plan |
+|---|---|---|---|---|
+| `purchase_started` | Planned | A member starts a real coin purchase (store sheet or web payment page opened) | `pack: enum(p100\|p550\|p1200\|p2500)`, `store: enum(google_play\|app_store\|web)` | [docs/server.md §12.1](server.md) |
+| `purchase_completed` | Planned | The payment is verified on the server and the coins are credited | `pack`, `store`, `provider: enum(google_play\|app_store\|vnpay\|momo)` | [docs/server.md §12.1](server.md) (`purchase_completed{provider, pack_id}`) |
+| `purchase_refunded` | Planned | A store or payment provider reports a refund | `pack`, `provider` | [docs/server.md §12.1](server.md) |
+| `purchase_failed` | Proposed | The purchase was cancelled, declined or could not be verified | `pack`, `store`, `reason: enum(cancelled\|declined\|unverified\|error)` | This plan (to confirm with the PO and Apero) |
+| `ad_impression` | Proposed | A real rewarded ad is shown (replaces the sample ad of [F45](../wiki/features/F45-nhiem-vu-ngay.md)) | `network: enum(…)`, the networks Apero chooses | This plan; real ads are a separate PO decision ([docs/coins.md](coins.md), [docs/server.md §12.1](server.md)) |
+| `ad_rewarded` | Proposed | The ad network's server-side callback confirms the ad was watched | `network` | This plan; same condition as above |
+
+Notes:
+- `price_vnd` is deliberately not a property: the price is fixed by the pack code (`p100` = 10.000đ … `p2500` =
+  200.000đ, [docs/coins.md §4.1](coins.md)), so revenue is derived from `pack` without sending money amounts.
+- No transaction id, receipt, order id or payment detail ever goes into analytics; those stay in the payment tables
+  planned in docs/server.md.
+- Real ads would also need ad consent, a privacy-policy update and (on iOS) ATT; see docs/server.md §12.1.
+
 ## 5. KPIs and funnels
 
 ### 5.1 The lifecycle funnel
@@ -219,7 +242,7 @@ Notes on the safety and account events:
 | **Engagement** | Do they keep going, and is the AI good? | `message_sent`, `reply_completed`, `reply_failed`, `regenerate_used`, `message_edited`, `reply_rated`, feature events | **WES** (North Star); messages per active user per day; turns per story; TTFT distribution (`ttft_bucket` where `aborted = false`); failure rate = `reply_failed` / (`reply_completed` + `reply_failed`); dissatisfaction = (`regenerate_used` + assistant `message_edited` + `reply_rated{down}`) / `reply_completed`; feature adoption = share of active users with `thought_revealed`, `heart_drawer_opened`, `mode_switched`, `suggestions_requested` |
 | **Retention** | Do they come back? | any event except `session_started`; `story_resumed` | DAU / WAU / MAU; **D1 / D7 retention** (users whose first event was on day d0 and who are active on d0+1 / d0+7; a device's signed-out events count as the account later seen on it); stories resumed per week; sessions per user per week |
 | **Creation** | Do they build for others? | `character_created`, `character_published`, `lore_imported`, `persona_created`, `story_started{source: public}` | Creators/week; AI-draft share = `character_created{via: ai_draft}` / all; public characters/week; **community plays** = `story_started{source: public}` per week |
-| **Monetisation readiness** (coin system, built in test mode) | What would people spend, and what does it cost? | `message_sent`, `reply_completed` (`kind`, `output_tokens`, `duration_ms`), `story_started{source: public}` | **Messages per active user per day** = future coin spend per user; generations per message = (`reply_completed`) / `message_sent` (regenerate and retry cost compute too); **compute per turn** = mean `output_tokens` and `duration_ms` per `reply_completed` → coin price per turn; share of heavy users (≥ 50 messages/day) = candidates for top-ups; creator payout base = community plays per creator (from public-character stories) |
+| **Monetisation readiness** (coin system, built in test mode) | What would people spend, and what does it cost? | `message_sent`, `reply_completed` (`kind`, `output_tokens`, `duration_ms`), `story_started{source: public}`, and the coin events of §4.7: `coins_spent`, `coins_insufficient`, `coins_granted`, `wallet_viewed`, `topup_viewed`, `topup_pack_selected`, `topup_code_redeemed`, `missions_viewed`, `ad_started`, `mission_claimed`, `creator_rank_reached` | **Messages per active user per day** = future coin spend per user; generations per message = (`reply_completed`) / `message_sent` (regenerate and retry cost compute too); **compute per turn** = mean `output_tokens` and `duration_ms` per `reply_completed` → coin price per turn; share of heavy users (≥ 50 messages/day) = candidates for top-ups; creator payout base = community plays per creator (from public-character stories); **coin balance** = coins issued (`coins_granted.amount` by `source`) vs coins spent (6 × `coins_spent`) per day; **% of members hitting 0 coins in 7 days** (`coins_insufficient`); the top-up and rewarded-ad funnels of §5.4 |
 
 Guardrails: **Safety** = `content_reported` per 1,000 `message_sent`, by `reason` (`minor_safety` must stay at
 zero and every one is reviewed); **Privacy** = opt-out rate (`analytics_opt_out` / active accounts), deletions,
@@ -240,6 +263,36 @@ commitments: activation rate ≥ 50 % of invited signups; ≥ 40 % of started st
 15 %; reply failure rate < 2 %; first token under 10 s for ≥ 90 % of replies after warm-up; `minor_safety` reports = 0
 unreviewed.
 
+### 5.4 Coin funnels (top-up and rewarded ad)
+
+Both funnels run on events that are recorded today (§4.7). Nothing is sold in test mode: a "top-up" is a code the
+owner hands out, and the ad is a 15-second sample ad that talks to no ad network. The funnels are defined now so
+the same steps carry over when real payments and ads arrive (§4.8).
+
+**Top-up funnel** (per account, steps in order within 24 h):
+
+| Step | Event | Src | Note |
+|---|---|---|---|
+| 1. Runs out of coins | `coins_insufficient` | S | A reply was refused with 402 `coins_required` |
+| 2. Opens "Nạp coin" | `topup_viewed` | C | `from: composer` = straight from the out-of-coins block |
+| 3. Looks at a pack | `topup_pack_selected` | C | `pack`; opens the "Giá dự kiến" explanation |
+| 4. Gets coins | `topup_code_redeemed` | S | Test mode; in Round 2 this step becomes `purchase_completed` (§4.8) |
+
+KPIs: step-to-step conversion; **top-up rate** = accounts with step 4 / accounts with step 1; pack mix from step 3
+vs step 4; failure share = `topup_code_failed` / (`topup_code_redeemed` + `topup_code_failed`), by `reason`.
+
+**Rewarded-ad funnel** (per account and day):
+
+| Step | Event | Src | Note |
+|---|---|---|---|
+| 1. Opens "Nhiệm vụ hôm nay" | `missions_viewed` | C | `from: wallet\|composer\|link` |
+| 2. Starts the ad | `ad_started` | S | Sample ad today; `ad_impression` in Round 2 (§4.8) |
+| 3. Claims the reward | `mission_claimed{mission: ad}` | S | Also `coins_granted{source: mission_ad}`; `ad_rewarded` in Round 2 |
+
+KPIs: **ad completion rate** = `mission_claimed{mission: ad}` / `ad_started`; ads per active member per day (at most
+3 per day, [docs/coins.md](coins.md)); share of out-of-coins members who choose missions instead of leaving =
+accounts with `coins_insufficient` followed by `missions_viewed{from: composer}` the same day.
+
 ## 6. Where server events are recorded
 
 | Event | Code (`backend/lyris/`) |
@@ -254,6 +307,10 @@ unreviewed.
 | `session_started` | `analytics/tracker.py` (automatic) |
 | `analytics_opt_out` | `api/routes_accounts.py` (`PATCH /api/account`) |
 | `content_reported`, `account_deleted`, `data_exported` | `api/routes_compliance.py` |
+| `coins_granted{source: signup}` | `api/routes_auth.py` (with `signup_completed`) |
+| `coins_spent`, `coins_released`, `coins_insufficient` | `coins/wallet.py` (`CoinService.hold` / `charge` / `release`, called by `chat/service.py` around every reply and by `api/routes_studio.py` for the Studio test chat; holds released at start-up go through `emit_restart_releases`, called from `api/app.py`) |
+| `coins_granted` (daily, top-up code, missions), `coins_adjusted`, `topup_code_redeemed`, `topup_code_failed`, `topup_code_created`, `ad_started`, `mission_claimed` | `coins/wallet.py` (`CoinService`, called by `api/routes_coins.py`; the daily check-in is also called from `api/routes_auth.py`) |
+| `creator_rank_reached`, `coins_granted{source: creator_rank\|creator_first_public}` | `coins/wallet.py` (`_emit_refresh`, detached, when the "Nhân vật hot" board of `coins/hot.py` is recomputed) |
 
 ## 7. Client contract (`POST /api/events`)
 
@@ -346,6 +403,30 @@ Content-Type: application/json
   local; events of an account that has not accepted the current Privacy Policy stay local.
 - `LYRIS_POSTHOG_HOST` must start with `https://`; anything else (including `http://`) stops the server at start-up
   with a clear message, so events never travel unencrypted.
+- **Round 2 handover:** set `LYRIS_POSTHOG_KEY` (and `LYRIS_POSTHOG_HOST`) to Apero's own PostHog project on the
+  server Apero evaluates, or, if Apero prefers its own tools, hand over the CSV/JSONL export of §8 for the
+  evaluation period. Either way the event names and properties are the ones in §4.
+
+### 9.1 Mapping to GA4 / Firebase and AppsFlyer (if Apero uses them)
+
+Lyris sends to PostHog only. If Round 2 runs on Google Analytics 4 / Firebase or AppsFlyer, the catalog maps over
+without renaming: every name is lowercase `snake_case` starting with a letter, the longest is 24 characters
+(`character_profile_viewed`), the longest property name is 15 characters, no event has more than 7 properties, and
+every property value is a short code, a boolean or a number. Suggested mapping (proposal; check each tool's current
+reserved names and limits with Apero before wiring it):
+
+| Lyris event | GA4 / Firebase | AppsFlyer |
+|---|---|---|
+| `signup_completed` | `sign_up` (recommended event) | `af_complete_registration` |
+| `login_succeeded` | `login` (recommended event) | `af_login` |
+| `topup_viewed` | `view_item_list` | custom event, same name |
+| `topup_pack_selected` | `select_item` (`item_id` = `pack`) | custom event, same name |
+| `purchase_started` (§4.8) | `begin_checkout` | `af_initiated_checkout` |
+| `purchase_completed` (§4.8) | `purchase` (`currency: VND`, `value` from the pack price) | `af_purchase` (`af_revenue`, `af_currency: VND`, `af_content_id` = `pack`) |
+| every other event | custom event with the same name and properties | custom event with the same name and properties |
+
+The privacy rules of §10 still apply on any tool: no user text, no IP, the opt-out and `Sec-GPC` respected, and no
+advertising identifiers unless the PO decides on real ads (§4.8).
 
 ## 10. Privacy rules
 
@@ -359,8 +440,10 @@ Content-Type: application/json
 - Default content is safe: no sexual content; romance, jealousy and possessiveness only non-explicitly; sexual
   content involving minors is refused absolutely. `content_reported{reason: minor_safety}` is monitored with zero
   tolerance.
-- **Planned, not built:** a "mature mode" behind age verification. If it ships, add `mature_mode_enabled` and
-  `age_verified` (booleans only) and keep the same no-text rule.
+- Lyris is for users aged 16+ (Terms; no birth date is collected, so no age property exists).
+- **Planned, not built (F48):** a "Nội dung an toàn" (safe content) toggle, on by default; turning it off (only once
+  18+ content exists) needs an "I am 18 or older" confirmation. If it ships, add `safe_content_changed {on}`
+  (boolean only) and keep the same no-text rule.
 - Any new event or property must be added to the registry (`events.py`) and the client whitelist (`track.ts`) in
   the same change, with an enum/boolean/bounded integer type and a row in §4. The sync test fails otherwise.
 
@@ -405,8 +488,12 @@ Run against a scratch database (never the real one), e.g.
 - **Mục tiêu:** đo cả vòng đời người dùng: thu hút → kích hoạt → tương tác → giữ chân → sáng tạo → sẵn sàng
   kiếm tiền (hệ thống coin, đã có ở chế độ thử). **Chỉ số North Star: số story "sống" mỗi tuần** (story có từ 3 lượt
   `message_sent` trong một tuần, giờ Việt Nam).
-- **45 sự kiện** (§4), chia theo nhóm: thu hút và tài khoản, khám phá, bắt đầu story, tương tác và chất lượng AI,
-  sáng tạo, giữ chân, an toàn nội dung, tài khoản, coin. Sự kiện server biết thì server ghi; giao diện chỉ gửi những gì
+- **57 sự kiện** (§4), chia theo nhóm: thu hút và tài khoản, khám phá, bắt đầu story, tương tác và chất lượng AI,
+  sáng tạo, giữ chân, an toàn nội dung, tài khoản, coin. §4.8 liệt kê các sự kiện **dự kiến cho Round 2**
+  (`purchase_*`, `ad_impression`, `ad_rewarded`): chưa có trong code, chưa được ghi.
+- **Phễu coin** (§5.4): phễu nạp coin `coins_insufficient` → `topup_viewed` → `topup_pack_selected` →
+  `topup_code_redeemed` (Round 2: `purchase_completed`), và phễu quảng cáo có thưởng `missions_viewed` →
+  `ad_started` → `mission_claimed{mission: ad}`. Sự kiện server biết thì server ghi; giao diện chỉ gửi những gì
   chỉ giao diện biết qua `POST /api/events` (tối đa 20 sự kiện, cần `X-Lyris: 1`, 30 lần/phút; chưa đăng nhập: mỗi
   sự kiện một lần mỗi request, 10 lần/phút mỗi IP, tối đa 30 thiết bị mới mỗi giờ mỗi IP).
 - **KPI chính** (§5): tỉ lệ kích hoạt, số lượt mỗi story, DAU/WAU/MAU, D1/D7, thời gian chờ chữ đầu, tỉ lệ lỗi, tỉ
@@ -422,4 +509,6 @@ Run against a scratch database (never the real one), e.g.
   hiện tại: sự kiện chỉ ở máy, không gửi PostHog. Báo cáo nội dung và xoá tài khoản được ghi không gắn ai.
 - **Xem số liệu:** chủ máy vào Tài khoản → "Quản lý tài khoản" → tab "Số liệu", hoặc tải CSV/JSONL
   (`/api/admin/analytics/export.csv`, `.jsonl`) để gửi Apero cho Round 2.
+- **Round 2:** đặt `LYRIS_POSTHOG_KEY` của dự án PostHog do Apero cấp, hoặc bàn giao file export CSV/JSONL. Nếu
+  Apero dùng GA4/Firebase hay AppsFlyer, bảng ánh xạ ở §9.1 (đề xuất, cần kiểm lại với Apero).
 - **Kiểm tra (QA):** danh sách ở §11, chạy trên DB tạm, không bao giờ trên DB thật.

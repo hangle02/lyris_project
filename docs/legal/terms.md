@@ -1,6 +1,6 @@
 # Điều khoản sử dụng Lyris
 
-Phiên bản: 2026-11-16
+Phiên bản: 2026-11-16 · Hiệu lực từ: 2026-11-16
 
 Chào mừng bạn đến với Lyris, nơi bạn cùng các nhân vật AI viết nên những story. Khi tạo tài khoản hoặc tiếp tục dùng Lyris, bạn đồng ý với các điều khoản dưới đây và với [Chính sách quyền riêng tư](privacy.md).
 
@@ -9,7 +9,7 @@ Chào mừng bạn đến với Lyris, nơi bạn cùng các nhân vật AI vi�
 ## 1. Ai được dùng Lyris
 
 - Tài khoản mới cần mã mời do quản trị viên của máy chủ Lyris tạo.
-- Lyris không đặt độ tuổi tối thiểu. Nếu bạn dưới 16 tuổi, hãy dùng Lyris khi đã được cha mẹ hoặc người giám hộ cho phép.
+- **Lyris dành cho người từ đủ 16 tuổi trở lên.** Khi tạo tài khoản và đồng ý các điều khoản này, bạn xác nhận mình đã đủ 16 tuổi. Lyris không hỏi ngày sinh. Người dưới 16 tuổi không được dùng Lyris. Nếu chúng tôi biết một tài khoản thuộc về người dưới 16 tuổi, tài khoản đó sẽ bị xoá.
 - Bạn giữ mật khẩu của mình. Mọi hoạt động từ tài khoản của bạn được coi là của bạn. Thấy dấu hiệu lạ, hãy đổi mật khẩu và chọn "Đăng xuất mọi thiết bị".
 
 ## 2. Nhân vật là AI, không phải người thật
@@ -34,7 +34,7 @@ Lyris giữ nội dung ở mức an toàn. Tình cảm, ghen tuông, chiếm h�
 
 AI của Lyris được dặn tránh những nội dung trên và lảng đi khi bị kéo về phía đó. Cố tình lách để AI viết nội dung bị cấm cũng là vi phạm.
 
-**Chế độ người lớn chưa có.** Lyris hiện không có chế độ nội dung dành cho người lớn. Nếu sau này có, nó sẽ cần xác minh tuổi, do người dùng tự bật và có điều khoản riêng.
+**Nội dung an toàn được bật sẵn.** Mọi tài khoản đều bắt đầu với "Nội dung an toàn" đang bật. Hiện Lyris không có nội dung dành cho người từ 18 tuổi (nội dung 18+). Nếu sau này có, nội dung đó chỉ mở khi bạn tự tắt "Nội dung an toàn" và tích ô "Tôi đã đủ 18 tuổi". Đây là lời tự xác nhận của bạn: xác nhận sai là vi phạm điều khoản. Chúng tôi có thể tắt quyền xem nội dung 18+ (hoặc khoá tài khoản) nếu quyền này bị lạm dụng hay xác nhận không đúng. Kể cả khi đó, mục 1 của quy tắc trên vẫn cấm tuyệt đối.
 
 ## 4. Báo cáo nội dung
 
@@ -80,7 +80,7 @@ Các điều khoản này theo pháp luật Việt Nam. Câu hỏi, khiếu nạ
 
 ## English
 
-Version: 2026-11-16
+Version: 2026-11-16 · Effective from: 2026-11-16
 
 Welcome to Lyris, where you write stories together with AI characters. By creating an account or continuing to use Lyris, you agree to these terms and to the [Privacy Policy](privacy.md).
 
@@ -89,7 +89,7 @@ Welcome to Lyris, where you write stories together with AI characters. By creati
 ### 1. Who can use Lyris
 
 - New accounts need an invite code created by the administrator of the Lyris server.
-- Lyris sets no minimum age. If you are under 16, use Lyris only with permission from a parent or guardian.
+- **Lyris is for people aged 16 or older.** By creating an account and accepting these terms, you confirm that you are 16 or older. Lyris does not ask for your date of birth. People under 16 must not use Lyris. If we learn that an account belongs to someone under 16, the account will be deleted.
 - Keep your password safe. Activity from your account is treated as yours. If anything looks wrong, change your password and choose "Sign out of all devices".
 
 ### 2. Characters are AI, not people
@@ -114,7 +114,7 @@ Lyris keeps content safe. Romance, jealousy and possessiveness in stories are al
 
 Lyris's AI is instructed to avoid this content and to deflect when pushed toward it. Deliberately trying to get around this is also a violation.
 
-**No mature mode yet.** Lyris has no mature-content mode today. If one is added later, it will require age verification, be opt-in, and come with its own terms.
+**Safe content is on by default.** Every account starts with "Nội dung an toàn" (safe content) turned on. Lyris has no content for people aged 18 or older (18+ content) today. If it is added later, it will only be available after you turn "Nội dung an toàn" off yourself and tick "Tôi đã đủ 18 tuổi" (I am 18 or older). This is your own confirmation: confirming falsely breaks these terms. We may remove access to 18+ content (or disable the account) if it is misused or the confirmation is untrue. Even then, rule 1 above stays absolutely prohibited.
 
 ### 4. Reporting content
 

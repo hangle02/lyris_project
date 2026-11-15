@@ -153,3 +153,8 @@ Các dòng trước "Tạo wiki" được dựng lại từ [docs/plan.md](../do
 - 2026-11-14 · verify.sh: F44 ✅ passing (Thưởng sáng tác theo bảng xếp hạng Nhân vật hot) · [F44-thuong-sang-tac](features/F44-thuong-sang-tac.md)
 - 2026-11-14 · verify.sh: F46 ✅ passing (Bảng xếp hạng Nhân vật hot) · [F46-bang-xep-hang-nhan-vat-hot](features/F46-bang-xep-hang-nhan-vat-hot.md)
 - 2026-11-14 · verify.sh: F47 ✅ passing (Tìm nhân vật ở Khám phá) · [F47-tim-nhan-vat](features/F47-tim-nhan-vat.md)
+
+## 2026-11-15
+
+- 2026-11-15 · PO chốt tuổi: Lyris cho người 16+ (Điều khoản §1, Chính sách §8; đồng ý Điều khoản là xác nhận 16+; không hỏi năm sinh), "Nội dung an toàn" bật sẵn, 18+ sau này chỉ khi tắt nút và tích "Tôi đã đủ 18 tuổi"; sửa docs/legal (vi + en, giữ phiên bản), docs/compliance.md, docs/server.md, docs/coins.md, README; thêm F48 (Kế hoạch); F61 bỏ ô năm sinh; không đổi code · [tuoi-16-va-noi-dung-an-toan](decisions/tuoi-16-va-noi-dung-an-toan.md), [F48](features/F48-noi-dung-an-toan.md), [F61](features/F61-dang-ky-cong-khai.md), [raw](raw/2026-11-15-tuoi-toi-thieu-3.md)
+- 2026-11-14 · verify.sh: F01 ✅ passing (Chế độ Story (văn tiểu thuyết)) · [F01-che-do-story](features/F01-che-do-story.md)

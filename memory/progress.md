@@ -224,3 +224,7 @@
 - 2026-11-14 · F44 ✅ passing (verify.sh xanh)
 - 2026-11-14 · F46 ✅ passing (verify.sh xanh)
 - 2026-11-14 · F47 ✅ passing (verify.sh xanh)
+- 2026-11-14 · sync: F01 trang đổi: bỏ Done when "Unit: `lib/storyBlocks.ts`: lời trong ngoặc kép từ 3 chữ trở lên thành thẻ thoại, bỏ cặp ngoặc ngoài cùng; câu ngắn hơn ở lại trong dòng; `*hành động*` thành dẫn truyện không còn dấu sao." · thêm Done when "Unit: `lib/storyBlocks.ts`: lời trong ngoặc kép từ 3 chữ trở lên thành thẻ thoại, bỏ cặp ngoặc ngoài cùng; câu nói ngắn của nhân vật kiệm lời cũng thành thẻ khi có dấu kết câu trong ngoặc (`"Được."`, `“Ừ!”`, `“Thật?”`) hoặc đứng đầu đoạn (`“Đi thôi”, hắn nói.`, dấu phẩy thừa bị bỏ); từ được nhắc giữa câu không dấu kết câu (`gọi cô là “bé con”`) ở lại trong dòng; `*hành động*` thành dẫn truyện không còn dấu sao."
+- 2026-11-14 · F01 🟡 claimed (Model báo đã làm) — chờ verify.sh chứng minh
+- 2026-11-14 · F01 ✅ passing (verify.sh xanh)
+- 2026-11-14 · sync: F61 trang đổi: bỏ Done when "Bot: với `LYRIS_SIGNUP=open`, `#/signup` không có ô "Mã mời"; có nút "Tiếp tục với Google" và "Tiếp tục với Apple" (trên web và trên vỏ iOS giả), và ô "Năm sinh"." · thêm Done when "Bot: với `LYRIS_SIGNUP=open`, `#/signup` không có ô "Mã mời"; có nút "Tiếp tục với Google" và "Tiếp tục với Apple" (trên web và trên vỏ iOS giả), và **không** có ô "Năm sinh"."

@@ -40,4 +40,7 @@ Từ 640px: thành hộp thoại giữa màn hình, cỡ vừa.
 - [Đọc suy nghĩ](../features/F08-doc-suy-nghi.md)
 - [Ẩn chữ kỹ thuật](../features/F27-an-chu-ky-thuat.md) (model nằm trong "Nâng cao", chỉ chủ máy)
 
+Không có nút "Nội dung an toàn" ở đây: nút theo **tài khoản**, nằm trong [sheet Tài khoản](account-sheet.md)
+([F48](../features/F48-noi-dung-an-toan.md), kế hoạch; tạm chọn, xem [tuoi-16-va-noi-dung-an-toan](../decisions/tuoi-16-va-noi-dung-an-toan.md)).
+
 Chi tiết: [auth.md §1.1](../../docs/auth.md) (ai được đổi model), [design-impl.md §15](../../docs/design-impl.md).

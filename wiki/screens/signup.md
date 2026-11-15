@@ -17,6 +17,9 @@ Người được mời tạo tài khoản mới bằng mã mời do chủ máy 
 5. **"Tên đăng nhập"** (placeholder "@handle"), gợi ý quy tắc độ dài và ký tự: chữ a-z, số, _ và dấu chấm.
 6. **"Mật khẩu"** ("Ít nhất 8 ký tự.") và **"Nhập lại mật khẩu"**, có nút Hiện/Ẩn.
 7. **Nút "Tạo tài khoản"** rộng hết cột.
+   - *Ngay trên nút:* ô đánh dấu đồng ý Điều khoản và Chính sách (bắt buộc, [F35](../features/F35-quyen-rieng-tu-va-bao-cao.md)).
+     *Kế hoạch ([F48](../features/F48-noi-dung-an-toan.md)):* câu đồng ý thêm "và xác nhận tôi đã đủ 16 tuổi" (Lyris dành cho
+     người 16+). **Không có ô năm sinh / ngày sinh** (PO chốt 2026-11-15).
 8. **"Đã có tài khoản? Đăng nhập"**.
 
 Từ 640px: cột rộng tối đa 400px, nằm giữa màn hình.
@@ -33,5 +36,6 @@ Từ 640px: cột rộng tối đa 400px, nằm giữa màn hình.
 ## Tính năng
 
 - [Đăng nhập](../features/F29-dang-nhap.md)
+- [Nút Nội dung an toàn và xác nhận 18+](../features/F48-noi-dung-an-toan.md) (kế hoạch: câu đồng ý 16+)
 
 Chi tiết: [auth.md §7.3 và §7.4](../../docs/auth.md).

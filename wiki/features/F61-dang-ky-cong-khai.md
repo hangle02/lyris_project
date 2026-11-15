@@ -25,7 +25,9 @@ Thiết kế: [docs/server.md §10](../../docs/server.md).
   số điện thoại (tạm chọn).
 - Móc OTP số điện thoại theo cờ `LYRIS_PHONE_VERIFY=publish`: bật thì phải xác thực số điện thoại Việt Nam trước khi bật
   "Công khai" nhân vật (Nghị định 147/2024, chờ luật sư; tạm chọn).
-- Bản host hỏi năm sinh khi đăng ký (chỉ lưu năm) để có cơ chế "tuổi đã khai" của App Store 1.2.1(a) (tạm chọn).
+- **Không hỏi năm sinh** khi đăng ký (PO chốt 2026-11-15, [tuoi-16-va-noi-dung-an-toan](../decisions/tuoi-16-va-noi-dung-an-toan.md)):
+  Lyris dành cho người 16+ theo Điều khoản, đồng ý Điều khoản là tự xác nhận 16+. Cơ chế "tuổi đã khai" của App Store
+  1.2.1(a) là ô "Tôi đã đủ 18 tuổi" khi tắt "Nội dung an toàn" ([F48](F48-noi-dung-an-toan.md)).
 - Vai trò `owner` thành `staff` (nhiều người, MFA TOTP, nhật ký `admin_audit`).
 
 ## Done when
@@ -38,7 +40,7 @@ Thiết kế: [docs/server.md §10](../../docs/server.md).
 - [ ] Unit: thiết bị iOS có bit DeviceCheck "đã nhận quà" (API giả) → tài khoản mới vẫn tạo được nhưng ví 0 coin, kể cả sau khi "cài lại app" (khoá App Attest mới); thiết bị chưa có bit → +300 và server đặt bit; tài khoản tạo trên web chỉ nhận +300 sau khi xác minh email hoặc số điện thoại (`test_signup_grant_device_limit`).
 - [ ] Unit: `LYRIS_PHONE_VERIFY=publish` → bật "Công khai" nhân vật khi chưa xác thực số điện thoại trả 403 `phone_required`; sau khi nhập đúng OTP (bộ gửi SMS giả) thì bật được; cờ tắt → như bây giờ (`test_phone_verify_before_publish`).
 - [ ] Unit: staff vào `/api/admin/*` cần TOTP; mỗi thao tác staff có một dòng `admin_audit` (`test_staff_mfa_and_audit`).
-- [ ] Bot: với `LYRIS_SIGNUP=open`, `#/signup` không có ô "Mã mời"; có nút "Tiếp tục với Google" và "Tiếp tục với Apple" (trên web và trên vỏ iOS giả), và ô "Năm sinh".
+- [ ] Bot: với `LYRIS_SIGNUP=open`, `#/signup` không có ô "Mã mời"; có nút "Tiếp tục với Google" và "Tiếp tục với Apple" (trên web và trên vỏ iOS giả), và **không** có ô "Năm sinh".
 
 ## Tests
 
@@ -54,12 +56,12 @@ Thiết kế: [docs/server.md §10](../../docs/server.md).
 
 ## Ngoài Done when
 
-Không chặn ✅: Điều khoản và Chính sách mới cho bản host (email, Apple/Google, số điện thoại, năm sinh, nơi lưu dữ liệu,
+Không chặn ✅: Điều khoản và Chính sách mới cho bản host (email, Apple/Google, số điện thoại, nơi lưu dữ liệu,
 hạn sao lưu 35 ngày), đổi `LEGAL_VERSION`; luật sư duyệt; luật sư trả lời Lyris có thuộc diện mạng xã hội theo Nghị định
 147/2024 không (quyết định bật cờ `LYRIS_PHONE_VERIFY`); nhà cung cấp SMS OTP.
 
 ## Liên quan
 
 - **Tài liệu:** [docs/server.md §10, §13](../../docs/server.md), [docs/auth.md](../../docs/auth.md), [docs/compliance.md §3, §4](../../docs/compliance.md)
-- **Tính năng:** [F29](F29-dang-nhap.md), [F30](F30-quan-ly-tai-khoan.md), [F42](F42-vi-coin.md), [F55](F55-app-ios-android.md)
+- **Tính năng:** [F48](F48-noi-dung-an-toan.md), [F29](F29-dang-nhap.md), [F30](F30-quan-ly-tai-khoan.md), [F42](F42-vi-coin.md), [F55](F55-app-ios-android.md)
 - **Quyết định:** [dang-ky-bang-ma-moi](../decisions/dang-ky-bang-ma-moi.md), [quen-mat-khau](../decisions/quen-mat-khau.md), [phien-token-cho-app](../decisions/phien-token-cho-app.md)

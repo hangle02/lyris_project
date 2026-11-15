@@ -73,6 +73,7 @@ Mỗi trang có "Done when" (dòng Unit / Bot / Model thật) và "Tests" (test 
 | F45 | [nhiem-vu-ngay](features/F45-nhiem-vu-ngay.md) | Đã có | Ra mắt (coin) | Nhiệm vụ ngày tối đa 30 coin: quảng cáo mẫu 15 giây, 3 nhân vật, 20 lượt |
 | F46 | [bang-xep-hang-nhan-vat-hot](features/F46-bang-xep-hang-nhan-vat-hot.md) | Đã có | Ra mắt (coin) | Bảng "Nhân vật hot" `#/explore/hot`: top 100 theo tổng người chơi, cập nhật mỗi giờ; dải 3 hạng đầu thay khung nổi bật ở Khám phá |
 | F47 | [tim-nhan-vat](features/F47-tim-nhan-vat.md) | Đã có | Ra mắt (coin) | Ô "Tìm nhân vật" ở Khám phá: không dấu, tên/vai trò/tag/giới thiệu, debounce 250 ms |
+| F48 | [noi-dung-an-toan](features/F48-noi-dung-an-toan.md) | Kế hoạch | Ra mắt | Nút "Nội dung an toàn" bật sẵn; tắt (khi có nội dung 18+) phải tích "Tôi đã đủ 18 tuổi"; câu đồng ý ghi 16+, không hỏi năm sinh |
 
 ## Màn hình
 
@@ -162,7 +163,7 @@ Xếp theo ngày. "Ai quyết": người dùng, thiết kế, hay đo đạc.
 | 2026-11-14 | [du-lieu-train-co-dong-y](decisions/du-lieu-train-co-dong-y.md) | Dữ liệu train chỉ lấy từ tài khoản đã đồng ý | thiết kế |
 | 2026-11-14 | [luoi-o-bang-nhau](decisions/luoi-o-bang-nhau.md) | Ô nhân vật trong lưới luôn bằng nhau | người dùng |
 | 2026-11-14 | [luu-su-kien-trong-app-va-posthog](decisions/luu-su-kien-trong-app-va-posthog.md) | Sự kiện lưu trong DB của app, gửi thêm PostHog khi có khoá; không bao giờ có chữ người dùng | người dùng |
-| 2026-11-14 | [noi-dung-an-toan-chua-cong-tuoi](decisions/noi-dung-an-toan-chua-cong-tuoi.md) | Nội dung mặc định an toàn, chưa có cổng tuổi; chế độ người lớn chỉ là kế hoạch | người dùng |
+| 2026-11-14 | [noi-dung-an-toan-chua-cong-tuoi](decisions/noi-dung-an-toan-chua-cong-tuoi.md) | **Phần tuổi đã thay bởi tuoi-16-va-noi-dung-an-toan.** Nội dung mặc định an toàn, chưa có cổng tuổi; chế độ người lớn chỉ là kế hoạch | người dùng |
 | 2026-11-14 | [kich-ban-model-that](decisions/kich-ban-model-that.md) | Mỗi dòng "Model thật" có kịch bản luật máy; phần chỉ người chấm được tách ra (tạm chọn) | thiết kế |
 | 2026-11-14 | [nguong-ttft-f14](decisions/nguong-ttft-f14.md) | TTFT mỗi lượt sau lượt đầu ≤ 6 giây, đo qua app thật (tạm chọn) | đo đạc |
 | 2026-11-14 | [giu-cho-coin-truoc-khi-sinh](decisions/giu-cho-coin-truoc-khi-sinh.md) | Mỗi lượt 6 coin: giữ chỗ trước khi sinh, chỉ trừ khi có chữ, không bao giờ làm mất câu trả lời; ngày theo giờ Việt Nam (phần tạm chọn) | người dùng + thiết kế |
@@ -176,6 +177,7 @@ Xếp theo ngày. "Ai quyết": người dùng, thiết kế, hay đo đạc.
 | 2026-11-14 | [coin-f44-khi-build](decisions/coin-f44-khi-build.md) | Coin F44 khi build: đếm người chơi qua story và bản sao (id nhân vật bị dùng lại), trần mốc 10 đếm trong sổ, settle khi checkin/lưu Công khai/mở khoá, chủ máy và coin tắt không hứa coin, bot dựng người chơi bằng environment/seed-creator-players.py (tạm chọn) | AI (tạm chọn) |
 | 2026-11-14 | [xep-hang-nhan-vat-hot](decisions/xep-hang-nhan-vat-hot.md) | Thay thưởng mốc người chơi bằng thưởng bảng "Nhân vật hot" top 100/50/10 (+100/+200/+300, cộng dồn) và +50 công khai lần đầu; bậc top N cần bảng ≥ N nhân vật, trần 600 coin/7 ngày, tính bảng mỗi giờ khi cần (tạm chọn) | người dùng + thiết kế |
 | 2026-11-14 | [kham-pha-tim-kiem-bo-khung-noi-bat](decisions/kham-pha-tim-kiem-bo-khung-noi-bat.md) | Khám phá bỏ khung nổi bật Hạ Vy; ô "Tìm nhân vật" không dấu; dải 3 hạng đầu "Nhân vật hot" (tạm chọn) | người dùng + thiết kế |
+| 2026-11-15 | [tuoi-16-va-noi-dung-an-toan](decisions/tuoi-16-va-noi-dung-an-toan.md) | Lyris cho người 16+ (Điều khoản, không hỏi năm sinh); "Nội dung an toàn" bật sẵn; 18+ sau này chỉ khi tắt nút và tích "Tôi đã đủ 18 tuổi" | người dùng (PO chốt) |
 
 ## Thiết kế
 
@@ -212,6 +214,7 @@ Lời chủ dự án, chép nguyên văn. Không sửa.
 - [raw/2026-11-14-coin-tra-loi.md](raw/2026-11-14-coin-tra-loi.md): câu trả lời về coin: 6 coin mỗi lượt, 300 quà, +60 mỗi ngày, nạp chế độ thử, mốc 10/50/100, nhiệm vụ 30 coin/ngày, hết coin khoá ô nhập.
 - [raw/2026-11-14-f44-bang-xep-hang.md](raw/2026-11-14-f44-bang-xep-hang.md): đổi F44: thưởng khi nhân vật vào top 100/50/10 "nhân vật hot", làm bảng xếp hạng, thưởng nhỏ khi công khai lần đầu.
 - [raw/2026-11-14-f44-bang-xep-hang-tra-loi.md](raw/2026-11-14-f44-bang-xep-hang-tra-loi.md): trả lời 1A 2C 3A 4A 5A; thêm thanh tìm kiếm, bỏ khung Hạ Vy to ở Khám phá.
+- [raw/2026-11-15-tuoi-toi-thieu.md](raw/2026-11-15-tuoi-toi-thieu.md), [-2](raw/2026-11-15-tuoi-toi-thieu-2.md), [-3](raw/2026-11-15-tuoi-toi-thieu-3.md): tuổi tối thiểu: 12 rồi đổi thành 16+ trong Điều khoản; nút "Nội dung an toàn" bật sẵn; không khai năm sinh, tắt nút thì tích "đã đủ 18+".
 
 ## Bài học
 

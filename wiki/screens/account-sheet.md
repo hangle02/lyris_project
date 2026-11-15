@@ -19,6 +19,11 @@ Mọi thứ về tài khoản ở một chỗ: profile, mật khẩu, persona ch
    - Chủ máy: phần **"Máy MacBook M2"** với nhãn trạng thái, Bộ nhớ hợp nhất, Model đang nạp, Model chat mặc định (đổi được), KV cache, Flash Attention, Lượt sinh song song, Model nạp cùng lúc, Phiên bản Ollama, Ký ức. Dòng "Cập nhật lúc …, tự làm mới mỗi 10 giây."
    - Mọi người: phần **"Công cụ"** với công tắc **"Công cụ nâng cao"** ("Hiện xem trước prompt, ước lượng token và thời gian sinh trong Studio.").
 6. **"Đăng xuất"** và **"Đăng xuất mọi thiết bị"**.
+   - *Kế hoạch ([F48](../features/F48-noi-dung-an-toan.md)), chỉ khi người vận hành bật nội dung 18+ (`LYRIS_ADULT_CONTENT`):*
+     mục **"Nội dung"** có công tắc **"Nội dung an toàn"** (`role="switch"`, bật sẵn). Bấm tắt thì hiện ô **"Tôi đã đủ 18 tuổi"**
+     (chưa tích) và nút **"Tắt nội dung an toàn"**, nút chỉ bấm được khi đã tích. Bật lại thì lần tắt sau phải tích lại.
+     Tài khoản bị người vận hành khoá nút: công tắc tắt, câu "Người quản lý đã bật lại Nội dung an toàn cho tài khoản này."
+     Không bật nội dung 18+: không có mục này (mọi tài khoản luôn ở nội dung an toàn).
 7. Link nhỏ **"Giới thiệu & bản quyền ảnh"**.
 
 **Trang con trong sheet** (có nút "‹ Tài khoản" để quay lại):
@@ -44,5 +49,6 @@ Từ 640px: hộp thoại giữa màn hình, cỡ vừa.
 - [Persona](../features/F21-persona.md)
 - [Đăng nhập](../features/F29-dang-nhap.md)
 - [Ẩn chữ kỹ thuật](../features/F27-an-chu-ky-thuat.md)
+- [Nút Nội dung an toàn và xác nhận 18+](../features/F48-noi-dung-an-toan.md) (kế hoạch)
 
 Chi tiết: [accounts.md §5](../../docs/accounts.md), [auth.md](../../docs/auth.md), [design-impl.md §6.6 và §13](../../docs/design-impl.md).

@@ -820,10 +820,10 @@ toán lỗi chữ ký > 5 trong 10 phút · `ledger_audit` lệch · bản sao l
     sự kiện SSE mới `retract{from_seq}` để client thay phần từ `from_seq` bằng câu lảng, và không lưu chữ đó.
   - Không lưu chữ bị chặn ngoài log an toàn 30 ngày cho staff.
 - **Nội dung người tạo và tuổi (App Store 1.2.1(a)):** app có nội dung của người tạo phải giới hạn được nội dung vượt
-  xếp hạng tuổi của app theo tuổi đã khai hoặc đã xác minh. Hiện chưa có cổng tuổi (docs/compliance.md §2), nhưng mọi
-  nhân vật công khai đều chịu luật an toàn mặc định nên không vượt xếp hạng 16+ dự kiến. Bản host thêm khai năm sinh khi
-  đăng ký (tạm chọn, chỉ lưu năm) để có cơ chế "tuổi đã khai"; nhân vật "18+" (chỉ khi có chế độ người lớn) chỉ hiện cho
-  tài khoản đã xác minh tuổi.
+  xếp hạng tuổi của app theo tuổi đã khai hoặc đã xác minh. Lyris dành cho người 16+ (Điều khoản §1; đồng ý Điều khoản
+  lúc tạo tài khoản là tự xác nhận 16+; **không hỏi năm sinh**, PO chốt 2026-11-15, docs/compliance.md §0). Nút "Nội dung
+  an toàn" bật sẵn cho mọi tài khoản nên mọi nhân vật công khai đều chịu luật an toàn mặc định. Nhân vật "18+" (chỉ khi
+  có nội dung 18+, F48) chỉ hiện cho tài khoản đã tắt nút và tích "Tôi đã đủ 18 tuổi" (cơ chế "tuổi đã khai").
 - **Truy cập của staff:** không ai đọc story của người khác trong app (giữ luật hiện tại). Truy cập DB production qua bastion,
   MFA, mọi phiên được ghi. Báo cáo chỉ có chữ khi người báo cáo đồng ý (đã có).
 - **Mã hoá:** TLS mọi chặng (kể cả trong VPC tới Postgres/Redis), mã hoá lúc nghỉ của Postgres, S3, bản sao lưu.
@@ -1013,9 +1013,9 @@ React Native/Expo** (dùng lại `src/lib/*.ts`, viết lại màn hình), khôn
 | 5.1.1(v) Account deletion | — | Đã có "Xoá tài khoản" trong app; thêm thu hồi token Apple |
 | 4.8 Login Services | Có Google login mà không có cách đăng nhập tương đương bảo vệ riêng tư | Luật từ 2024: có đăng nhập bên thứ ba thì phải có thêm **một** cách đăng nhập chỉ lấy tên + email, cho ẩn email, không theo dõi quảng cáo. Sign in with Apple thoả luật này (không còn là "bắt buộc" nguyên văn); Lyris chọn nó |
 | 2.1 App Completeness | Nội dung giữ chỗ ("Quảng cáo mẫu" của F45 thưởng coin); IAP không chạy với tài khoản người duyệt | Ẩn "Quảng cáo mẫu" ở bản host và app (`LYRIS_SAMPLE_ADS=off`; quảng cáo thật thì cần ATT + khai lại nhãn quyền riêng tư, quyết định riêng của PO). Sandbox được nhận cho mọi tài khoản (§11.3) |
-| 1.2.1(a) Creator content | Nội dung người tạo vượt xếp hạng tuổi | Luật an toàn mặc định cho mọi nhân vật công khai; khai năm sinh khi đăng ký; nhân vật 18+ chỉ khi có xác minh tuổi (§13) |
+| 1.2.1(a) Creator content | Nội dung người tạo vượt xếp hạng tuổi | Luật an toàn mặc định cho mọi nhân vật công khai (nút "Nội dung an toàn" bật sẵn); 16+ theo Điều khoản, không hỏi năm sinh; nhân vật 18+ chỉ cho tài khoản đã tắt nút và tự xác nhận 18+ (F48, §13) |
 | 5.1.2 / quyền riêng tư AI | Gửi dữ liệu cho AI bên thứ ba phải nói rõ | AI chạy trên máy chủ của Lyris (2A), không gửi cho bên thứ ba; ghi rõ trong Chính sách và nhãn quyền riêng tư |
-| Xếp hạng tuổi | Chat AI, tình cảm, nội dung người dùng tạo | Trả lời bảng hỏi tuổi mới của App Store trung thực; dự kiến 16+ (không nội dung tình dục); "chế độ người lớn" (docs/compliance.md §6) chỉ khi có xác minh tuổi và sẽ thành 18+ |
+| Xếp hạng tuổi | Chat AI, tình cảm, nội dung người dùng tạo | Trả lời bảng hỏi tuổi mới của App Store trung thực; với nội dung an toàn bật sẵn và chưa có nội dung 18+: cân nhắc 12+ hoặc 17+ (Điều khoản vẫn 16+); chế độ 18+ (F48, docs/compliance.md §6) có rồi thì xem lại xếp hạng (17+ / 18+) |
 | Nhãn quyền riêng tư (App Privacy) | — | Liên kết với người dùng: định danh (User ID), nội dung người dùng (story, ảnh), mua hàng, dữ liệu sử dụng (nếu bật PostHog), email (nếu người dùng thêm). **Không** dùng để theo dõi. Không có ATT |
 | 1.5 Developer info, hỗ trợ | — | Trang hỗ trợ + email hỗ trợ của đơn vị phát hành (không dùng email cá nhân) |
 | Tài khoản demo cho người duyệt | Đăng ký mở nên không bắt buộc | Vẫn đưa tài khoản demo có sẵn coin sandbox |
@@ -1122,8 +1122,8 @@ bằng chứng).
     (nhiệm vụ ngày còn 2 việc: trò chuyện với 3 nhân vật khác nhau +10 và gửi 20 lượt +5, tối đa 15 coin/ngày thay vì 30). Hay thay bằng quảng cáo thật (cần ATT, nhãn quyền riêng
     tư, mạng quảng cáo)?
 11. **Kho phát hành:** tạm chọn chỉ Việt Nam ở lần ra mắt đầu (§16.4). Có cần thị trường khác ngay không?
-12. **Năm sinh và quà trên web:** bản host hỏi năm sinh khi đăng ký (chỉ lưu năm, cho App Store 1.2.1(a)); quà 300 coin
-    trên web chỉ trao sau khi xác minh email hoặc số điện thoại (§10). Đồng ý không?
+12. **Quà trên web:** quà 300 coin trên web chỉ trao sau khi xác minh email hoặc số điện thoại (§10). Đồng ý không?
+    (Năm sinh: PO đã trả lời 2026-11-15, **không hỏi năm sinh**; 16+ theo Điều khoản, 18+ bằng ô tự xác nhận, F48.)
 
 ## 21. Phản biện đã áp dụng (2026-11-14)
 
@@ -1157,4 +1157,4 @@ Bác = không đổi, kèm lý do.
 | 21 | "Quảng cáo mẫu" là nội dung giữ chỗ (2.1) | Nhận: ẩn ở bản host/app (tạm chọn), hỏi PO | §3, §16.4, §19, §20 |
 | 22 | Ghép màn RN vào Capacitor không thực tế; thiếu cách đo; máy Android chưa cụ thể | Nhận | §16.2, F55, [quyết định](../wiki/decisions/app-di-dong-capacitor.md) |
 | 23 | `COLLATE NOCASE`, `timestamptz(3)`, `BY DEFAULT`, `coin_day` kiểu `date`, thứ hạng FTS | Nhận | §5.2, F50 |
-| P3 | SSE `no-transform`; nối lại khi pod gốc chết; `302` URL ký `no-store`; VNPay (`/pay/return`, IPN thất bại trả `00`, `× 100`, `vnp_CreateDate`); CGNAT; xoá mọi `sess:*` khi khoá; LoRA và cache, giấy phép; chạy thử kín Google Play, kho chỉ Việt Nam, 1.2.1(a) | Nhận hết. Riêng chạy thử kín 12 người/14 ngày: chỉ bắt buộc với tài khoản **cá nhân**; Lyris dùng tài khoản tổ chức nhưng vẫn chạy thử kín. Riêng 1.2.1(a): chưa có cổng tuổi, nên thêm khai năm sinh (tạm chọn) thay vì giả định đã có | §4.1, §4.3, §6, §8.1, §9, §11.5, §13, §16.4, F51, F54, F57 |
+| P3 | SSE `no-transform`; nối lại khi pod gốc chết; `302` URL ký `no-store`; VNPay (`/pay/return`, IPN thất bại trả `00`, `× 100`, `vnp_CreateDate`); CGNAT; xoá mọi `sess:*` khi khoá; LoRA và cache, giấy phép; chạy thử kín Google Play, kho chỉ Việt Nam, 1.2.1(a) | Nhận hết. Riêng chạy thử kín 12 người/14 ngày: chỉ bắt buộc với tài khoản **cá nhân**; Lyris dùng tài khoản tổ chức nhưng vẫn chạy thử kín. Riêng 1.2.1(a): chưa có cổng tuổi, nên thêm khai năm sinh (tạm chọn) thay vì giả định đã có; sau đó PO bỏ năm sinh (2026-11-15): 16+ theo Điều khoản, 18+ bằng ô tự xác nhận (F48) | §4.1, §4.3, §6, §8.1, §9, §11.5, §13, §16.4, F51, F54, F57 |

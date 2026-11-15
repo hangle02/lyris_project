@@ -1,4 +1,13 @@
-# Kịch bản video demo (2 phút 50 giây)
+# Kịch bản video demo có lời đọc (2 phút 50 giây)
+
+> **Video đã nộp khác kịch bản này.** Video có link trong README (`demo-video/out/lyris-demo.mp4`) dài **2:22**
+> (141,8 giây) và được dựng theo [demo-video-plan.md](demo-video-plan.md): nhạc nền, không lời đọc, cảnh app dựng lại
+> bằng code từ nội dung thật app và model đã trả ra. Kịch bản có lời đọc dưới đây dài 2:50 (vẫn trong 2–3 phút đề
+> yêu cầu); đây là kế hoạch cho một bản quay màn hình thật có lời đọc, không phải video đã nộp.
+>
+> *The submitted video (linked in the README) is 2:22 long and follows [demo-video-plan.md](demo-video-plan.md)
+> (music, no voice-over, app scenes re-created in code from real app and model output). The voiced 2:50 script
+> below is the plan for a real screen recording with voice-over, not the submitted video.*
 
 > **English summary.** A 2:50 screen recording of Lyris's core flow on a phone-sized screen: Explore → character
 > profile → "Bước vào câu chuyện" → persona → story turns (narration, dialogue cards, a blurred thought tapped
@@ -7,7 +16,8 @@
 > sign-up consent → 15 s on the owner's metrics and reports. Vietnamese voice-over with English subtitles (both
 > columns below). Record on a warmed-up model with a story prepared in advance.
 
-Yêu cầu của đề: video 2–3 phút về luồng chính, có link trong README. Bản này dài **2:50**. Mỗi dòng của bảng là một
+Yêu cầu của đề: video 2–3 phút về luồng chính, có link trong README. Kịch bản này dài **2:50** (video đã nộp: 2:22,
+xem ghi chú đầu trang). Mỗi dòng của bảng là một
 cảnh: thời điểm, thao tác trên màn hình, lời đọc (tiếng Việt) và phụ đề tiếng Anh (dùng làm phụ đề, hoặc đọc bản
 tiếng Anh nếu nhóm muốn).
 

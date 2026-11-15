@@ -8,7 +8,7 @@
     "done": [
       "Unit: `POST /api/stories/{id}/messages` stream câu trả lời qua SSE rồi lưu lượt khi xong; ngắt giữa chừng thì lưu phần đã có, ngắt trước chữ đầu tiên thì không lưu gì.",
       "Unit: `llm/thought.py` tách `[Thought: ...]` khỏi chữ ở mọi cách chia chunk, kể cả khối chưa đóng lúc đang stream; thẻ suy nghĩ nằm đúng chỗ của nó trong lượt.",
-      "Unit: `lib/storyBlocks.ts`: lời trong ngoặc kép từ 3 chữ trở lên thành thẻ thoại, bỏ cặp ngoặc ngoài cùng; câu ngắn hơn ở lại trong dòng; `*hành động*` thành dẫn truyện không còn dấu sao.",
+      "Unit: `lib/storyBlocks.ts`: lời trong ngoặc kép từ 3 chữ trở lên thành thẻ thoại, bỏ cặp ngoặc ngoài cùng; câu nói ngắn của nhân vật kiệm lời cũng thành thẻ khi có dấu kết câu trong ngoặc (`\"Được.\"`, `“Ừ!”`, `“Thật?”`) hoặc đứng đầu đoạn (`“Đi thôi”, hắn nói.`, dấu phẩy thừa bị bỏ); từ được nhắc giữa câu không dấu kết câu (`gọi cô là “bé con”`) ở lại trong dòng; `*hành động*` thành dẫn truyện không còn dấu sao.",
       "Bot: gửi một lượt ở Story thì ba chấm đang gõ hiện trước chữ đầu tiên, chữ hiện dần trong vùng đang stream, rồi lượt mới của nhân vật xuất hiện.",
       "Bot: trong lúc sinh có nút aria-label 'Dừng' (thay nút 'Gửi (Enter)'); sinh xong thì 'Dừng' biến mất.",
       "Bot: lượt nhân vật vừa sinh (`aria-label=\"Lượt của {tên}\"`) có thẻ thoại không bắt đầu bằng dấu ngoặc kép, có thẻ suy nghĩ, không chứa chữ `[Thought`; phần dẫn truyện có `font-style: italic` và không có viền.",
@@ -29,7 +29,7 @@
       "bot: lúc chờ chỉ có ba chấm, không có chữ"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T06:28:06.885Z"
+    "verified_at": "2026-11-14T18:02:07.493Z"
   },
   {
     "id": "F02",
@@ -1431,6 +1431,38 @@
     "verified_at": "2026-11-14T16:52:40.410Z"
   },
   {
+    "id": "F48",
+    "title": "Nút Nội dung an toàn và xác nhận 18+",
+    "page": "wiki/features/F48-noi-dung-an-toan.md",
+    "phase": "Ra mắt",
+    "stage": "planned",
+    "done": [
+      "Unit: tài khoản mới (signup, thiết lập chủ máy) và tài khoản có từ trước migration đều có `safe_content = 1`, `adult_confirmed_at = NULL`; `GET /api/account` trả `\"safe_content\": true`; bảng `accounts` không có cột nào chứa `birth` (`test_safe_content_on_by_default`).",
+      "Unit: `LYRIS_ADULT_CONTENT` tắt (mặc định) → `PATCH /api/account {\"safe_content\": false, \"confirm_adult\": true}` trả 409 `adult_content_unavailable` và `safe_content` vẫn 1 (`test_cannot_turn_off_without_adult_content`).",
+      "Unit: `LYRIS_ADULT_CONTENT` bật → `{\"safe_content\": false}` thiếu `confirm_adult` hoặc `confirm_adult: false` trả 422 `adult_confirm_required`, không đổi gì; có `confirm_adult: true` → 200, `safe_content = 0`, `adult_confirmed_at` bằng giờ của đồng hồ giả; `{\"safe_content\": true}` → `safe_content = 1`, `adult_confirmed_at = NULL`, lần tắt sau lại cần `confirm_adult` (`test_turn_off_needs_adult_confirmation`).",
+      "Unit: chủ máy `POST /api/admin/accounts/{id}/safe-content-lock` → tài khoản đó `safe_content = 1`, `adult_confirmed_at = NULL`; tự tắt lại → 403 `safe_content_locked`; sau `.../safe-content-unlock` tắt được (có `confirm_adult: true`); thành viên gọi route khoá → 403 (`test_owner_can_lock_safe_content`).",
+      "Unit: prompt story, nhắn tin, gợi ý lượt và AI viết nháp của tài khoản đã tắt nút vẫn có câu \"tuyệt đối không có gì tình dục với người dưới 18 tuổi\" (vi) / \"never anything sexual involving anyone under 18\" (en); với nút bật, hash prompt chuẩn không đổi (`test_minor_rule_kept_when_safe_content_off`).",
+      "Unit: `GET /api/account/export` có `safe_content` và `adult_confirmed_at`, không có khoá nào chứa `birth`; sự kiện `safe_content_changed` chỉ có `on: bool`, nằm trong `track.ts` và `docs/tracking-plan.md` (`test_safe_content_in_export_and_event`).",
+      "Unit: `CONSENT_PARTS` ghép thành câu kết thúc bằng \"và xác nhận tôi đã đủ 16 tuổi.\"; `canTurnOffSafeContent({adultTicked: false})` là `false`, `{adultTicked: true}` là `true` (`frontend/src/lib/safeContent.test.ts`).",
+      "Bot: ở 390px `#/signup` có ô đánh dấu có nhãn chứa \"đã đủ 16 tuổi\"; không có ô nào có nhãn hay placeholder \"Năm sinh\" hoặc \"Ngày sinh\"; nút \"Tạo tài khoản\" tắt khi chưa đánh dấu.",
+      "Bot: máy chủ bot bật `LYRIS_ADULT_CONTENT`, mở `#/?open=system`: có `role=\"switch\"` aria-label \"Nội dung an toàn\" với `aria-checked=\"true\"`; bấm thì hiện ô \"Tôi đã đủ 18 tuổi\" chưa tích và nút \"Tắt nội dung an toàn\" bị tắt (`disabled`); tích ô rồi bấm nút thì công tắc thành `aria-checked=\"false\"`; bấm công tắc bật lại thì `aria-checked=\"true\"` và lần tắt sau ô \"Tôi đã đủ 18 tuổi\" lại chưa tích.",
+      "Bot: máy chủ bot không bật cờ (mặc định): sheet Tài khoản ở `#/?open=system` không có công tắc \"Nội dung an toàn\"; ở 390px cả hai theme, khi có công tắc thì trang không cuộn ngang (`scrollWidth ≤ clientWidth`) và ô \"Tôi đã đủ 18 tuổi\" cao ít nhất 44px."
+    ],
+    "tests": [
+      "backend/tests/test_safe_content.py::test_safe_content_on_by_default",
+      "backend/tests/test_safe_content.py::test_cannot_turn_off_without_adult_content",
+      "backend/tests/test_safe_content.py::test_turn_off_needs_adult_confirmation",
+      "backend/tests/test_safe_content.py::test_owner_can_lock_safe_content",
+      "backend/tests/test_safe_content.py::test_minor_rule_kept_when_safe_content_off",
+      "backend/tests/test_safe_content.py::test_safe_content_in_export_and_event",
+      "frontend/src/lib/safeContent.test.ts",
+      "bot: tạo tài khoản ghi xác nhận đủ 16 tuổi, không hỏi năm sinh",
+      "bot: tắt Nội dung an toàn phải tích Tôi đã đủ 18 tuổi",
+      "bot: không bật nội dung 18+ thì không có công tắc Nội dung an toàn"
+    ],
+    "state": "pending"
+  },
+  {
     "id": "F50",
     "title": "Postgres và chuyển lớp Repo",
     "page": "wiki/features/F50-postgres.md",
@@ -1781,7 +1813,7 @@
       "Unit: thiết bị iOS có bit DeviceCheck \"đã nhận quà\" (API giả) → tài khoản mới vẫn tạo được nhưng ví 0 coin, kể cả sau khi \"cài lại app\" (khoá App Attest mới); thiết bị chưa có bit → +300 và server đặt bit; tài khoản tạo trên web chỉ nhận +300 sau khi xác minh email hoặc số điện thoại (`test_signup_grant_device_limit`).",
       "Unit: `LYRIS_PHONE_VERIFY=publish` → bật \"Công khai\" nhân vật khi chưa xác thực số điện thoại trả 403 `phone_required`; sau khi nhập đúng OTP (bộ gửi SMS giả) thì bật được; cờ tắt → như bây giờ (`test_phone_verify_before_publish`).",
       "Unit: staff vào `/api/admin/*` cần TOTP; mỗi thao tác staff có một dòng `admin_audit` (`test_staff_mfa_and_audit`).",
-      "Bot: với `LYRIS_SIGNUP=open`, `#/signup` không có ô \"Mã mời\"; có nút \"Tiếp tục với Google\" và \"Tiếp tục với Apple\" (trên web và trên vỏ iOS giả), và ô \"Năm sinh\"."
+      "Bot: với `LYRIS_SIGNUP=open`, `#/signup` không có ô \"Mã mời\"; có nút \"Tiếp tục với Google\" và \"Tiếp tục với Apple\" (trên web và trên vỏ iOS giả), và **không** có ô \"Năm sinh\"."
     ],
     "tests": [
       "backend/tests/test_public_signup.py::test_signup_open_vs_invite",

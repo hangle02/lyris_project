@@ -67,6 +67,32 @@ test("a paragraph that is only a short quote is still a card", () => {
   assert.deepEqual(view(paragraphBlocks("  “Ừm…” ")), [["d", "“Ừm…”"]]);
 });
 
+test("a short spoken line inside narration is a card (laconic characters)", () => {
+  // Ends with sentence punctuation inside the quote: spoken, whatever its length.
+  assert.deepEqual(view(paragraphBlocks('"Được." Hắn đáp, giọng nói vẫn giữ vẻ trầm ổn.')), [
+    ["d", "“Được.”"],
+    ["n", "Hắn đáp, giọng nói vẫn giữ vẻ trầm ổn."],
+  ]);
+  assert.deepEqual(view(paragraphBlocks("Anh nhìn cô một lúc. “Ừ!” rồi quay đi.")), [
+    ["n", "Anh nhìn cô một lúc."],
+    ["d", "“Ừ!”"],
+    ["n", "rồi quay đi."],
+  ]);
+  assert.deepEqual(view(paragraphBlocks("Hắn hỏi lại: “Thật?”")), [
+    ["n", "Hắn hỏi lại:"],
+    ["d", "“Thật?”"],
+  ]);
+  // Opens the paragraph (punctuation written outside the quote): spoken too.
+  assert.deepEqual(view(paragraphBlocks("“Đi thôi”, hắn nói.")), [
+    ["d", "“Đi thôi”"],
+    ["n", "hắn nói."],
+  ]);
+  // A short term or nickname mid-sentence, without its own punctuation, stays inline.
+  const nick = paragraphBlocks("Hắn vẫn gọi cô là “bé con” như hồi nhỏ.");
+  assert.equal(nick.length, 1);
+  assert.equal(nick[0]?.kind, "narration");
+});
+
 test("punctuation left between two cards is dropped", () => {
   const blocks = paragraphBlocks("“Anh nói thật đấy chứ,” “em không tin nổi đâu.”");
   assert.deepEqual(view(blocks), [

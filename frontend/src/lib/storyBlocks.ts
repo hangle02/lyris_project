@@ -1,8 +1,10 @@
 // Story Mode: một lượt của nhân vật thành ba loại khối (DESIGN.md §6 lớp 2, design-impl §6.2.3).
 //
 // - narration: đoạn dẫn truyện / hành động (hiển thị nghiêng, màu muted, không khung). Có thể chứa
-//   lời trích ngắn (dưới 3 từ: tên riêng, một từ được nhắc) giữ trong dòng, hiển thị thẳng.
-// - dialogue: lời thoại trong ngoặc kép từ 3 từ trở lên, thành thẻ riêng; khi hiển thị bỏ cặp ngoặc ngoài cùng (speechText).
+//   lời trích ngắn (dưới 3 từ, không có dấu kết câu, không đứng đầu đoạn: tên riêng, biệt danh, một
+//   từ được nhắc) giữ trong dòng, hiển thị thẳng.
+// - dialogue: lời thoại trong ngoặc kép từ 3 từ trở lên, hoặc câu nói ngắn ("“Được.”", "“Ừ!”", hay
+//   đứng đầu đoạn), thành thẻ riêng; khi hiển thị bỏ cặp ngoặc ngoài cùng (speechText).
 // - thought: [Thought: ...] giữ đúng vị trí model đặt.
 //
 // Hàm thuần, không phụ thuộc React; có test ở storyBlocks.test.ts.
@@ -62,6 +64,19 @@ function isWholeQuote(text: string): boolean {
   return segs.length === 1 && segs[0]?.kind === "quote" && /[\p{L}\p{N}]/u.test(text);
 }
 
+/**
+ * True when a short quote reads as something said, not a term or nickname being mentioned: it ends
+ * with sentence punctuation inside its marks ("“Được.”", "“Ừ!”", "“Thật?”"), or it opens the
+ * paragraph ("“Đi thôi”, hắn nói."). Laconic characters speak in one or two words; their lines are
+ * still dialogue cards.
+ */
+function looksSpoken(quote: string, opensParagraph: boolean): boolean {
+  if (opensParagraph) return true;
+  let inner = quote.trim();
+  if (inner && CLOSERS.has(inner[inner.length - 1] as string)) inner = inner.slice(0, -1);
+  return /[.!?…,~]$/u.test(inner.trim());
+}
+
 /** True when a narration piece carries words (not only punctuation or spaces left between two cards). */
 function hasWords(parts: NarrationPart[]): boolean {
   return parts.some((p) => /[\p{L}\p{N}]/u.test(p.text));
@@ -100,12 +115,23 @@ export function paragraphBlocks(paragraph: string, minWords: number = DIALOGUE_M
   const blocks: StoryBlock[] = [];
   let run: NarrationPart[] = [];
   const flush = () => {
+    // Narration right after a card drops the comma / colon the card left behind ("“Đi thôi”, hắn nói.").
+    const first = run[0];
+    if (first && first.kind !== "quote" && blocks[blocks.length - 1]?.kind === "dialogue") {
+      first.text = first.text.replace(/^\s*[,;:]\s*/u, "");
+    }
     const parts = trimParts(run);
     run = [];
     if (parts.length && hasWords(parts)) blocks.push({ kind: "narration", parts });
   };
+  let wordsBefore = false;
   for (const seg of segs) {
-    if (seg.kind === "quote" && (speechOnly || quoteWordCount(seg.text) >= minWords)) {
+    const opens = !wordsBefore;
+    if (/[\p{L}\p{N}]/u.test(seg.text)) wordsBefore = true;
+    if (
+      seg.kind === "quote" &&
+      (speechOnly || quoteWordCount(seg.text) >= minWords || looksSpoken(seg.text, opens))
+    ) {
       flush();
       blocks.push({ kind: "dialogue", text: curlyQuote(seg.text) });
       continue;

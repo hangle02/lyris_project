@@ -1,0 +1,90 @@
+{
+  "at": "2026-11-14T16:47:51.199Z",
+  "quick": false,
+  "real_model_flag": false,
+  "fixture": false,
+  "suites": {
+    "backend pytest -q": {
+      "ok": true,
+      "rc": 0,
+      "info": "1649 passed, 113 skipped in 71.06s (0:01:11)",
+      "seconds": 71,
+      "timed_out": false
+    },
+    "frontend npm test": {
+      "ok": true,
+      "rc": 0,
+      "info": "tests 468 · pass 468 · fail 0 · skipped 0",
+      "seconds": 2,
+      "timed_out": false
+    },
+    "frontend npm run typecheck": {
+      "ok": true,
+      "rc": 0,
+      "info": "",
+      "seconds": 4,
+      "timed_out": false
+    },
+    "frontend npm run build": {
+      "ok": true,
+      "rc": 0,
+      "info": "",
+      "seconds": 4,
+      "timed_out": false
+    }
+  },
+  "bot": {
+    "rc": 0,
+    "seconds": 202,
+    "report": "reports/latest/report.json",
+    "checks": 113,
+    "failed": [],
+    "infra": ""
+  },
+  "real_model": null,
+  "targets": [
+    {
+      "id": "F22",
+      "title": "Khám phá và nhân vật mẫu",
+      "ok": true,
+      "reasons": [],
+      "real_model_skipped": false,
+      "promoted": true
+    },
+    {
+      "id": "F23",
+      "title": "Hồ sơ nhân vật (chỉ xem)",
+      "ok": true,
+      "reasons": [],
+      "real_model_skipped": false,
+      "promoted": true
+    },
+    {
+      "id": "F44",
+      "title": "Thưởng sáng tác theo bảng xếp hạng Nhân vật hot",
+      "ok": true,
+      "reasons": [],
+      "real_model_skipped": false,
+      "promoted": true
+    },
+    {
+      "id": "F46",
+      "title": "Bảng xếp hạng Nhân vật hot",
+      "ok": true,
+      "reasons": [],
+      "real_model_skipped": false,
+      "promoted": true
+    },
+    {
+      "id": "F47",
+      "title": "Tìm nhân vật ở Khám phá",
+      "ok": true,
+      "reasons": [],
+      "real_model_skipped": false,
+      "promoted": true
+    }
+  ],
+  "regressions": [],
+  "ok": true,
+  "waiting": 0
+}

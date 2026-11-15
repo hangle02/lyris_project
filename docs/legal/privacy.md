@@ -1,6 +1,6 @@
 # Chính sách quyền riêng tư của Lyris
 
-Phiên bản: 2026-11-16
+Phiên bản: 2026-11-16 · Hiệu lực từ: 2026-11-16
 
 Lyris là ứng dụng nhập vai bằng chữ: bạn cùng các nhân vật AI viết nên những story. Trang này nói rõ Lyris lưu gì về bạn, dùng vào việc gì, giữ trong bao lâu và bạn kiểm soát nó thế nào. Chúng tôi viết đúng với những gì ứng dụng đang làm, không hơn.
 
@@ -16,7 +16,7 @@ Lyris là ứng dụng nhập vai bằng chữ: bạn cùng các nhân vật AI 
 
 ## 2. Lyris lưu những gì
 
-**Tài khoản.** @handle, tên hiển thị, phần giới thiệu, ảnh đại diện và ảnh bìa (nếu bạn tải lên), mật khẩu (chỉ lưu dạng băm scrypt, không ai đọc lại được), thời điểm tạo tài khoản, lần đăng nhập gần nhất, người đã mời bạn, và thời điểm bạn đồng ý Điều khoản và chính sách này.
+**Tài khoản.** @handle, tên hiển thị, phần giới thiệu, ảnh đại diện và ảnh bìa (nếu bạn tải lên), mật khẩu (chỉ lưu dạng băm scrypt, không ai đọc lại được), thời điểm tạo tài khoản, lần đăng nhập gần nhất, người đã mời bạn, và thời điểm bạn đồng ý Điều khoản và chính sách này. Lyris không hỏi ngày sinh hay năm sinh của bạn.
 
 **Nội dung bạn tạo.** Persona, nhân vật (kèm ảnh và sổ thế giới), story, mọi tin nhắn của bạn và của nhân vật (cả các bản viết lại), ghi chú và đánh giá bạn để lại, ký ức và tóm tắt mà AI rút ra từ story để nhớ mạch truyện, cài đặt của story.
 
@@ -79,7 +79,9 @@ Lyris chỉ dùng cookie của chính mình, không có cookie quảng cáo hay 
 
 ## 8. Trẻ em
 
-Lyris không đặt độ tuổi tối thiểu, nhưng nội dung tình dục bị cấm trên Lyris và mọi nội dung tình dục liên quan tới trẻ vị thành niên bị cấm tuyệt đối. Nếu bạn dưới 16 tuổi, hãy dùng Lyris khi đã được cha mẹ hoặc người giám hộ cho phép. Lyris không cố ý thu thập gì về trẻ em ngoài những gì mô tả ở trên. Cha mẹ hoặc người giám hộ có thể liên hệ chúng tôi để xoá tài khoản của con.
+Lyris dành cho người từ đủ 16 tuổi trở lên. Khi tạo tài khoản, bạn xác nhận mình đã đủ 16 tuổi ([Điều khoản](terms.md) mục 1); người dưới 16 tuổi không được dùng Lyris. Lyris **không thu thập ngày sinh hay năm sinh** và không cố ý thu thập dữ liệu của người dưới 16 tuổi. Nếu chúng tôi biết một tài khoản thuộc về người dưới 16 tuổi, tài khoản đó và dữ liệu của nó sẽ bị xoá; cha mẹ hoặc người giám hộ có thể liên hệ chúng tôi để yêu cầu việc này.
+
+"Nội dung an toàn" luôn được bật sẵn, và mọi nội dung tình dục liên quan tới trẻ vị thành niên bị cấm tuyệt đối. Hiện Lyris không có nội dung 18+. Nếu sau này có và bạn tắt "Nội dung an toàn" rồi tích "Tôi đã đủ 18 tuổi", Lyris chỉ lưu **thời điểm** bạn xác nhận (không lưu ngày sinh hay giấy tờ). Bật lại "Nội dung an toàn" thì lần sau muốn tắt phải xác nhận lại.
 
 ## 9. Bảo mật
 
@@ -93,7 +95,7 @@ Khi chính sách này thay đổi đáng kể, chúng tôi đổi số phiên b�
 
 ## English
 
-Version: 2026-11-16
+Version: 2026-11-16 · Effective from: 2026-11-16
 
 Lyris is a text roleplay app: you write stories together with AI characters. This page explains what Lyris stores about you, why, for how long, and how you control it. It describes what the app actually does.
 
@@ -109,7 +111,7 @@ Lyris is a text roleplay app: you write stories together with AI characters. Thi
 
 ### 2. What Lyris stores
 
-**Account.** Handle, display name, bio, avatar and banner (if you upload them), password (stored only as a scrypt hash), when the account was created, last sign-in, who invited you, and when you accepted the Terms and this policy.
+**Account.** Handle, display name, bio, avatar and banner (if you upload them), password (stored only as a scrypt hash), when the account was created, last sign-in, who invited you, and when you accepted the Terms and this policy. Lyris does not ask for your date or year of birth.
 
 **Your content.** Personas, characters (with images and world lore), stories, every message from you and from the character (including rewrites), your ratings and notes, the memories and summaries the AI extracts so it can follow the story, and story settings.
 
@@ -172,7 +174,9 @@ The app also keeps a few things in your browser's local storage, only on your de
 
 ### 8. Children
 
-Lyris sets no minimum age, but sexual content is prohibited on Lyris and any sexual content involving minors is absolutely prohibited. If you are under 16, use Lyris only with permission from a parent or guardian. Lyris does not knowingly collect anything about children beyond what is described above. A parent or guardian can contact us to delete their child's account.
+Lyris is for people aged 16 or older. By creating an account you confirm that you are 16 or older ([Terms](terms.md) section 1); people under 16 must not use Lyris. Lyris **does not collect your date or year of birth** and does not knowingly collect data from anyone under 16. If we learn that an account belongs to someone under 16, that account and its data will be deleted; a parent or guardian can contact us to ask for this.
+
+"Nội dung an toàn" (safe content) is always on by default, and any sexual content involving minors is absolutely prohibited. Lyris has no 18+ content today. If it is added later and you turn "Nội dung an toàn" off and tick "Tôi đã đủ 18 tuổi" (I am 18 or older), Lyris stores only the **time** you confirmed (no date of birth, no ID documents). If you turn safe content back on, you must confirm again the next time you turn it off.
 
 ### 9. Security
 

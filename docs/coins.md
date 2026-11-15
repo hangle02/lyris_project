@@ -795,8 +795,8 @@ F35). **Kể cả chủ máy**: lần mở app đầu tiên sau khi build xong, 
 - Xoá tài khoản thì coin còn lại mất. Coin có được do lạm dụng (tài khoản ảo, lách nhiệm vụ) có thể bị người quản lý thu hồi.
 - Thưởng sáng tác không phải tiền công hay hợp đồng; không có chia sẻ doanh thu.
 - Quảng cáo mẫu không gửi dữ liệu cho bên quảng cáo nào (Lyris vẫn ghi số liệu sử dụng như mọi màn khác, theo Chính sách).
-- Người dưới 16 tuổi cần phép của cha mẹ/người giám hộ (đã có, §1). Khi có thanh toán thật: người dưới 18 tuổi cần cha mẹ/người
-  giám hộ đồng ý trước khi mua coin.
+- Lyris dành cho người từ 16 tuổi (Điều khoản §1, đồng ý lúc tạo tài khoản là tự xác nhận 16+; PO chốt 2026-11-15). Khi có
+  thanh toán thật: người dưới 18 tuổi cần cha mẹ/người giám hộ đồng ý trước khi mua coin.
 
 Chính sách quyền riêng tư ([docs/legal/privacy.md](legal/privacy.md), vi + en): kê thêm **sổ coin** (số coin, thời điểm, loại;
 không nội dung) trong dữ liệu được lưu, giữ tới khi xoá tài khoản, có trong "Tải dữ liệu của tôi"; và ghi quảng cáo mẫu không
@@ -806,8 +806,8 @@ Không có phần thưởng ngẫu nhiên (không hộp quà, không quay số):
 
 **Khi ra mắt có tiền thật (ngoài kế hoạch này):** cổng thanh toán được cấp phép ở Việt Nam trên web (hoá đơn điện tử, điều khoản
 bán hàng, chính sách hoàn tiền); trong app cửa hàng phải dùng Google Play Billing / Apple In-App Purchase cho coin (hàng số);
-quảng cáo thật cần đồng ý quảng cáo cá nhân hoá, ATT trên iOS, kê khai Data safety; **người dưới 16 tuổi không được nhận quảng
-cáo cá nhân hoá** (chỉ quảng cáo không cá nhân hoá, đánh dấu tuổi với mạng quảng cáo); xem lại thuế và nghĩa vụ của đơn vị phát hành;
+quảng cáo thật cần đồng ý quảng cáo cá nhân hoá, ATT trên iOS, kê khai Data safety; Lyris chỉ cho người 16+ nhưng tuổi là
+tự xác nhận, nên **quảng cáo cá nhân hoá chỉ khi người dùng đồng ý riêng** (mặc định quảng cáo không cá nhân hoá); xem lại thuế và nghĩa vụ của đơn vị phát hành;
 và thực hiện điều Điều khoản đã hứa về coin của chế độ thử.
 Cập nhật [compliance.md §5.4](compliance.md) lúc đó.
 

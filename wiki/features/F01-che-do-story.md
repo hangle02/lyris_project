@@ -24,7 +24,7 @@ Kỹ thuật:
 
 - [ ] Unit: `POST /api/stories/{id}/messages` stream câu trả lời qua SSE rồi lưu lượt khi xong; ngắt giữa chừng thì lưu phần đã có, ngắt trước chữ đầu tiên thì không lưu gì.
 - [ ] Unit: `llm/thought.py` tách `[Thought: ...]` khỏi chữ ở mọi cách chia chunk, kể cả khối chưa đóng lúc đang stream; thẻ suy nghĩ nằm đúng chỗ của nó trong lượt.
-- [ ] Unit: `lib/storyBlocks.ts`: lời trong ngoặc kép từ 3 chữ trở lên thành thẻ thoại, bỏ cặp ngoặc ngoài cùng; câu ngắn hơn ở lại trong dòng; `*hành động*` thành dẫn truyện không còn dấu sao.
+- [ ] Unit: `lib/storyBlocks.ts`: lời trong ngoặc kép từ 3 chữ trở lên thành thẻ thoại, bỏ cặp ngoặc ngoài cùng; câu nói ngắn của nhân vật kiệm lời cũng thành thẻ khi có dấu kết câu trong ngoặc (`"Được."`, `“Ừ!”`, `“Thật?”`) hoặc đứng đầu đoạn (`“Đi thôi”, hắn nói.`, dấu phẩy thừa bị bỏ); từ được nhắc giữa câu không dấu kết câu (`gọi cô là “bé con”`) ở lại trong dòng; `*hành động*` thành dẫn truyện không còn dấu sao.
 - [ ] Bot: gửi một lượt ở Story thì ba chấm đang gõ hiện trước chữ đầu tiên, chữ hiện dần trong vùng đang stream, rồi lượt mới của nhân vật xuất hiện.
 - [ ] Bot: trong lúc sinh có nút aria-label 'Dừng' (thay nút 'Gửi (Enter)'); sinh xong thì 'Dừng' biến mất.
 - [ ] Bot: lượt nhân vật vừa sinh (`aria-label="Lượt của {tên}"`) có thẻ thoại không bắt đầu bằng dấu ngoặc kép, có thẻ suy nghĩ, không chứa chữ `[Thought`; phần dẫn truyện có `font-style: italic` và không có viền.
