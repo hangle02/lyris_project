@@ -48,11 +48,7 @@ Where each part of the brief is answered (English half; the Vietnamese half has 
 
 ### Demo video
 
-**Demo video (2:22, core flow):** [watch on Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
-
-- **Length and language:** 2 minutes 22 seconds; no voice-over, a music track with on-screen captions in Vietnamese and an English line under each caption.
-- **How it was made:** the app scenes are animated re-creations of the real app screens, and all their text is what the app and the model actually produced in a recorded session ([docs/demo-video-plan.md](docs/demo-video-plan.md), Vietnamese). For real app screens, see [Screenshots](#screenshots).
-- A voice-over script for the same flow: [docs/demo-script.md](docs/demo-script.md) (Vietnamese).
+**Demo video (2:22):** [watch on Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
 
 ### Screenshots
 
@@ -141,14 +137,23 @@ References: see [References](#references) at the end of this README.
 
 ### Target users
 
-- **Primary: readers of Vietnamese romance web fiction** (ngôn tình, đam mỹ, cổ trang, vườn trường) who want to *live inside* a story rather than read it. Mobile-first, mostly evenings. Persona: Linh, below.
-- **Secondary: writers and character creators** who build characters and whole worlds (side characters, places, secrets, plot hooks) and want them played faithfully. Persona: Minh, below.
+**Vietnamese-speaking adults aged 18+ who seek immersive, personalized and interactive experiences with fictional characters.** This is who the launch, the marketing and the personas aim at; the minimum age to use the app is 16 (see *Age* below).
+
+Lyris serves four behavioral segments:
+
+| Segment | Seeking | What Lyris gives them (built) | Persona |
+|---|---|---|---|
+| **1. Immersive Fiction Readers** (primary) | To participate in the stories they love, not only read them: ngôn tình, đam mỹ, cổ trang, vườn trường. Mobile-first, mostly evenings. | Story mode where the player always stays the author; "Bước vào câu chuyện" in two taps | Linh |
+| **2. Relationship-Driven Roleplayers** | Persistent and evolving relationships with AI characters | Six emotions that rise and fall, memory across days, Story and DM modes in one timeline, a story that picks up where it stopped | none yet |
+| **3. Fandom & Character Enthusiasts** | Deeper interactions with fictional characters and universes | Character profiles, a Lorebook where each entry says who knows it, Explore search and the "Nhân vật hot" ranking. A fan character made public must respect copyright ([Terms](docs/legal/terms.md)) | none yet |
+| **4. Independent Creators & Worldbuilders** (secondary) | To transform their characters and worlds (side characters, places, secrets, plot hooks) into interactive experiences, played faithfully | Character Studio, Lorebook, public characters, the "Nhân vật hot" ranking and creator coin rewards | Minh |
+
 - **Age: 16+** (stated in the Terms; accepting them at sign-up confirms it, with no birth-date field). Safe content is on by default for everyone; an 18+ mode, if it ever comes, sits behind turning off the "Nội dung an toàn" toggle and an 18+ confirmation.
 - **Not a revenue segment:** **Self-hosting enthusiasts** with a capable machine can still run Lyris themselves (self-hosting stays possible and free, with coins switched off by `LYRIS_COINS=0`), but the business plan does not count on them.
 
 #### Customer personas (hypotheses to validate)
 
-Two personas drawn from the [launch-channel](#launch-channel-and-business-model) audiences. They are **hypotheses, not research findings**: we will check them against the tracking data (activation funnel, D1/D7 retention, creation events) and short user interviews after launch.
+Two personas drawn from the [launch-channel](#launch-channel-and-business-model) audiences. They cover segments 1 and 4; segments 2 and 3 have no persona yet. They are **hypotheses, not research findings**: we will check them against the tracking data (activation funnel, D1/D7 retention, creation events) and short user interviews after launch.
 
 | | **Linh, the story reader** | **Minh, the character writer** |
 |---|---|---|
@@ -750,11 +755,7 @@ Mỗi phần của đề bài được trả lời ở đâu trong nửa tiếng
 
 ### Video demo
 
-**Video demo (2:22, luồng chính):** [xem trên Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
-
-- **Độ dài và ngôn ngữ:** 2 phút 22 giây; không có lời đọc, nền nhạc kèm chữ trên màn hình bằng tiếng Việt và một dòng tiếng Anh dưới mỗi câu.
-- **Cách làm:** các cảnh app là hình dựng lại có chuyển động theo đúng giao diện app thật, và mọi chữ trong đó là nội dung app và model đã thật sự trả ra trong một lần quay ([docs/demo-video-plan.md](docs/demo-video-plan.md)). Màn hình app thật: xem [Ảnh chụp màn hình](#ảnh-chụp-màn-hình).
-- Kịch bản có lời đọc cho cùng luồng: [docs/demo-script.md](docs/demo-script.md).
+**Video demo (2:22):** [xem trên Google Drive](https://drive.google.com/file/d/1ew4_fgywsVmjGFwK4U-7Vl9aLGexrYvS/view?usp=drive_link)
 
 ### Ảnh chụp màn hình
 
@@ -843,14 +844,23 @@ Cùng các vấn đề trên, nhìn từ phía người dùng: họ "thuê" Lyri
 
 ### Người dùng mục tiêu
 
-- **Nhóm chính: người đọc truyện mạng tiếng Việt** (ngôn tình, đam mỹ, cổ trang, vườn trường) muốn *sống trong* câu chuyện thay vì chỉ đọc. Dùng điện thoại là chính, thường vào buổi tối. Chân dung: Linh, bên dưới.
-- **Nhóm phụ: người viết và tạo nhân vật**, dựng cả thế giới (nhân vật phụ, nơi chốn, bí mật, móc sự kiện) và muốn nhân vật được đóng đúng. Chân dung: Minh, bên dưới.
+**Người trưởng thành từ 18 tuổi nói tiếng Việt, muốn có trải nghiệm nhập vai sâu, cá nhân hoá và tương tác với nhân vật hư cấu.** Đây là nhóm mà việc ra mắt, quảng bá và các chân dung khách hàng nhắm tới; tuổi tối thiểu để dùng app là 16 (xem *Tuổi* bên dưới).
+
+Lyris phục vụ bốn nhóm theo hành vi:
+
+| Nhóm | Tìm kiếm | Lyris cho gì (đã có) | Chân dung |
+|---|---|---|---|
+| **1. Người đọc muốn nhập vai vào truyện** (nhóm chính) | Được tham gia vào những câu chuyện mình yêu thích, không chỉ đọc: ngôn tình, đam mỹ, cổ trang, vườn trường. Dùng điện thoại là chính, thường vào buổi tối. | Chế độ Story, người chơi luôn là người viết vai của mình; "Bước vào câu chuyện" sau hai lần chạm | Linh |
+| **2. Người nhập vai vì mối quan hệ** | Mối quan hệ lâu dài và thay đổi theo thời gian với nhân vật AI | Sáu chỉ số cảm xúc lên xuống, trí nhớ qua nhiều ngày, Story và DM chung một dòng thời gian, story tiếp đúng chỗ đã dừng | chưa có |
+| **3. Người hâm mộ nhân vật và fandom** | Tương tác sâu hơn với nhân vật và thế giới hư cấu | Hồ sơ nhân vật, sổ thế giới ghi rõ ai biết điều gì, ô tìm ở Khám phá và bảng "Nhân vật hot". Nhân vật fan làm khi để Công khai phải tôn trọng bản quyền ([Điều khoản](docs/legal/terms.md)) | chưa có |
+| **4. Người sáng tác và dựng thế giới độc lập** (nhóm phụ) | Biến nhân vật và thế giới của mình (nhân vật phụ, nơi chốn, bí mật, móc sự kiện) thành trải nghiệm tương tác, được đóng đúng | Studio nhân vật, sổ thế giới, nhân vật công khai, bảng "Nhân vật hot" và coin thưởng sáng tác | Minh |
+
 - **Tuổi: 16+** (ghi trong Điều khoản; đồng ý Điều khoản khi tạo tài khoản là xác nhận điều này, không có ô năm sinh). Nội dung an toàn bật sẵn cho mọi người; chế độ 18+, nếu sau này có, nằm sau việc tắt nút "Nội dung an toàn" và xác nhận 18+.
 - **Không phải nhóm mang doanh thu:** **Người thích tự chạy AI**, có máy đủ mạnh, vẫn tự chạy Lyris được (tự chạy vẫn làm được và miễn phí, tắt coin bằng `LYRIS_COINS=0`), nhưng kế hoạch kinh doanh không dựa vào nhóm này.
 
 #### Chân dung khách hàng (giả thuyết cần kiểm chứng)
 
-Hai chân dung rút từ đối tượng của các [kênh ra mắt](#kênh-ra-mắt-và-mô-hình-doanh-thu). Đây là **giả thuyết, không phải kết quả nghiên cứu**: nhóm sẽ đối chiếu với số liệu theo dõi (phễu kích hoạt, D1/D7, sự kiện sáng tác) và phỏng vấn ngắn sau khi ra mắt.
+Hai chân dung rút từ đối tượng của các [kênh ra mắt](#kênh-ra-mắt-và-mô-hình-doanh-thu). Hai chân dung này ứng với nhóm 1 và nhóm 4; nhóm 2 và nhóm 3 chưa có chân dung. Đây là **giả thuyết, không phải kết quả nghiên cứu**: nhóm sẽ đối chiếu với số liệu theo dõi (phễu kích hoạt, D1/D7, sự kiện sáng tác) và phỏng vấn ngắn sau khi ra mắt.
 
 | | **Linh, người đọc truyện** | **Minh, người viết nhân vật** |
 |---|---|---|

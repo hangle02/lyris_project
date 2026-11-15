@@ -32,7 +32,7 @@ Mọi story và chat chỉ nằm trên máy Mac. Không gửi gì ra ngoài.
 
 ## Trải nghiệm chính
 
-1. **[Khám phá](screens/explore.md)** (tab trái): ô "Tìm nhân vật" và dải "Nhân vật hot" thay thẻ nhân vật nổi bật ([F46](features/F46-bang-xep-hang-nhan-vat-hot.md), [F47](features/F47-tim-nhan-vat.md); bảng đầy đủ ở [`#/explore/hot`](screens/hot-ranking.md)), lọc theo cảm xúc ("Chữa lành", "Dịu dàng", "Bí ẩn nội tâm", "Tình đầu"), lưới thẻ nhân vật bằng nhau, phần "Nhân vật được chia sẻ" từ tài khoản khác.
+1. **[Khám phá](screens/explore.md)** (tab trái): ô "Tìm nhân vật" và dải "Nhân vật hot" thay thẻ nhân vật nổi bật ([F46](features/F46-bang-xep-hang-nhan-vat-hot.md), [F47](features/F47-tim-nhan-vat.md); bảng đầy đủ ở [`#/explore/hot`](screens/hot-ranking.md)), lọc theo cảm xúc ("Chữa lành", "Dịu dàng", "Bí ẩn nội tâm", "Tình đầu"), một lưới thẻ nhân vật bằng nhau gồm cả nhân vật công khai của tài khoản khác (dòng "bởi @handle", không tách mục riêng).
 2. **[Hồ sơ nhân vật](screens/character-profile.md)**: ảnh lớn, tên, vai trò, tag, "Lời nói đặc trưng", tab "Giới thiệu" và "Thiết lập" (chỉ xem, không sửa). Không bao giờ hiện bí mật của nhân vật.
 3. **[Bước vào câu chuyện](screens/start-story-sheet.md)**: sheet chọn persona. Mở "Tuỳ chỉnh story" để đổi bối cảnh, lời mở đầu, ngôn ngữ, Story/DM, kiểu quan hệ, ngôi kể, đại từ dẫn truyện, kiểu suy nghĩ, có đọc suy nghĩ hay không.
 4. **[Chat](screens/chat-story.md)**, hai chế độ chung một dòng thời gian:

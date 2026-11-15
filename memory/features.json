@@ -660,6 +660,8 @@
       "Unit: lọc theo vibe so sánh sau chuẩn hoá: không phân biệt hoa thường, giữ dấu.",
       "Unit: dòng tác giả: 'Mẫu của Lyris' cho mẫu, 'bởi @handle' cho card người dùng; không có dòng nguồn ảnh.",
       "Unit: Khám phá liệt kê nhân vật công khai của tài khoản khác.",
+      "Unit: `exploreGrid` gộp một danh sách: card của mình, mẫu chưa cài, rồi nhân vật công khai của tài khoản khác (mỗi nhân vật đúng một ô, ô chia sẻ giữ 'bởi @handle'); chip cảm xúc lấy cả tag của nhân vật chia sẻ.",
+      "Bot: `#/explore` không có mục riêng `section[aria-labelledby=explore-shared]`; nhân vật công khai của tài khoản khác nằm trong lưới `section[aria-labelledby=explore-all]` với dòng 'bởi @handle'.",
       "Bot: ở 390px `#/explore` có lưới nhân vật `section[aria-labelledby=explore-all]`; các thẻ rộng bằng nhau, thẻ cùng hàng cao bằng nhau; không cuộn ngang.",
       "Bot: lưới có 2 cột ở 390px, 3 cột ở 800px, 5 cột ở 1280px; hàng cuối thiếu ô thì không kéo giãn.",
       "Bot: bấm một chip trong nhóm 'Lọc theo cảm xúc' thì chip có `aria-pressed=\"true\"`, bộ đếm thành 'x / tổng' (x > 0), lưới còn đúng x thẻ và chỉ còn nhân vật có tag đó (đủ mọi nhân vật có tag, đối chiếu tag từ `/api/cards`, `/api/templates`); bấm lại thì bộ đếm về tổng và lưới về như cũ (cùng các thẻ, cùng thứ tự)."
@@ -671,10 +673,11 @@
       "backend/tests/test_lyris_design.py::test_template_install_idempotent",
       "bot: Khám phá tải xong, thẻ đều nhau, không tràn ngang 390px",
       "bot: lưới Khám phá 2/3/5 cột",
-      "bot: chip cảm xúc chỉ giữ nhân vật có tag đó, bấm lại thì lưới như cũ"
+      "bot: chip cảm xúc chỉ giữ nhân vật có tag đó, bấm lại thì lưới như cũ",
+      "bot: tài khoản khác thấy nhân vật được chia sẻ"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T16:52:40.134Z"
+    "verified_at": "2026-11-15T03:31:14.314Z"
   },
   {
     "id": "F23",
@@ -952,7 +955,7 @@
       "Unit: bắt đầu story với nhân vật công khai chụp một bản sao đầy đủ; chủ sửa, ẩn hay xoá nhân vật thì story của người chơi vẫn chạy; sổ thế giới của bản sao không lọt vào xem trước hay chat thử.",
       "Unit: hồ sơ công khai chỉ có trường whitelist; mô tả công tắc không hứa giữ bí mật; danh sách Studio ghi 'Công khai' thay 'Riêng tư'.",
       "Bot: trình sửa nhân vật của mình (bot nhập từ card .json rồi lưu) có công tắc 'Công khai' trong phần 'Cơ bản', trình sửa nhân vật cài từ mẫu không có; bật 'Công khai' và lưu thì có nút 'Người khác thấy gì'.",
-      "Bot: tài khoản thứ hai mở `#/explore` thấy nhân vật đó trong 'Nhân vật được chia sẻ'; hồ sơ của nó không có 'Sửa nhân vật' và 'bởi @handle' là link tới `#/u/<handle>`."
+      "Bot: tài khoản thứ hai mở `#/explore` thấy nhân vật đó trong lưới 'Nhân vật' (chung lưới, không có mục riêng), ô ghi 'bởi @handle'; hồ sơ của nó không có 'Sửa nhân vật' và 'bởi @handle' là link tới `#/u/<handle>`."
     ],
     "tests": [
       "backend/tests/test_public_cards.py",
@@ -963,7 +966,7 @@
       "bot: tài khoản khác thấy nhân vật được chia sẻ"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T09:16:26.457Z"
+    "verified_at": "2026-11-15T03:31:14.375Z"
   },
   {
     "id": "F32",
@@ -1415,8 +1418,8 @@
       "Unit: `filterItems` tìm trong tên, vai trò, tag và giới thiệu của cả ba loại thẻ (`card`, `template`, `shared`); kết hợp với vibe là phép \"và\"; chuỗi rỗng hay chỉ khoảng trắng trả đúng danh sách cũ (cùng thứ tự); thứ tự kết quả giữ nguyên thứ tự lưới.",
       "Unit: `useDebounced` (đồng hồ giả của `node:test` `mock.timers`) chỉ đổi giá trị sau 250 ms kể từ lần đổi cuối: gõ 5 ký tự cách nhau 100 ms thì chỉ lọc một lần.",
       "Unit: sự kiện `explore_searched` chỉ có `has_results: bool` (không có chữ đã gõ), nằm trong `track.ts` và `tracking-plan.md`; phát tối đa một lần cho mỗi chuỗi tìm khác nhau sau debounce.",
-      "Bot: ở 390px `#/explore` có ô `input[type=search]` placeholder 'Tìm nhân vật', aria-label 'Tìm nhân vật theo tên, tag hoặc giới thiệu', đứng trên dải 'Nhân vật hot' và mục 'Nhân vật'; gõ 'ha vy' (không dấu) thì sau ≤ 1 giây lưới 'Nhân vật' chỉ còn thẻ có tên chứa 'Hạ Vy', bộ đếm là '1 / tổng', dải 'Nhân vật hot' ẩn; bấm nút 'Xoá tìm kiếm' thì ô rỗng, bộ đếm về tổng và lưới về như cũ (cùng các thẻ, cùng thứ tự).",
-      "Bot: gõ 'zzqxy' thì hiện 'Không tìm thấy nhân vật nào cho “zzqxy”.' và nút 'Xoá tìm kiếm', không còn thẻ nào trong hai lưới; bấm nút thì lưới về như cũ; tìm 'ha vy' khi đang bật một chip cảm xúc mà Hạ Vy không có thì cũng ra trạng thái không có kết quả.",
+      "Bot: ở 390px `#/explore` có ô `input[type=search]` placeholder 'Tìm nhân vật', aria-label 'Tìm nhân vật theo tên, tag hoặc giới thiệu', đứng trên dải 'Nhân vật hot' và mục 'Nhân vật'; gõ 'ha vy' (không dấu) thì sau ≤ 1 giây lưới 'Nhân vật' chỉ còn đúng các thẻ có tên chứa 'Hạ Vy' của lưới lúc đầu (thẻ mẫu 'Hạ Vy' và nhân vật chia sẻ cùng tên, giữ thứ tự), bộ đếm là 'x / tổng' với x là số thẻ đó, dải 'Nhân vật hot' ẩn; bấm nút 'Xoá tìm kiếm' thì ô rỗng, bộ đếm về tổng và lưới về như cũ (cùng các thẻ, cùng thứ tự).",
+      "Bot: gõ 'zzqxy' thì hiện 'Không tìm thấy nhân vật nào cho “zzqxy”.' và nút 'Xoá tìm kiếm', không còn thẻ nào trong lưới; bấm nút thì lưới về như cũ; tìm 'ha vy' khi đang bật một chip cảm xúc mà Hạ Vy không có thì cũng ra trạng thái không có kết quả.",
       "Bot: ở 390px, cả hai theme, ô tìm vừa một dòng (placeholder không bị cắt: `scrollWidth ≤ clientWidth` của input), cao ít nhất 44px, nút 'Xoá tìm kiếm' trong ô chạm được 44 × 44px; trang không cuộn ngang."
     ],
     "tests": [
@@ -1428,7 +1431,7 @@
       "bot: ô Tìm nhân vật vừa một dòng 390px, cao 44px, không tràn ngang"
     ],
     "state": "passing",
-    "verified_at": "2026-11-14T16:52:40.410Z"
+    "verified_at": "2026-11-15T03:31:14.437Z"
   },
   {
     "id": "F48",

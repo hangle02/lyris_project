@@ -11,11 +11,11 @@ là lưới chỉ còn nhân vật khớp. Gõ không dấu vẫn ra ("ha vy" ra
 
 ## Hoạt động thế nào
 
-- Tìm trong **mọi nhân vật trên Khám phá**: nhân vật của bạn, nhân vật mẫu của Lyris và nhân vật công khai của người khác ("Nhân vật được chia sẻ") (tạm chọn: cả nhân vật của bạn, vì chúng nằm chung lưới).
+- Tìm trong **mọi nhân vật trên Khám phá**: nhân vật của bạn, nhân vật mẫu của Lyris và nhân vật công khai của người khác (tất cả nằm chung một lưới từ 2026-11-15).
 - So sánh **không dấu, không phân biệt hoa thường** (bỏ dấu tiếng Việt, "đ" thành "d"), gộp khoảng trắng. Nhiều từ thì nhân vật phải khớp **mọi** từ, ở bất kỳ trường nào (tên, vai trò, tag, giới thiệu). Mỗi từ gõ phải khớp **phần đầu một từ** ("ha" ra "Hạ", "Hải", không ra "thành", "nhà"; tạm chọn sau rà soát 2026-11-14); dấu câu tách từ.
 - Lọc sau **250 ms** kể từ lần gõ cuối (debounce). Ô rỗng (hay chỉ có khoảng trắng) là không lọc.
 - Tìm cùng lúc với chip cảm xúc: nhân vật phải khớp cả hai. Bộ đếm của mục "Nhân vật" thành "x / tổng".
-- Đang tìm thì dải "Nhân vật hot" ([F46](F46-bang-xep-hang-nhan-vat-hot.md)) ẩn; mục "Nhân vật được chia sẻ" chỉ còn ô khớp, không còn ô nào thì mục ẩn.
+- Đang tìm thì dải "Nhân vật hot" ([F46](F46-bang-xep-hang-nhan-vat-hot.md)) ẩn; lưới 'Nhân vật' (gồm cả nhân vật chia sẻ) chỉ còn ô khớp.
 - Không có kết quả ở cả hai mục: "Không tìm thấy nhân vật nào cho “{chữ đã gõ}”." và nút "Xoá tìm kiếm". Nút "×" trong ô (aria-label "Xoá tìm kiếm") xoá chữ, lưới về như cũ.
 - Chữ đã gõ không gửi lên server, không vào sự kiện (chỉ `explore_searched {has_results}`). Không lưu sau khi rời trang (tạm chọn).
 
@@ -31,8 +31,8 @@ Kỹ thuật:
 - [ ] Unit: `filterItems` tìm trong tên, vai trò, tag và giới thiệu của cả ba loại thẻ (`card`, `template`, `shared`); kết hợp với vibe là phép "và"; chuỗi rỗng hay chỉ khoảng trắng trả đúng danh sách cũ (cùng thứ tự); thứ tự kết quả giữ nguyên thứ tự lưới.
 - [ ] Unit: `useDebounced` (đồng hồ giả của `node:test` `mock.timers`) chỉ đổi giá trị sau 250 ms kể từ lần đổi cuối: gõ 5 ký tự cách nhau 100 ms thì chỉ lọc một lần.
 - [ ] Unit: sự kiện `explore_searched` chỉ có `has_results: bool` (không có chữ đã gõ), nằm trong `track.ts` và `tracking-plan.md`; phát tối đa một lần cho mỗi chuỗi tìm khác nhau sau debounce.
-- [ ] Bot: ở 390px `#/explore` có ô `input[type=search]` placeholder 'Tìm nhân vật', aria-label 'Tìm nhân vật theo tên, tag hoặc giới thiệu', đứng trên dải 'Nhân vật hot' và mục 'Nhân vật'; gõ 'ha vy' (không dấu) thì sau ≤ 1 giây lưới 'Nhân vật' chỉ còn thẻ có tên chứa 'Hạ Vy', bộ đếm là '1 / tổng', dải 'Nhân vật hot' ẩn; bấm nút 'Xoá tìm kiếm' thì ô rỗng, bộ đếm về tổng và lưới về như cũ (cùng các thẻ, cùng thứ tự).
-- [ ] Bot: gõ 'zzqxy' thì hiện 'Không tìm thấy nhân vật nào cho “zzqxy”.' và nút 'Xoá tìm kiếm', không còn thẻ nào trong hai lưới; bấm nút thì lưới về như cũ; tìm 'ha vy' khi đang bật một chip cảm xúc mà Hạ Vy không có thì cũng ra trạng thái không có kết quả.
+- [ ] Bot: ở 390px `#/explore` có ô `input[type=search]` placeholder 'Tìm nhân vật', aria-label 'Tìm nhân vật theo tên, tag hoặc giới thiệu', đứng trên dải 'Nhân vật hot' và mục 'Nhân vật'; gõ 'ha vy' (không dấu) thì sau ≤ 1 giây lưới 'Nhân vật' chỉ còn đúng các thẻ có tên chứa 'Hạ Vy' của lưới lúc đầu (thẻ mẫu 'Hạ Vy' và nhân vật chia sẻ cùng tên, giữ thứ tự), bộ đếm là 'x / tổng' với x là số thẻ đó, dải 'Nhân vật hot' ẩn; bấm nút 'Xoá tìm kiếm' thì ô rỗng, bộ đếm về tổng và lưới về như cũ (cùng các thẻ, cùng thứ tự).
+- [ ] Bot: gõ 'zzqxy' thì hiện 'Không tìm thấy nhân vật nào cho “zzqxy”.' và nút 'Xoá tìm kiếm', không còn thẻ nào trong lưới; bấm nút thì lưới về như cũ; tìm 'ha vy' khi đang bật một chip cảm xúc mà Hạ Vy không có thì cũng ra trạng thái không có kết quả.
 - [ ] Bot: ở 390px, cả hai theme, ô tìm vừa một dòng (placeholder không bị cắt: `scrollWidth ≤ clientWidth` của input), cao ít nhất 44px, nút 'Xoá tìm kiếm' trong ô chạm được 44 × 44px; trang không cuộn ngang.
 
 ## Tests

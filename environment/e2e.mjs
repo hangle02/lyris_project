@@ -2056,10 +2056,16 @@ export async function play(c) {
   await c.step(C.SHARED, async () => {
     if (!memberIn || !sharedCard) throw new Error('thiếu thành viên hoặc nhân vật công khai');
     await c.goto('#/explore');
-    await c.waitFor(`!!document.querySelector('section[aria-labelledby=explore-shared]')`, 'mục Nhân vật được chia sẻ', 15000);
-    const link = { within: 'section[aria-labelledby=explore-shared]', css: 'a', labelStarts: `Xem nhân vật ${sharedCard.name}` };
-    await c.waitFor(`!!__bot.find(${J(link)})`, `nhân vật ${sharedCard.name} trong mục chia sẻ`, 8000);
-    await c.shot('Nhân vật được chia sẻ');
+    // Một lưới (PO 2026-11-15): nhân vật công khai của tài khoản khác nằm trong lưới 'Nhân vật', không có mục riêng.
+    await c.waitFor('document.querySelectorAll("section[aria-labelledby=explore-all] ul > li").length > 0', 'lưới nhân vật', 15000);
+    const link = { within: 'section[aria-labelledby=explore-all]', css: 'a', labelStarts: `Xem nhân vật ${sharedCard.name}` };
+    await c.waitFor(`!!__bot.find(${J(link)})`, `nhân vật ${sharedCard.name} trong lưới Nhân vật`, 8000);
+    const grid = await c.evaluate(`({ separate: !!document.querySelector('section[aria-labelledby=explore-shared]'),
+      credit: (__bot.find(${J(link)})?.innerText ?? '').includes('bởi @${c.creds.handle}') })`);
+    await c.shot('Nhân vật được chia sẻ trong lưới Nhân vật');
+    if (grid.separate || !grid.credit) {
+      return { ok: false, detail: `${grid.separate ? 'VẪN có mục riêng explore-shared · ' : ''}${grid.credit ? '' : `ô không ghi 'bởi @${c.creds.handle}'`}` };
+    }
     // Hồ sơ nhân vật thử GET /api/cards/{id} trước (404 vì không phải của mình) rồi mới đọc bản công khai: đúng thiết kế.
     expectedErrors.push(`(/api/cards/${sharedCard.id})`);
     await c.click(link, 'nhân vật được chia sẻ');
@@ -2808,8 +2814,11 @@ export async function play(c) {
     if (r.placeholder !== 'Tìm nhân vật') problems.push(`placeholder "${r.placeholder}"`);
     if (r.label !== 'Tìm nhân vật theo tên, tag hoặc giới thiệu') problems.push(`aria-label "${r.label}"`);
     if (!r.aboveGrid || !r.aboveHot) problems.push("ô tìm không đứng trên dải 'Nhân vật hot' và mục 'Nhân vật'");
-    if (after.counter !== `1 / ${before.counter}`) problems.push(`bộ đếm "${after.counter}" (cần "1 / ${before.counter}")`);
-    if (after.grid.length !== 1 || !after.grid.every((n) => n.includes('Hạ Vy'))) problems.push(`lưới: ${after.grid.join(', ')}`);
+    // Một lưới (PO 2026-11-15): nhân vật chia sẻ cùng tên (@sangtac "Hạ Vy Quán Trà") cũng nằm trong lưới, nên kết quả
+    // phải là ĐÚNG các thẻ có tên chứa 'Hạ Vy' của lưới lúc đầu, cùng thứ tự, có thẻ mẫu 'Hạ Vy'.
+    const expected = before.grid.filter((n) => n.includes('Hạ Vy'));
+    if (after.counter !== `${expected.length} / ${before.counter}`) problems.push(`bộ đếm "${after.counter}" (cần "${expected.length} / ${before.counter}")`);
+    if (J(after.grid) !== J(expected) || !after.grid.includes('Hạ Vy')) problems.push(`lưới: ${after.grid.join(', ')} (cần ${expected.join(', ')})`);
     if (waited > 1000) problems.push(`lọc sau ${waited}ms`);
     if (after.hot) problems.push("dải 'Nhân vật hot' vẫn hiện khi đang tìm");
     if (cleared.value !== '') problems.push(`ô sau khi xoá: "${cleared.value}"`);
@@ -2826,7 +2835,7 @@ export async function play(c) {
     const empty = 'Không tìm thấy nhân vật nào cho “zzqxy”.';
     await typeInto('zzqxy');
     const shown = await c.waitFor(`document.body.innerText.includes(${J(empty)})`, 'câu báo không có kết quả', 3000).catch(() => false);
-    const cards = await c.evaluate(`document.querySelectorAll('section[aria-labelledby=explore-all] ul > li, section[aria-labelledby=explore-shared] ul > li').length`);
+    const cards = await c.evaluate(`document.querySelectorAll('section[aria-labelledby=explore-all] ul > li').length`);
     const button = { css: 'button', text: 'Xoá tìm kiếm' };
     const hasButton = await c.exists(button);
     await scan('#/explore (tìm không có kết quả)');

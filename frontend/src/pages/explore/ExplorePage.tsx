@@ -13,7 +13,7 @@ import type { CardSummary, PublicCardSummary, TemplateInfo } from "../../types";
 import { HotRowLink } from "./HotRows";
 import { HOT_COPY, hotRow, hotStripView } from "./hotLogic";
 import type { HotBoard } from "./hotLogic";
-import { buildItems, buildVibes, itemRoute, normalizeTag, sharedItems, vibeLabel } from "./logic";
+import { buildItems, buildVibes, exploreGrid, itemRoute, normalizeTag, sharedItems, vibeLabel } from "./logic";
 import type { ExploreItem } from "./logic";
 import { SEARCH_COPY, createSearchTracker, filterItems, noResultsText, queryWords, useDebounced } from "./search";
 
@@ -166,9 +166,9 @@ function GridSkeleton() {
 
 /**
  * Khám phá (DESIGN.md page 2, docs/design-impl.md §6.4, wiki/screens/explore.md): "Tìm nhân vật" (F47), the
- * "Nhân vật hot" strip (F46, in place of the old featured card), vibe filters, and a compact 4:3 grid of the user's
- * characters plus templates not installed yet, then other accounts' public characters. Every character has
- * exactly one cell. Tapping a character opens its profile ("#/character/...").
+ * "Nhân vật hot" strip (F46, in place of the old featured card), vibe filters, and one compact 4:3 grid: the user's
+ * characters, templates not installed yet, then other accounts' public characters (no separate section: the credit
+ * line says who made each). Every character has exactly one cell. Tapping a character opens its profile.
  */
 export function ExplorePage() {
   const [cards, setCards] = useState<CardSummary[] | null>(null);
@@ -224,17 +224,16 @@ export function ExplorePage() {
     track("explore_viewed");
   }, []);
 
-  const items = useMemo(() => (cards && templates ? buildItems(cards, templates) : []), [cards, templates]);
+  // One grid (PO 2026-11-15): yours, templates not installed, then other accounts' public characters.
+  const items = useMemo(
+    () => (cards && templates ? exploreGrid(buildItems(cards, templates), sharedItems(shared, me?.handle ?? null)) : []),
+    [cards, templates, shared, me?.handle],
+  );
   const vibes = useMemo(() => (templates ? buildVibes(items, templates) : []), [items, templates]);
   const shown = useMemo(() => filterItems(items, { query: settledQuery, vibe }), [items, settledQuery, vibe]);
-  const sharedAll = useMemo(() => sharedItems(shared, me?.handle ?? null), [shared, me?.handle]);
-  const sharedShown = useMemo(
-    () => filterItems(sharedAll, { query: settledQuery, vibe }),
-    [sharedAll, settledQuery, vibe],
-  );
   const searching = queryWords(settledQuery).length > 0;
   const filtered = searching || vibe !== null;
-  const nothingFound = searching && shown.length === 0 && sharedShown.length === 0;
+  const nothingFound = searching && shown.length === 0;
 
   const ready = cards !== null && templates !== null;
 
@@ -352,28 +351,6 @@ export function ExplorePage() {
               </ul>
             )}
           </section>
-
-          {/* Phase 4b: other accounts' public characters. No section at all when there are none. */}
-          {sharedShown.length > 0 && (
-            <section aria-labelledby="explore-shared" className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-baseline justify-between gap-3">
-                  <h2 id="explore-shared" className="text-[18px] leading-tight font-semibold text-fg">
-                    Nhân vật được chia sẻ
-                  </h2>
-                  <span className="text-[14px] text-muted tabular-nums">
-                    {filtered ? `${sharedShown.length} / ${sharedAll.length}` : sharedAll.length}
-                  </span>
-                </div>
-                <p className="text-[14px] leading-snug text-muted">Người khác trên Lyris này chia sẻ. Story bạn bắt đầu là của riêng bạn.</p>
-              </div>
-              <ul className={GRID}>
-                {sharedShown.map((item) => (
-                  <ItemCard key={item.key} item={item} />
-                ))}
-              </ul>
-            </section>
-          )}
         </>
       )}
     </div>

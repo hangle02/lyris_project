@@ -26,7 +26,7 @@ Kỹ thuật:
 - [ ] Unit: bắt đầu story với nhân vật công khai chụp một bản sao đầy đủ; chủ sửa, ẩn hay xoá nhân vật thì story của người chơi vẫn chạy; sổ thế giới của bản sao không lọt vào xem trước hay chat thử.
 - [ ] Unit: hồ sơ công khai chỉ có trường whitelist; mô tả công tắc không hứa giữ bí mật; danh sách Studio ghi 'Công khai' thay 'Riêng tư'.
 - [ ] Bot: trình sửa nhân vật của mình (bot nhập từ card .json rồi lưu) có công tắc 'Công khai' trong phần 'Cơ bản', trình sửa nhân vật cài từ mẫu không có; bật 'Công khai' và lưu thì có nút 'Người khác thấy gì'.
-- [ ] Bot: tài khoản thứ hai mở `#/explore` thấy nhân vật đó trong 'Nhân vật được chia sẻ'; hồ sơ của nó không có 'Sửa nhân vật' và 'bởi @handle' là link tới `#/u/<handle>`.
+- [ ] Bot: tài khoản thứ hai mở `#/explore` thấy nhân vật đó trong lưới 'Nhân vật' (chung lưới, không có mục riêng), ô ghi 'bởi @handle'; hồ sơ của nó không có 'Sửa nhân vật' và 'bởi @handle' là link tới `#/u/<handle>`.
 
 ## Tests
 

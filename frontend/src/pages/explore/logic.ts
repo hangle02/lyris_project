@@ -324,11 +324,27 @@ export function templateEntryRoute(t: Pick<TemplateInfo, "slug" | "installed_car
   return t.installed_card_id !== null ? characterRoute(t.installed_card_id, start) : templateRoute(t.slug, start);
 }
 
-// ---- Phase 4b: "Nhân vật được chia sẻ" (docs/auth.md §7.3) ----
+// ---- Phase 4b: other accounts' public characters (docs/auth.md §7.3) ----
 
 /**
- * Other accounts' public characters for the "Nhân vật được chia sẻ" grid: never your own (also when
- * an older server sent them), newest change first, each credited "bởi @handle".
+ * The one Khám phá grid (PO 2026-11-15, wiki/decisions/kham-pha-mot-luoi.md): your cards and templates not
+ * installed (`buildItems`), then other accounts' public characters. No separate section: each card's credit
+ * line ("Mẫu của Lyris", "bởi @handle") already says who made it. Each character once.
+ */
+export function exploreGrid(items: ExploreItem[], shared: ExploreItem[]): ExploreItem[] {
+  const seen = new Set(items.map((i) => i.key));
+  const out = [...items];
+  for (const s of shared) {
+    if (seen.has(s.key)) continue;
+    seen.add(s.key);
+    out.push(s);
+  }
+  return out;
+}
+
+/**
+ * Other accounts' public characters, at the end of the Khám phá grid: never your own (also when an older
+ * server sent them), newest change first, each credited "bởi @handle".
  */
 export function sharedItems(cards: readonly PublicCardSummary[], ownHandle: string | null): ExploreItem[] {
   const own = (ownHandle ?? "").trim().replace(/^@+/, "").toLowerCase();

@@ -311,3 +311,44 @@ test("every character has exactly one cell, Hạ Vy too (featured or not, instal
   assert.deepEqual(fresh.map((i) => i.name), ["Tần Dương", "Hạ Vy", "X"]);
   assert.equal(new Set(fresh.map((i) => i.key)).size, fresh.length);
 });
+
+test("exploreGrid: one list — your cards, templates not installed, then others' public characters", async () => {
+  const { exploreGrid, sharedItems } = await import("./logic.ts");
+  const mine = buildItems([card(1, "A", ["biển"])], [template("x", "X", { vibes: ["Cổ trang"] })]);
+  const others = sharedItems(
+    [
+      {
+        id: 7,
+        uid: "u7",
+        visibility: "public" as const,
+        name: "Lục Bắc Uyên",
+        role: "Tổng giám đốc",
+        gender: "male" as const,
+        language: "vi" as const,
+        style_profile: "viet_hien_dai",
+        description: "{{char}} chờ {{user}}.",
+        tags: ["Bí ẩn"],
+        avatar_url: null,
+        updated_at: "2026-11-15T00:00:00Z",
+        creator_handle: "mai",
+        creator_name: "mai",
+        creator_avatar_url: null,
+      },
+    ],
+    null,
+  );
+  const grid = exploreGrid(mine, others);
+  assert.deepEqual(
+    grid.map((i) => i.kind),
+    ["card", "template", "shared"],
+  );
+  assert.equal(grid[2]?.creator, "bởi @mai");
+  // Each character once, even if the same shared card were passed twice.
+  assert.equal(exploreGrid(mine, [...others, ...others]).length, 3);
+  assert.deepEqual(exploreGrid(mine, []), mine);
+  // Vibe chips take the shared characters' tags too ("bí ẩn" is on a card and a shared character only).
+  const withTag = buildItems([card(2, "B", ["Bí ẩn"])], []);
+  assert.ok(!buildVibes(withTag, []).includes("bí ẩn"));
+  assert.ok(buildVibes(exploreGrid(withTag, others), []).includes("bí ẩn"));
+  assert.ok(filterByVibe(grid, "bí ẩn").some((i) => i.kind === "shared"));
+});
