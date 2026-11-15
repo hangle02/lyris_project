@@ -42,7 +42,7 @@ Where each part of the brief is answered (English half; the Vietnamese half has 
 
 ### Pitch
 
-**Lyris is a Vietnamese-first AI roleplay app for readers of Vietnamese romance web fiction who want to live inside a story, not only read it.** You pick a character, or write your own in the Studio, and step into a story where the AI narrates and plays the character while you alone control your own persona. Lyris keeps you the author (the AI never writes your lines), uses the right Vietnamese forms of address for each character and story, and gives every character a memory and feelings that rise and fall with what you do; writers can turn their characters and worlds into ones readers can talk to. Chatting costs coins: every account gets free coins on sign-up and every day, and more come in packs from 10.000đ (test mode today, no real money yet). The submitted version (built) runs on one machine with a local open model and invite-only accounts; after the course Lyris goes to the open web as a hosted app, then to Google Play and the App Store (planned, see [Roadmap](#roadmap-hosted-lyris)).
+**Lyris is a Vietnamese-first AI roleplay app for young Vietnamese adults who love reading and fiction and want to live inside a story, not only read it, with a character who remembers them or with characters and worlds of their own.** You pick a character, or write your own in the Studio, and step into a story where the AI narrates and plays the character while you alone control your own persona. Lyris keeps you the author (the AI never writes your lines), uses the right Vietnamese forms of address for each character and story, and gives every character a memory and feelings that rise and fall with what you do; creators can turn their characters and worlds into ones other people can play. Chatting costs coins: every account gets free coins on sign-up and every day, and more come in packs from 10.000đ (test mode today, no real money yet). The submitted version (built) runs on one machine with a local open model and invite-only accounts; after the course Lyris goes to the open web as a hosted app, then to Google Play and the App Store (planned, see [Roadmap](#roadmap-hosted-lyris)).
 
 **Launch channel:** the open web (a PWA served over HTTPS), starting as an invite-only beta released in waves; Google Play and the App Store come later (planned). See [Launch plan](#launch-plan-first-90-days-proposed).
 
@@ -82,46 +82,50 @@ The same problems seen from the user's side: what progress people "hire" Lyris t
 
 **Job statements**
 
+The two core jobs come from the team's customer personas, written by Huynh Quoc Toi ([original, in English](wiki/raw/2026-11-15-chan-dung-khach-hang.md)).
+
 | Who | Job statement |
 |---|---|
-| **Core job: the story reader** (Vietnamese romance web-fiction reader) | *When* I finish a chapter in the evening and want more time with a kind of character I love, *I want to* step into a story with that character and speak and act as my own persona in natural Vietnamese, *so I can* live the relationship myself and pick it up again tomorrow where we left off. |
-| **Related job: the character writer** (Wattpad / Facebook writer) | *When* I have created a character and their world, *I want to* turn them into someone my readers can talk to, played faithfully (voice, forms of address, secrets), *so I can* deepen my readers' attachment and grow my audience. |
+| **Group 1: Emotional Companionship Seekers** (persona: Lê Gia Hân) | *When* I feel lonely, stressed or emotionally overwhelmed, *I want to* create and interact with an AI character who understands me and remembers our shared experiences, *so I can* express myself freely and feel emotionally supported. |
+| **Group 2: Creative Roleplay & Fiction Enthusiasts** (persona: Phạm Quốc Bảo) | *When* I have a creative idea or want to escape into a fictional world, *I want to* create my own characters, settings and storylines with AI, *so I can* experience immersive, interactive storytelling without limitations. |
 
-**Dimensions of each job**
+**Wellbeing:** Lyris is an entertainment and roleplay app, not a mental-health or counselling service. The safeguards today are a rule in every story and DM prompt that the character answers talk of self-harm with care and never encourages it, a rule in the character-draft and reply-suggestion prompts against any self-harm content, and the [Terms](docs/legal/terms.md) (§2), which say Lyris does not replace professional advice and point to people you trust, a professional or emergency services (115 in Vietnam); in-app crisis detection or a help screen is neither built nor planned yet.
 
-| | Story reader | Character writer |
+**Dimensions of each job** (the owner's functional, emotional and social jobs, condensed; what Lyris covers today, built or planned, is in the [persona tables](#customer-personas-hypotheses-to-validate))
+
+| | Group 1: companionship (Hân) | Group 2: creative roleplay (Bảo) |
 |---|---|---|
-| **Functional** | A character who answers exactly what I wrote, uses the right anh/em, remembers names and promises across days, and never writes my lines | Set personality, forms of address, signature lines, a world and who knows which secret once; have it played the same way for every reader |
-| **Emotional** | Immersion and romance tension, comfort and healing, feeling in control of my own persona; no jolt from broken Vietnamese | Pride that the character comes alive; trust that it will not be distorted |
-| **Social** | Talk about favourite characters and moments in reading groups; bring a friend along | Standing in writing communities; readers bringing more readers; recognition through the ranking |
+| **Functional** | Create a character with the personality, appearance, tone and behaviour I like; define our relationship (best friend, partner, older sibling, mentor); build a personal setting and story around it; have the AI remember my details and our important moments; keep the same personality across sessions | Define characters (appearance, personality, background, interests, voice, motivations); set the world (era, places, rules, cultures, social systems); develop plots, conflicts and twists; define relationships among characters (friends, rivals, allies, romantic partners); roleplay directly and steer how the story unfolds; keep events, character details and past choices; edit, redirect or expand the story |
+| **Emotional** | Feel heard, understood and acknowledged; a private-feeling space to share without fear of judgment; familiarity and continuity over time | Freedom to create and imagine; immersion in a world of my own making; enjoying unexpected turns; ownership and control of my world and characters |
+| **Social** | Explore the relationship dynamics and communication styles I prefer; express my identity and interests through a character I made | Show creativity and identity through original characters and stories; share characters and worlds with like-minded communities; connect with fandom, creative-writing and roleplay communities |
 
 **Job map: where today's alternatives fail**
 
 | Job step | Where current alternatives fail | What Lyris does (built) |
 |---|---|---|
-| **1. Discover a character** that fits today's mood | Generic AI chat apps are English-first; reading platforms such as Wattpad have the characters, but you can only read them | Explore with vibe filters, "Tìm nhân vật" search, the "Nhân vật hot" ranking, read-only profiles |
-| **2. Set up persona and story** | Few apps let the player set their own persona plus per-story forms of address and language | "Bước vào câu chuyện" sheet: persona, Story or DM, language, forms of address per character and per story |
+| **1. Create or find a character** that fits today's mood | General-purpose chatbots feel generic; many AI chat apps are English-first or limit how deep a character can be customised; reading platforms such as Wattpad have the characters, but you can only read them | Character Studio (personality, appearance, background, goals, secret, speech style, forms of address, greetings), an AI draft from a one-line idea, Character Card import; Explore with vibe filters, "Tìm nhân vật" search, the "Nhân vật hot" ranking |
+| **2. Set up persona, relationship and story** | Few apps let the player set their own persona, the relationship and the setting for each story | "Bước vào câu chuyện" sheet: persona (with a free description, e.g. the relationship to the character), Story or DM, language, setting, opening, relationship type (a romance pairing or "Không lãng mạn"), point of view and narration pronouns for this story ("Ngôi kể", "Đại từ dẫn truyện"); forms of address in dialogue come from the character |
 | **3. Play turns** | Generic apps write for the player, ignore the last turn and drift off the scene; wrong forms of address and stray English or Chinese words | Input conventions, a closing instruction to continue from the player's exact turn, Vietnamese-first prompts |
 | **4. Keep continuity over days** | Characters forget names, promises and facts; their attitude never changes; human roleplay partners are not always available or drop out | Scene summaries, memories and facts with correct rollback, six emotion dimensions, one timeline for Story and DM, available any time |
-| **5. Share and create** | Reading-only platforms give readers no way to interact; nothing rewards a writer for bringing readers | Character Studio, Lorebook with "who knows this", public characters, invite codes, ranking-based creator coins |
+| **5. Build worlds, share and create** | Original characters and worlds stay in notes and posts nobody can play; few tools organise a world; nothing rewards a creator whose character others enjoy | Lorebook with "who knows this", public characters, invite codes, ranking-based creator coins; community comments, image posts and follows are planned (F39) |
 
 **Forces of progress** (why someone would switch, or not)
-- **Push of the current situation:** AI apps that take over the player's role, wrong Vietnamese, characters that forget; reading is passive; human partners keep their own schedules.
-- **Pull of Lyris:** a Vietnamese-first character who remembers and lets the player stay the author; hand-written worlds; private stories; there whenever the player is.
-- **Anxieties:** is a 12B model good enough; are intimate stories private; will coins run out; is the content safe. Lyris answers with 300 free coins plus 60 a day and missions, fully private stories, no user text in analytics, data export and account deletion, and safe content by default.
-- **Habits:** reading apps, Wattpad and Facebook groups; AI chat apps people already know; human roleplay in Discord or Facebook groups. Launch channels go to these places (see [Launch channels](#launch-channels)).
+- **Push of the current situation:** general chatbots that feel generic and shallow; AI apps that take over the player's role, get Vietnamese wrong, drift from the character and forget; roleplay partners with matching taste are hard to find and keep their own schedules; sharing private feelings with people risks being judged.
+- **Pull of Lyris:** a Vietnamese-first character who remembers within a story and lets the player stay the author; deep character and world tools; stories other accounts cannot read; there whenever the player is.
+- **Anxieties:** is a 12B model good enough; will the character stay itself; are intimate stories private; will coins run out; is the content safe. Lyris answers with 300 free coins plus 60 a day and missions, stories no other account (not even the in-app admin) can read, no user text in analytics, data export and account deletion, and safe content by default.
+- **Habits:** Wattpad, romance novels and reading apps; anime, manga and fandom groups; AI chat apps people already know; human roleplay in Discord or Facebook groups. Launch channels go to these places (see [Launch channels](#launch-channels)).
 
 **Desired outcomes and how we will measure them**
 
 | Desired outcome (user's view) | Measure | Status |
 |---|---|---|
 | Minimise the times the AI writes my lines or decisions | Harness: the judge's `godmodding` verdict on model scenarios such as `03-hanh-dong-cho-ai`; in use: dissatisfaction rate (`regenerate_used` + `message_edited` + `reply_rated` down, per `reply_completed`) | Scenario check built and run internally; real-user rate is a hypothesis |
-| Minimise wrong forms of address and mixed-in foreign words | Harness machine checks on scenarios `06-viet-hien-dai`, `07-co-trang`, `08-tieng-anh` | Internal only; to be evaluated with readers |
+| Minimise wrong forms of address and mixed-in foreign words | Harness machine checks on scenarios `06-viet-hien-dai`, `07-co-trang`, `08-tieng-anh` | Internal only; to be evaluated with users |
 | Minimise the effort to pick up an old story where it stopped | `story_resumed` per week; memory scenario `f10-ky-uc` | Hypothesis |
 | Keep a story going | Turns per story (`message_sent`); first target ≥ 40 % of started stories reach 5 turns; North Star: weekly engaged stories | Hypothesis ([tracking plan §5.3](docs/tracking-plan.md#53-first-targets-for-round-2)) |
 | Come back to the character | D1 ≥ 35 %, D7 ≥ 15 % (first targets) | Hypothesis |
 | Minimise waiting for a reply | First token under 10 s for ≥ 90 % of replies after warm-up (`reply_completed` `ttft_bucket`) | About 5 s measured on a 12B model at home; real use is a hypothesis |
-| Creator: maximise how many readers play my character | Players per public character, `story_started` from public characters, `character_published`, `creator_rank_reached` | Hypothesis |
+| Creator (Group 2): maximise how many people play my character | Players per public character, `story_started` from public characters, `character_published`, `creator_rank_reached` | Hypothesis |
 
 **How Lyris answers each problem.** The approaches below are built; how well they work with real users is **still to be evaluated** (see [Limitations](#limitations-and-future-evaluation)).
 
@@ -143,27 +147,53 @@ Lyris serves four behavioral segments:
 
 | Segment | Seeking | What Lyris gives them (built) | Persona |
 |---|---|---|---|
-| **1. Immersive Fiction Readers** (primary) | To participate in the stories they love, not only read them: ngôn tình, đam mỹ, cổ trang, vườn trường. Mobile-first, mostly evenings. | Story mode where the player always stays the author; "Bước vào câu chuyện" in two taps | Linh |
-| **2. Relationship-Driven Roleplayers** | Persistent and evolving relationships with AI characters | Six emotions that rise and fall, memory across days, Story and DM modes in one timeline, a story that picks up where it stopped | none yet |
-| **3. Fandom & Character Enthusiasts** | Deeper interactions with fictional characters and universes | Character profiles, a Lorebook where each entry says who knows it, Explore search and the "Nhân vật hot" ranking. A fan character made public must respect copyright ([Terms](docs/legal/terms.md)) | none yet |
-| **4. Independent Creators & Worldbuilders** (secondary) | To transform their characters and worlds (side characters, places, secrets, plot hooks) into interactive experiences, played faithfully | Character Studio, Lorebook, public characters, the "Nhân vật hot" ranking and creator coin rewards | Minh |
+| **1. Immersive Fiction Readers** (primary) | To participate in the stories they love, not only read them: ngôn tình, đam mỹ, cổ trang, vườn trường. Mobile-first, mostly evenings. | Story mode where the player always stays the author; "Bước vào câu chuyện" in two taps | Lê Gia Hân |
+| **2. Relationship-Driven Roleplayers** | Persistent and evolving relationships with AI characters | Six emotions that rise and fall, memory across days, Story and DM modes in one timeline, a story that picks up where it stopped | Lê Gia Hân |
+| **3. Fandom & Character Enthusiasts** | Deeper interactions with fictional characters and universes | Character profiles, a Lorebook where each entry says who knows it, Explore search and the "Nhân vật hot" ranking. A fan character made public must respect copyright ([Terms](docs/legal/terms.md)) | Phạm Quốc Bảo |
+| **4. Independent Creators & Worldbuilders** (secondary) | To transform their characters and worlds (side characters, places, secrets, plot hooks) into interactive experiences, played faithfully | Character Studio, Lorebook, public characters, the "Nhân vật hot" ranking and creator coin rewards | Phạm Quốc Bảo |
 
 - **Age: 16+** (stated in the Terms; accepting them at sign-up confirms it, with no birth-date field). Safe content is on by default for everyone; an 18+ mode, if it ever comes, sits behind turning off the "Nội dung an toàn" toggle and an 18+ confirmation.
 - **Not a revenue segment:** **Self-hosting enthusiasts** with a capable machine can still run Lyris themselves (self-hosting stays possible and free, with coins switched off by `LYRIS_COINS=0`), but the business plan does not count on them.
 
 #### Customer personas (hypotheses to validate)
 
-Two personas drawn from the [launch-channel](#launch-channel-and-business-model) audiences. They cover segments 1 and 4; segments 2 and 3 have no persona yet. They are **hypotheses, not research findings**: we will check them against the tracking data (activation funnel, D1/D7 retention, creation events) and short user interviews after launch.
+Two personas written by Huynh Quoc Toi for the team ([original, in English](wiki/raw/2026-11-15-chan-dung-khach-hang.md)), condensed here. **Lê Gia Hân** stands for segments 1 and 2, **Phạm Quốc Bảo** for segments 3 and 4. They are **hypotheses, not research findings**: we will check them against the tracking data (activation funnel, D1/D7 retention, creation events) and short user interviews after launch.
 
-| | **Linh, the story reader** | **Minh, the character writer** |
+- **Group 1, Emotional Companionship Seekers: Lê Gia Hân, 21.** A third-year university student living in District 7. She enjoys Wattpad stories and romance novels, especially emotionally mature, warm and attentive characters: a caring older sibling, a thoughtful partner, a gentle best friend.
+- **Group 2, Creative Roleplay & Fiction Enthusiasts: Phạm Quốc Bảo, 20.** A second-year university student who loves anime, manga and light novels. He follows fandom communities, creates original characters (OCs), and enjoys roleplay, world-building and stories with many characters and plotlines.
+
+| | **Lê Gia Hân** (Group 1) | **Phạm Quốc Bảo** (Group 2) |
 |---|---|---|
-| **Who** | 18–25, student or young office worker; reads ngôn tình and đam mỹ on her phone every evening (reading apps, Wattpad, Facebook groups) | 20–30; writes web fiction or original-character posts on Wattpad and Facebook writing groups; has a small following |
-| **Wants** | To be *inside* the story with a favourite kind of character (slow-burn romance, jealousy, healing) without the AI taking over her role | Characters played faithfully (voice, forms of address, secrets) and a reason for readers to keep coming back |
-| **Pain today** | English-first apps, wrong anh/em, characters that forget, an AI that writes her lines for her | No easy way to turn a character and its world into something readers can talk to; nothing rewards bringing readers in |
-| **What Lyris gives** | Story mode, a six-emotion relationship, memory, and "Bước vào câu chuyện" in two taps | Character Studio, a Lorebook with "who knows this", public characters, the "Nhân vật hot" ranking and creator coin rewards |
-| **Where to reach** | Facebook reading groups, TikTok book communities, Wattpad reading communities | Wattpad writing communities, Facebook writing groups, TikTok creators |
-| **Likely to pay for** | Coins to keep chatting; personalization and early access to new features (planned) | Mostly earns coins through creator rewards; may top up for Studio test chats |
-| **Signal to validate** | First story with 3+ turns, D7 retention, turns per day | Characters published, players per public character |
+| **Age** | Typically 18–25 | Typically 16–28; marketing aims at 18+, the app is open from 16 (Terms) |
+| **Profile** | Young people seeking emotional connection, companionship and a space to express personal feelings | Creative users who enjoy fictional worlds, interactive storytelling and roleplay |
+| **Interests** | Romance novels, Wattpad, films, audio stories, conversations with fictional characters (Lyris is text only today) | Anime, manga, RPGs, fantasy, romance, science fiction, fanfiction, world-building |
+| **Behaviours** | Often uses the app at night or in stressful moments; tends to return to the same AI character over time | Often creates characters and settings, roleplays and takes part in fandom communities; may spend long stretches developing one story |
+| **Willingness to pay** | May pay for a personalised experience when the character feels consistent, remembers her and gives meaningful interaction. In Lyris: coins per reply (packs from 10.000đ, test mode); paid cosmetic personalisation (chat themes, couple avatar frames) is a later idea, not built ([Revenue model](#revenue-model)) | May pay for advanced features: deeper character creation, long-term memory, world customisation, deeper roleplay. In Lyris what exists of these (Studio, AI draft, Lorebook, memory within a story) is open to everyone and only replies cost coins (test mode); no paid feature tier is planned |
+| **Where to reach** | Facebook reading groups, TikTok book communities, Wattpad reading communities | Anime, manga and fandom groups on Facebook and Discord, roleplay communities, TikTok creators, Wattpad writing communities |
+| **Signal to validate** | `story_resumed` per week, D7 retention, turns per story (`message_sent`), `heart_drawer_opened` | `character_created` (and its `via: ai_draft` share), `lore_imported`, `character_published`, players per public character, `message_sent` with `has_directive` |
+
+**Lê Gia Hân: pain points and what Lyris does.** Product value, in the persona's words: an AI companion tailored to her (personality, relationship, the story around it) that builds on what they have shared.
+
+| Pain point | What Lyris does | Status |
+|---|---|---|
+| Uncomfortable sharing private matters with friends or family for fear of being judged | Stories are private: other accounts cannot read them, not even the in-app admin; analytics hold no user text; she can export her data or delete her account. The [Privacy Policy](docs/legal/privacy.md) states the limit: someone with direct access to the server could technically open the database | Built |
+| General-purpose chatbots feel generic and emotionally shallow | Characters with their own personality, speech style, example dialogue and forms of address (signature lines show on the profile); six emotions (affection, trust, attraction…) that rise and fall with what she does | Built; quality to be evaluated with users |
+| Characters drift from their personality, tone or behaviour | The character card (personality, speech style, example dialogue) goes into every prompt; real-model scenarios check forms of address and repetition | Built; consistency across sessions not yet measured |
+| The AI forgets personal details, past conversations and shared moments | Memories, facts (including facts about her persona) and rolling summaries, recalled into later turns; she sees them in "Cảm xúc & ký ức" (Feelings and memories) and can remove one with "Quên" (Forget) | Built, within one story: a new story with the same character starts from zero; memory shared across stories is not planned |
+| Wants an ongoing, personal relationship instead of starting from zero | A story picks up where it stopped, days later; Story and DM share one timeline. The relationship (best friend, older sibling, mentor…) is set through the character's forms of address and setting, her persona's description and the story's relationship type (a romance pairing or "Không lãng mạn", not romantic) | Built; there is no separate relationship-role field |
+
+**Phạm Quốc Bảo: pain points and what Lyris does.**
+
+| Pain point or job | What Lyris does | Status |
+|---|---|---|
+| Platforms limit how deeply characters and settings can be customised | Character Studio: personality, appearance, background, goals, secret, speech style, signature lines, example dialogue, forms of address, default scenario, greetings, starting emotions; "AI viết nháp nhân vật" drafts a full card from a one-line idea; Character Card import (V1, V2, V3) and V2 export (.json, .png) | Built. "Voice" means written speech style; audio and calls are only an idea, not designed |
+| Hard to find roleplay partners with compatible interests, style and storytelling skill | An AI partner at any hour that continues from his exact turn and never writes his persona's lines | Built |
+| The AI breaks immersion by forgetting events, changing traits or contradicting facts | Memories, facts and summaries with correct rollback on edit, regenerate and delete; Lorebook entries recalled by keyword | Built; to be evaluated on long stories |
+| Long stories with many characters, relationships and plotlines are hard to keep | Rolling summaries keep long stories going. A story has one AI character; side characters live as Lorebook "Người" (people) entries, and the card says how the character addresses others | Built; multi-character scenes and a story director are planned (F40, optional) |
+| Few integrated tools to organise worlds, characters, relationships and story developments | A Lorebook per character (up to 500 entries: stories and secrets, people, places), each with keywords, priority and "who knows this"; import from `world.md`; an event timeline in the "+" menu. Era, rules and cultures are free-text entries, and so are relationships between characters | Built; a world belongs to one character (no world shared across characters) |
+| Language barriers and international pricing | Vietnamese-first app and prompts; a story can be in English; coin packs priced in đồng from 10.000đ | Built (test mode); real payments planned (F56 app stores, F57 VNPay/MoMo) |
+| *Job:* edit, redirect or expand the story | `((…))` hidden directions, "Sửa" (edit), "Tạo lại câu trả lời" (regenerate, with versions), "Xoá từ đây" (delete from here), reply suggestions | Built |
+| *Job:* share characters and worlds with communities | Public characters that others play as their own private copy, the "Nhân vật hot" ranking, creator coins | Built; comments, image posts and follows planned (F39) |
 
 #### Positioning and why now
 
@@ -185,7 +215,7 @@ Lyris v1 is one loop, and every step is a tracked event ([tracking plan](docs/tr
 
 **North Star:** weekly engaged stories (stories with 3+ player turns in a week). A smaller **writer loop** feeds it: Studio → make a character public → other people play it → it climbs the "Nhân vật hot" ranking → creator coin rewards (`character_published`, `creator_rank_reached`).
 
-**Out of scope for v1** (planned or ideas, not built): 18+ content (later only behind the "Nội dung an toàn" toggle and an 18+ confirmation), phone calls and voice (the "Tender Moment" ideas), sending images, community feeds and comments, the story director, real payments, our own fine-tuned model, native iOS/Android apps and the multi-server hosted backend. They are listed under [Roadmap](#roadmap-hosted-lyris).
+**Out of scope for v1** (planned or ideas, not built): 18+ content (later only behind the "Nội dung an toàn" toggle and an 18+ confirmation), phone calls and voice (the "Tender Moment" ideas), sending images, community image posts, comments and follows, the story director, real payments, our own fine-tuned model, native iOS/Android apps and the multi-server hosted backend. They are listed under [Roadmap](#roadmap-hosted-lyris).
 
 ### Core features
 
@@ -230,8 +260,8 @@ Everything in these tables is **built** and covered by tests that `verification/
 
 | Channel | Audience | Where | How we execute | Why it should work |
 |---|---|---|---|---|
-| **1. Community discovery** | Readers of Vietnamese romance web fiction (ngôn tình, đam mỹ, cổ trang, vườn trường) | Vietnamese Facebook groups, TikTok book and roleplay communities, Discord servers, Wattpad reading communities | Introduce Lyris as Vietnamese-first; short clips of story mode with the hand-written worlds in [`worlds/`](worlds/) (Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương; imported in two steps, see [Try it as a reviewer](#try-it-as-a-reviewer)): stepping into a story, talking, keeping control of your own persona. For Wattpad readers: another way to live character-driven fiction. | These communities already love fictional characters and relationship-driven stories. |
-| **2. Creator-led discovery** | Writers and character creators | Wattpad writing communities, Vietnamese Facebook writing groups, TikTok creators, roleplay communities | Character Studio and the Lorebook for writers; publish public characters and share them with followers; the "Nhân vật hot" ranking and creator coin rewards (built) give a reason to promote. Later: collaborations with Vietnamese web-fiction authors, including Wattpad writers, only with the rights holders' permission. | Every writer brings characters, worlds and their own readers. |
+| **1. Community discovery** | Readers of Vietnamese romance web fiction (ngôn tình, đam mỹ, cổ trang, vườn trường), like the persona Lê Gia Hân | Vietnamese Facebook groups, TikTok book and roleplay communities, Discord servers, Wattpad reading communities | Introduce Lyris as Vietnamese-first; short clips of story mode with the hand-written worlds in [`worlds/`](worlds/) (Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương; imported in two steps, see [Try it as a reviewer](#try-it-as-a-reviewer)): stepping into a story, talking, keeping control of your own persona. For Wattpad readers: another way to live character-driven fiction. | These communities already love fictional characters and relationship-driven stories. |
+| **2. Creator-led discovery** | Writers, original-character creators and fandom roleplayers, like the persona Phạm Quốc Bảo | Wattpad writing communities, Vietnamese Facebook writing groups, anime, manga and fandom groups, TikTok creators, roleplay communities | Character Studio and the Lorebook for writers; publish public characters and share them with followers; the "Nhân vật hot" ranking and creator coin rewards (built) give a reason to promote. Later: collaborations with Vietnamese web-fiction authors, including Wattpad writers, only with the rights holders' permission. | Every writer brings characters, worlds and their own readers. |
 | **3. Referral and sharing** | Existing users | Inside the app | Invite codes (built): every invited member gets their own private stories. Referral coin rewards are planned (see Revenue). | A natural reason to bring friends along. |
 
 #### Distribution
@@ -475,7 +505,7 @@ The submitted version runs on one machine (SQLite + Ollama) and stays supported 
 - Compare local and open models for Vietnamese roleplay (forms of address, player agency, character voice).
 - Memory retrieval accuracy over long conversations.
 - Character consistency over long sessions.
-- Usability studies with Vietnamese interactive-fiction readers, starting with the two [personas](#customer-personas-hypotheses-to-validate).
+- Usability studies with Vietnamese users, starting with the two [personas](#customer-personas-hypotheses-to-validate) (Lê Gia Hân, Phạm Quốc Bảo).
 - Lightweight fine-tuning (LoRA) and whether it beats prompting alone.
 
 ### Tracking plan
@@ -691,7 +721,7 @@ The bot found two real bugs that unit tests had missed:
 | Nguyen Ngoc Anh Thu | 240065 | Research, tester | Problem statement, market data and research review, Jobs to be done, personas; app testing and bug reports |
 | Nguyen Thi Hai An | 240032 | Content and design, tester | Sample characters, character worlds and descriptions, UI feedback; app testing and bug reports |
 | Nguyen Anh Hong | 240169 | Business | Revenue model and coin pricing, launch channels |
-| Huynh Quoc Toi | 240193 | Tracking and QA | Tracking plan review, privacy and terms review, app testing |
+| Huynh Quoc Toi | 240193 | Tracking and QA | Customer personas, tracking plan review, privacy and terms review, app testing |
 
 ### Ownership and publishing
 
@@ -749,7 +779,7 @@ Mỗi phần của đề bài được trả lời ở đâu trong nửa tiếng
 
 ### Giới thiệu
 
-**Lyris là app nhập vai với nhân vật AI, ưu tiên tiếng Việt, dành cho độc giả truyện mạng lãng mạn tiếng Việt muốn sống trong câu chuyện chứ không chỉ đọc.** Bạn chọn một nhân vật (hoặc tự viết trong Studio) rồi bước vào một story: AI dẫn truyện và đóng vai nhân vật, còn persona của bạn chỉ bạn điều khiển. Lyris để bạn làm tác giả (AI không bao giờ viết lời thay bạn), xưng hô tiếng Việt đúng theo từng nhân vật và từng story, cho mỗi nhân vật trí nhớ và cảm xúc tăng giảm theo việc bạn làm; người viết biến nhân vật và thế giới của mình thành người độc giả trò chuyện được. Chat tốn coin: tài khoản nào cũng được coin miễn phí khi đăng ký và mỗi ngày, muốn thêm thì mua gói từ 10.000đ (hiện là chế độ thử, chưa có tiền thật). Bản nộp bài (đã có) chạy trên một máy với model mở chạy local và tài khoản theo lời mời; sau môn học, Lyris lên web mở dưới dạng app chạy trên máy chủ, rồi tới Google Play và App Store (kế hoạch, xem [Lộ trình](#lộ-trình-lyris-trên-máy-chủ)).
+**Lyris là app nhập vai với nhân vật AI, ưu tiên tiếng Việt, dành cho người trẻ Việt từ 18 tuổi mê đọc truyện và mê thế giới hư cấu, muốn sống trong câu chuyện chứ không chỉ đọc: cùng một nhân vật nhớ mình, hoặc với nhân vật và thế giới do chính mình tạo.** Bạn chọn một nhân vật (hoặc tự viết trong Studio) rồi bước vào một story: AI dẫn truyện và đóng vai nhân vật, còn persona của bạn chỉ bạn điều khiển. Lyris để bạn làm tác giả (AI không bao giờ viết lời thay bạn), xưng hô tiếng Việt đúng theo từng nhân vật và từng story, cho mỗi nhân vật trí nhớ và cảm xúc tăng giảm theo việc bạn làm; người sáng tác biến nhân vật và thế giới của mình thành thứ người khác chơi được. Chat tốn coin: tài khoản nào cũng được coin miễn phí khi đăng ký và mỗi ngày, muốn thêm thì mua gói từ 10.000đ (hiện là chế độ thử, chưa có tiền thật). Bản nộp bài (đã có) chạy trên một máy với model mở chạy local và tài khoản theo lời mời; sau môn học, Lyris lên web mở dưới dạng app chạy trên máy chủ, rồi tới Google Play và App Store (kế hoạch, xem [Lộ trình](#lộ-trình-lyris-trên-máy-chủ)).
 
 **Kênh ra mắt:** web mở (PWA chạy qua HTTPS), bắt đầu bằng bản beta theo lời mời, phát mã theo đợt; Google Play và App Store đến sau (kế hoạch). Xem [Kế hoạch ra mắt](#kế-hoạch-ra-mắt-90-ngày-đầu-đề-xuất).
 
@@ -789,46 +819,50 @@ Cùng các vấn đề trên, nhìn từ phía người dùng: họ "thuê" Lyri
 
 **Câu phát biểu công việc**
 
+Hai công việc chính lấy từ chân dung khách hàng của nhóm, do Huỳnh Quốc Tới viết ([bản gốc, tiếng Anh](wiki/raw/2026-11-15-chan-dung-khach-hang.md)).
+
 | Ai | Câu phát biểu |
 |---|---|
-| **Công việc chính: người đọc truyện** (độc giả truyện mạng ngôn tình tiếng Việt) | *Khi* đọc xong một chương vào buổi tối và còn muốn ở cạnh kiểu nhân vật mình thích, *tôi muốn* bước vào một story với nhân vật đó, nói và làm bằng persona của chính mình bằng tiếng Việt tự nhiên, *để* tự mình sống mối quan hệ ấy và hôm sau quay lại đúng chỗ đang dừng. |
-| **Công việc liên quan: người viết nhân vật** (tác giả trên Wattpad / Facebook) | *Khi* đã tạo một nhân vật và thế giới của họ, *tôi muốn* biến nhân vật thành người mà độc giả trò chuyện được, được đóng đúng (giọng, xưng hô, bí mật), *để* độc giả gắn bó hơn và cộng đồng của tôi lớn lên. |
+| **Nhóm 1: Người tìm sự đồng hành về cảm xúc** (chân dung: Lê Gia Hân) | *Khi* thấy cô đơn, căng thẳng hay ngợp cảm xúc, *tôi muốn* tạo và trò chuyện với một nhân vật AI hiểu mình và nhớ những điều hai bên đã cùng trải qua, *để* tự do bày tỏ và thấy mình được nâng đỡ về cảm xúc. |
+| **Nhóm 2: Người mê nhập vai sáng tạo và truyện hư cấu** (chân dung: Phạm Quốc Bảo) | *Khi* có một ý tưởng sáng tác hoặc muốn trốn vào một thế giới hư cấu, *tôi muốn* cùng AI tạo nhân vật, bối cảnh và mạch truyện của riêng mình, *để* trải nghiệm kể chuyện tương tác, cuốn hút, không bị giới hạn. |
 
-**Ba khía cạnh của mỗi công việc**
+**Sức khoẻ tinh thần:** Lyris là app giải trí và nhập vai, không phải dịch vụ sức khoẻ tâm thần hay tư vấn tâm lý. Lớp an toàn hiện có gồm một dòng luật trong mọi prompt story và nhắn tin (ai nhắc tới tự hại thì nhân vật đáp lại bằng sự quan tâm, không bao giờ cổ vũ), luật cấm nội dung tự hại trong prompt viết nháp nhân vật và gợi ý trả lời, và [Điều khoản](docs/legal/terms.md) (§2) ghi rõ Lyris không thay thế lời khuyên chuyên môn, khuyên liên hệ người thân, chuyên gia hoặc dịch vụ cấp cứu (115 tại Việt Nam); việc nhận biết khủng hoảng hay màn hỗ trợ trong app chưa có và chưa nằm trong kế hoạch.
 
-| | Người đọc truyện | Người viết nhân vật |
+**Ba khía cạnh của mỗi công việc** (công việc chức năng, cảm xúc, xã hội theo chân dung của chủ dự án, viết gọn; Lyris đáp ứng tới đâu, đã có hay kế hoạch, xem [bảng chân dung](#chân-dung-khách-hàng-giả-thuyết-cần-kiểm-chứng))
+
+| | Nhóm 1: đồng hành (Hân) | Nhóm 2: nhập vai sáng tạo (Bảo) |
 |---|---|---|
-| **Chức năng** | Nhân vật trả lời đúng điều mình vừa viết, xưng anh/em đúng, nhớ tên và lời hứa qua nhiều ngày, và không bao giờ viết lời thay mình | Đặt một lần tính cách, xưng hô, lời nói đặc trưng, thế giới và ai biết bí mật nào; mọi độc giả đều gặp đúng nhân vật ấy |
-| **Cảm xúc** | Đắm chìm, hồi hộp lãng mạn, được an ủi và chữa lành, thấy mình làm chủ persona; không bị khựng vì tiếng Việt lủng củng | Tự hào khi nhân vật "sống"; yên tâm nhân vật không bị bóp méo |
-| **Xã hội** | Kể về nhân vật và khoảnh khắc yêu thích trong nhóm đọc truyện; rủ bạn cùng chơi | Có chỗ đứng trong cộng đồng viết; độc giả kéo thêm độc giả; được ghi nhận qua bảng xếp hạng |
+| **Chức năng** | Tạo nhân vật có tính cách, ngoại hình, giọng điệu và cách cư xử mình thích; đặt mối quan hệ (bạn thân, người yêu, anh chị, người dẫn dắt); dựng bối cảnh và câu chuyện riêng quanh mối quan hệ đó; để AI nhớ chuyện của mình và những khoảnh khắc quan trọng; giữ tính cách như cũ qua nhiều phiên | Định nghĩa nhân vật (ngoại hình, tính cách, quá khứ, sở thích, giọng, động cơ); dựng thế giới (thời đại, nơi chốn, luật lệ, văn hoá, hệ thống xã hội); phát triển cốt truyện, xung đột, cú twist; đặt quan hệ giữa các nhân vật (bạn, đối thủ, đồng minh, người yêu); nhập vai trực tiếp và lái câu chuyện; giữ lại sự kiện, chi tiết nhân vật và lựa chọn cũ; sửa, đổi hướng hay mở rộng câu chuyện |
+| **Cảm xúc** | Được lắng nghe, thấu hiểu và ghi nhận; một chỗ riêng tư để chia sẻ mà không sợ bị phán xét; cảm giác quen thuộc, liền mạch theo thời gian | Tự do sáng tạo và tưởng tượng; đắm chìm trong thế giới do mình dựng; thích thú với diễn biến bất ngờ; thấy mình làm chủ thế giới và nhân vật của mình |
+| **Xã hội** | Thử những kiểu quan hệ và cách giao tiếp mình thích; thể hiện bản thân và sở thích qua nhân vật mình tạo | Thể hiện sự sáng tạo và bản sắc qua nhân vật và câu chuyện tự tạo; chia sẻ nhân vật, thế giới với cộng đồng cùng sở thích; kết nối với cộng đồng fandom, viết sáng tạo và nhập vai |
 
 **Các bước của công việc: cách làm hiện nay hỏng ở đâu**
 
 | Bước | Cách làm hiện nay hỏng ở đâu | Lyris làm gì (đã có) |
 |---|---|---|
-| **1. Tìm nhân vật** hợp tâm trạng hôm nay | App chat AI phổ thông ưu tiên tiếng Anh; nền tảng đọc như Wattpad có nhân vật nhưng chỉ đọc được | Khám phá có lọc theo cảm xúc, ô "Tìm nhân vật", bảng "Nhân vật hot", hồ sơ chỉ xem |
-| **2. Thiết lập persona và story** | Ít app cho người chơi đặt persona riêng cùng xưng hô và ngôn ngữ cho từng story | Sheet "Bước vào câu chuyện": persona, Story hay DM, ngôn ngữ, xưng hô theo nhân vật và theo story |
+| **1. Tạo hoặc tìm nhân vật** hợp tâm trạng hôm nay | Chatbot đa năng nghe chung chung; nhiều app chat AI ưu tiên tiếng Anh hoặc hạn chế độ sâu khi tuỳ chỉnh nhân vật; nền tảng đọc như Wattpad có nhân vật nhưng chỉ đọc được | Studio nhân vật (tính cách, ngoại hình, hoàn cảnh, mục tiêu, bí mật, cách nói, xưng hô, lời mở đầu), AI viết nháp từ một dòng ý tưởng, nhập Character Card; Khám phá có lọc theo cảm xúc, ô "Tìm nhân vật", bảng "Nhân vật hot" |
+| **2. Thiết lập persona, mối quan hệ và story** | Ít app cho người chơi đặt persona riêng, mối quan hệ và bối cảnh cho từng story | Sheet "Bước vào câu chuyện": persona (có phần mô tả tự do, ví dụ quan hệ với nhân vật), Story hay DM, ngôn ngữ, bối cảnh, lời mở đầu, kiểu quan hệ (một cặp đôi lãng mạn hoặc "Không lãng mạn"), ngôi kể và đại từ dẫn truyện cho story này ("Ngôi kể", "Đại từ dẫn truyện"); xưng hô trong lời thoại lấy theo nhân vật |
 | **3. Chơi từng lượt** | App phổ thông viết thay người chơi, bỏ qua lượt vừa rồi, trôi khỏi cảnh; xưng hô sai, lẫn chữ Anh hay chữ Trung | Quy ước nhập lượt, chỉ dẫn cuối prompt bảo tiếp nối đúng lượt người chơi, prompt ưu tiên tiếng Việt |
 | **4. Giữ mạch truyện qua nhiều ngày** | Nhân vật quên tên, lời hứa, sự kiện; thái độ không đổi; bạn nhập vai là người thật thì không phải lúc nào cũng rảnh, hoặc bỏ dở | Tóm tắt cảnh, ký ức và điều đã biết, lùi lại đúng khi sửa; sáu chỉ số cảm xúc; Story và DM chung một dòng thời gian; lúc nào cũng có mặt |
-| **5. Chia sẻ và sáng tác** | Nền tảng chỉ đọc không cho độc giả tương tác; không gì thưởng cho tác giả mang độc giả tới | Studio nhân vật, sổ thế giới có "ai biết", nhân vật công khai, mã mời, coin thưởng sáng tác theo bảng xếp hạng |
+| **5. Dựng thế giới, chia sẻ và sáng tác** | Nhân vật và thế giới tự tạo nằm trong ghi chú, bài đăng, không ai chơi được; ít công cụ sắp xếp thế giới; không gì thưởng cho người tạo khi người khác thích nhân vật của họ | Sổ thế giới có "ai biết", nhân vật công khai, mã mời, coin thưởng sáng tác theo bảng xếp hạng; bình luận, đăng ảnh và theo dõi trong cộng đồng là kế hoạch (F39) |
 
 **Các lực khi đổi sang Lyris** (vì sao người ta đổi, hay không đổi)
-- **Lực đẩy từ hiện tại:** app AI chiếm vai người chơi, tiếng Việt sai, nhân vật hay quên; đọc truyện thì thụ động; bạn nhập vai người thật có lịch riêng.
-- **Lực hút của Lyris:** nhân vật ưu tiên tiếng Việt, biết nhớ, để người chơi làm tác giả; các thế giới viết tay; story riêng tư; có mặt bất cứ lúc nào.
-- **Lo lắng:** model 12B có đủ hay không; story riêng tư có thật riêng tư; hết coin thì sao; nội dung có an toàn. Lyris trả lời bằng 300 coin miễn phí, thêm 60 mỗi ngày và nhiệm vụ; story riêng tư hoàn toàn; không ghi chữ người dùng vào số liệu; tự tải dữ liệu và xoá tài khoản; nội dung mặc định an toàn.
-- **Thói quen:** app đọc truyện, Wattpad, nhóm Facebook; app chat AI đã quen; nhập vai với người thật trên Discord hay Facebook. Kênh ra mắt đi thẳng tới những nơi này (xem [Kênh ra mắt](#kênh-ra-mắt)).
+- **Lực đẩy từ hiện tại:** chatbot đa năng nghe chung chung, hời hợt; app AI chiếm vai người chơi, tiếng Việt sai, nhân vật lệch tính cách và hay quên; khó tìm bạn nhập vai hợp gu, mà bạn người thật thì có lịch riêng; kể chuyện riêng với người quen thì sợ bị phán xét.
+- **Lực hút của Lyris:** nhân vật ưu tiên tiếng Việt, nhớ trong suốt một story, để người chơi làm tác giả; công cụ tạo nhân vật và thế giới chi tiết; story mà tài khoản khác không đọc được; có mặt bất cứ lúc nào.
+- **Lo lắng:** model 12B có đủ hay không; nhân vật có giữ đúng mình không; story riêng tư có thật riêng tư; hết coin thì sao; nội dung có an toàn. Lyris trả lời bằng 300 coin miễn phí, thêm 60 mỗi ngày và nhiệm vụ; story không tài khoản nào khác đọc được, kể cả quản trị viên trong app; không ghi chữ người dùng vào số liệu; tự tải dữ liệu và xoá tài khoản; nội dung mặc định an toàn.
+- **Thói quen:** Wattpad, tiểu thuyết lãng mạn và app đọc truyện; nhóm anime, manga, fandom; app chat AI đã quen; nhập vai với người thật trên Discord hay Facebook. Kênh ra mắt đi thẳng tới những nơi này (xem [Kênh ra mắt](#kênh-ra-mắt)).
 
 **Kết quả mong muốn và cách đo**
 
 | Kết quả mong muốn (theo lời người dùng) | Cách đo | Trạng thái |
 |---|---|---|
 | Ít lần AI viết lời hay quyết định thay mình nhất | Harness: kết luận `godmodding` của model chấm trên các kịch bản như `03-hanh-dong-cho-ai`; khi dùng thật: tỉ lệ không hài lòng (`regenerate_used` + `message_edited` + `reply_rated` chê, trên mỗi `reply_completed`) | Kịch bản đã có và chạy nội bộ; tỉ lệ với người dùng thật là giả thuyết |
-| Ít xưng hô sai và ít chữ nước ngoài chêm vào nhất | Kiểm tra máy của harness trên các kịch bản `06-viet-hien-dai`, `07-co-trang`, `08-tieng-anh` | Chỉ nội bộ; cần đánh giá với độc giả |
+| Ít xưng hô sai và ít chữ nước ngoài chêm vào nhất | Kiểm tra máy của harness trên các kịch bản `06-viet-hien-dai`, `07-co-trang`, `08-tieng-anh` | Chỉ nội bộ; cần đánh giá với người dùng |
 | Ít công sức nhất để quay lại story cũ đúng chỗ đang dừng | `story_resumed` mỗi tuần; kịch bản ký ức `f10-ky-uc` | Giả thuyết |
 | Giữ story tiếp diễn | Số lượt mỗi story (`message_sent`); mục tiêu đầu ≥ 40 % story đã bắt đầu đạt 5 lượt; North Star: số story "sống" mỗi tuần | Giả thuyết ([tracking plan §5.3](docs/tracking-plan.md#53-first-targets-for-round-2)) |
 | Quay lại với nhân vật | D1 ≥ 35 %, D7 ≥ 15 % (mục tiêu đầu) | Giả thuyết |
 | Chờ câu trả lời ít nhất | Chữ đầu tiên dưới 10 giây cho ≥ 90 % câu trả lời sau khi máy đã nóng (`ttft_bucket` của `reply_completed`) | Đo nội bộ khoảng 5 giây với model 12B ở nhà; dùng thật là giả thuyết |
-| Người viết: nhiều độc giả chơi nhân vật của mình nhất | Số người chơi mỗi nhân vật công khai, `story_started` từ nhân vật công khai, `character_published`, `creator_rank_reached` | Giả thuyết |
+| Người sáng tác (Nhóm 2): nhiều người chơi nhân vật của mình nhất | Số người chơi mỗi nhân vật công khai, `story_started` từ nhân vật công khai, `character_published`, `creator_rank_reached` | Giả thuyết |
 
 **Lyris trả lời từng vấn đề thế nào.** Các cách dưới đây đã có; hiệu quả với người dùng thật **vẫn cần đánh giá** (xem [Giới hạn](#giới-hạn-và-đánh-giá-tiếp-theo)).
 
@@ -846,31 +880,57 @@ Cùng các vấn đề trên, nhìn từ phía người dùng: họ "thuê" Lyri
 
 **Người trưởng thành từ 18 tuổi nói tiếng Việt, muốn có trải nghiệm nhập vai sâu, cá nhân hoá và tương tác với nhân vật hư cấu.** Đây là nhóm mà việc ra mắt, quảng bá và các chân dung khách hàng nhắm tới; tuổi tối thiểu để dùng app là 16 (xem *Tuổi* bên dưới).
 
-Lyris phục vụ bốn nhóm theo hành vi:
+Lyris phục vụ bốn phân khúc theo hành vi:
 
-| Nhóm | Tìm kiếm | Lyris cho gì (đã có) | Chân dung |
+| Phân khúc | Tìm kiếm | Lyris cho gì (đã có) | Chân dung |
 |---|---|---|---|
-| **1. Người đọc muốn nhập vai vào truyện** (nhóm chính) | Được tham gia vào những câu chuyện mình yêu thích, không chỉ đọc: ngôn tình, đam mỹ, cổ trang, vườn trường. Dùng điện thoại là chính, thường vào buổi tối. | Chế độ Story, người chơi luôn là người viết vai của mình; "Bước vào câu chuyện" sau hai lần chạm | Linh |
-| **2. Người nhập vai vì mối quan hệ** | Mối quan hệ lâu dài và thay đổi theo thời gian với nhân vật AI | Sáu chỉ số cảm xúc lên xuống, trí nhớ qua nhiều ngày, Story và DM chung một dòng thời gian, story tiếp đúng chỗ đã dừng | chưa có |
-| **3. Người hâm mộ nhân vật và fandom** | Tương tác sâu hơn với nhân vật và thế giới hư cấu | Hồ sơ nhân vật, sổ thế giới ghi rõ ai biết điều gì, ô tìm ở Khám phá và bảng "Nhân vật hot". Nhân vật fan làm khi để Công khai phải tôn trọng bản quyền ([Điều khoản](docs/legal/terms.md)) | chưa có |
-| **4. Người sáng tác và dựng thế giới độc lập** (nhóm phụ) | Biến nhân vật và thế giới của mình (nhân vật phụ, nơi chốn, bí mật, móc sự kiện) thành trải nghiệm tương tác, được đóng đúng | Studio nhân vật, sổ thế giới, nhân vật công khai, bảng "Nhân vật hot" và coin thưởng sáng tác | Minh |
+| **1. Người đọc muốn nhập vai vào truyện** (phân khúc chính) | Được tham gia vào những câu chuyện mình yêu thích, không chỉ đọc: ngôn tình, đam mỹ, cổ trang, vườn trường. Dùng điện thoại là chính, thường vào buổi tối. | Chế độ Story, người chơi luôn là người viết vai của mình; "Bước vào câu chuyện" sau hai lần chạm | Lê Gia Hân |
+| **2. Người nhập vai vì mối quan hệ** | Mối quan hệ lâu dài và thay đổi theo thời gian với nhân vật AI | Sáu chỉ số cảm xúc lên xuống, trí nhớ qua nhiều ngày, Story và DM chung một dòng thời gian, story tiếp đúng chỗ đã dừng | Lê Gia Hân |
+| **3. Người hâm mộ nhân vật và fandom** | Tương tác sâu hơn với nhân vật và thế giới hư cấu | Hồ sơ nhân vật, sổ thế giới ghi rõ ai biết điều gì, ô tìm ở Khám phá và bảng "Nhân vật hot". Nhân vật fan làm khi để Công khai phải tôn trọng bản quyền ([Điều khoản](docs/legal/terms.md)) | Phạm Quốc Bảo |
+| **4. Người sáng tác và dựng thế giới độc lập** (phân khúc phụ) | Biến nhân vật và thế giới của mình (nhân vật phụ, nơi chốn, bí mật, móc sự kiện) thành trải nghiệm tương tác, được đóng đúng | Studio nhân vật, sổ thế giới, nhân vật công khai, bảng "Nhân vật hot" và coin thưởng sáng tác | Phạm Quốc Bảo |
 
 - **Tuổi: 16+** (ghi trong Điều khoản; đồng ý Điều khoản khi tạo tài khoản là xác nhận điều này, không có ô năm sinh). Nội dung an toàn bật sẵn cho mọi người; chế độ 18+, nếu sau này có, nằm sau việc tắt nút "Nội dung an toàn" và xác nhận 18+.
-- **Không phải nhóm mang doanh thu:** **Người thích tự chạy AI**, có máy đủ mạnh, vẫn tự chạy Lyris được (tự chạy vẫn làm được và miễn phí, tắt coin bằng `LYRIS_COINS=0`), nhưng kế hoạch kinh doanh không dựa vào nhóm này.
+- **Không phải phân khúc mang doanh thu:** **Người thích tự chạy AI**, có máy đủ mạnh, vẫn tự chạy Lyris được (tự chạy vẫn làm được và miễn phí, tắt coin bằng `LYRIS_COINS=0`), nhưng kế hoạch kinh doanh không dựa vào nhóm này.
 
 #### Chân dung khách hàng (giả thuyết cần kiểm chứng)
 
-Hai chân dung rút từ đối tượng của các [kênh ra mắt](#kênh-ra-mắt-và-mô-hình-doanh-thu). Hai chân dung này ứng với nhóm 1 và nhóm 4; nhóm 2 và nhóm 3 chưa có chân dung. Đây là **giả thuyết, không phải kết quả nghiên cứu**: nhóm sẽ đối chiếu với số liệu theo dõi (phễu kích hoạt, D1/D7, sự kiện sáng tác) và phỏng vấn ngắn sau khi ra mắt.
+Hai chân dung do Huỳnh Quốc Tới viết cho nhóm ([bản gốc, tiếng Anh](wiki/raw/2026-11-15-chan-dung-khach-hang.md)), ở đây viết gọn lại. **Lê Gia Hân** đại diện cho phân khúc 1 và 2, **Phạm Quốc Bảo** cho phân khúc 3 và 4. Đây là **giả thuyết, không phải kết quả nghiên cứu**: nhóm sẽ đối chiếu với số liệu theo dõi (phễu kích hoạt, D1/D7, sự kiện sáng tác) và phỏng vấn ngắn sau khi ra mắt.
 
-| | **Linh, người đọc truyện** | **Minh, người viết nhân vật** |
+- **Nhóm 1, Người tìm sự đồng hành về cảm xúc: Lê Gia Hân, 21 tuổi.** Sinh viên năm ba, sống ở Quận 7. Thích truyện Wattpad và tiểu thuyết lãng mạn, nhất là những nhân vật trưởng thành về cảm xúc, ấm áp, thấu hiểu và chu đáo: một người anh chị biết quan tâm, một người yêu tinh tế, một người bạn thân dịu dàng.
+- **Nhóm 2, Người mê nhập vai sáng tạo và truyện hư cấu: Phạm Quốc Bảo, 20 tuổi.** Sinh viên năm hai, mê anime, manga và light novel. Theo dõi các cộng đồng fandom, tự tạo nhân vật (OC), thích nhập vai, dựng thế giới và phát triển câu chuyện có nhiều nhân vật, nhiều tuyến truyện.
+
+| | **Lê Gia Hân** (Nhóm 1) | **Phạm Quốc Bảo** (Nhóm 2) |
 |---|---|---|
-| **Là ai** | 18–25 tuổi, sinh viên hoặc mới đi làm; tối nào cũng đọc ngôn tình, đam mỹ trên điện thoại (app đọc truyện, Wattpad, nhóm Facebook) | 20–30 tuổi; viết truyện mạng hoặc bài về nhân vật tự tạo trên Wattpad và nhóm viết trên Facebook; có một nhóm độc giả nhỏ |
-| **Muốn** | Được ở *trong* câu chuyện với kiểu nhân vật mình thích (yêu chậm, ghen, chữa lành) mà AI không giành vai của mình | Nhân vật được đóng đúng (giọng, xưng hô, bí mật) và có lý do để độc giả quay lại |
-| **Khó khăn hôm nay** | App ưu tiên tiếng Anh, xưng anh/em sai, nhân vật hay quên, AI viết lời thay mình | Không có cách dễ để biến nhân vật và thế giới thành thứ độc giả trò chuyện được; không gì thưởng cho việc mang độc giả tới |
-| **Lyris cho gì** | Chế độ Story, quan hệ sáu chỉ số cảm xúc, trí nhớ, và "Bước vào câu chuyện" sau hai lần chạm | Studio nhân vật, sổ thế giới có "ai biết", nhân vật công khai, bảng "Nhân vật hot" và coin thưởng sáng tác |
-| **Gặp ở đâu** | Nhóm đọc truyện trên Facebook, cộng đồng sách trên TikTok, cộng đồng đọc trên Wattpad | Cộng đồng viết trên Wattpad, nhóm viết trên Facebook, nhà sáng tạo TikTok |
-| **Có thể trả tiền cho** | Coin để chat tiếp; cá nhân hoá và quyền thử sớm tính năng mới (kế hoạch) | Chủ yếu kiếm coin qua thưởng sáng tác; có thể nạp để chat thử ở Studio |
-| **Tín hiệu cần kiểm** | Story đầu tiên có từ 3 lượt, D7, số lượt mỗi ngày | Số nhân vật đăng công khai, số người chơi mỗi nhân vật công khai |
+| **Tuổi** | Thường 18–25 | Thường 16–28; quảng bá nhắm tới người từ 18 tuổi, app mở cho người từ 16 tuổi (Điều khoản) |
+| **Chân dung** | Người trẻ tìm sự kết nối cảm xúc, sự đồng hành và một chỗ để bày tỏ cảm xúc riêng | Người dùng sáng tạo, thích thế giới hư cấu, kể chuyện tương tác và nhập vai |
+| **Sở thích** | Tiểu thuyết lãng mạn, Wattpad, phim, truyện audio, trò chuyện với nhân vật hư cấu (Lyris hiện chỉ có chữ) | Anime, manga, game nhập vai (RPG), giả tưởng, lãng mạn, khoa học viễn tưởng, fanfiction, dựng thế giới |
+| **Hành vi** | Hay dùng app vào ban đêm hoặc lúc căng thẳng; thường quay lại với cùng một nhân vật AI | Thường tạo nhân vật và bối cảnh, nhập vai, tham gia cộng đồng fandom; có thể dành nhiều thời gian phát triển một câu chuyện |
+| **Sẵn sàng trả tiền** | Có thể trả cho trải nghiệm cá nhân hoá khi nhân vật nhất quán, nhớ mình và tương tác có ý nghĩa. Trong Lyris: coin cho mỗi câu trả lời (gói từ 10.000đ, chế độ thử); cá nhân hoá trả phí dạng trang trí (theme khung chat, khung avatar đôi) là ý tưởng về sau, chưa làm ([Mô hình doanh thu](#mô-hình-doanh-thu)) | Có thể trả cho tính năng nâng cao: tạo nhân vật sâu hơn, trí nhớ dài hạn, tuỳ chỉnh thế giới, nhập vai sâu hơn. Trong Lyris, phần đã có của những thứ này (Studio, AI viết nháp, sổ thế giới, trí nhớ trong một story) mở cho mọi người, chỉ câu trả lời tốn coin (chế độ thử); chưa có kế hoạch gói tính năng trả phí |
+| **Gặp ở đâu** | Nhóm đọc truyện trên Facebook, cộng đồng sách trên TikTok, cộng đồng đọc trên Wattpad | Nhóm anime, manga, fandom trên Facebook và Discord, cộng đồng nhập vai, nhà sáng tạo TikTok, cộng đồng viết trên Wattpad |
+| **Tín hiệu cần kiểm** | `story_resumed` mỗi tuần, D7, số lượt mỗi story (`message_sent`), `heart_drawer_opened` | `character_created` (và tỉ lệ `via: ai_draft`), `lore_imported`, `character_published`, số người chơi mỗi nhân vật công khai, `message_sent` có `has_directive` |
+
+**Lê Gia Hân: khó khăn và Lyris làm gì.** Giá trị sản phẩm, theo bản chân dung: một người bạn đồng hành AI làm theo ý cô (tính cách, mối quan hệ, câu chuyện xung quanh), biết tiếp nối những gì hai bên đã chia sẻ.
+
+| Khó khăn | Lyris làm gì | Trạng thái |
+|---|---|---|
+| Ngại kể chuyện riêng với bạn bè, gia đình vì sợ bị phán xét | Story là riêng tư: tài khoản khác không đọc được, kể cả quản trị viên trong app; số liệu sử dụng không chứa chữ người dùng; cô tự tải dữ liệu hoặc xoá tài khoản được. [Chính sách quyền riêng tư](docs/legal/privacy.md) ghi rõ giới hạn: người có quyền truy cập trực tiếp máy chủ về kỹ thuật có thể mở cơ sở dữ liệu | Đã có |
+| Chatbot đa năng nghe chung chung, hời hợt về cảm xúc | Nhân vật có tính cách, cách nói, ví dụ thoại và xưng hô riêng (lời nói đặc trưng hiện trên trang nhân vật); sáu chỉ số cảm xúc (thương mến, tin cậy, rung động…) lên xuống theo việc cô làm | Đã có; chất lượng cần đánh giá với người dùng |
+| Nhân vật lệch khỏi tính cách, giọng điệu, cách cư xử ban đầu | Thẻ nhân vật (tính cách, cách nói, ví dụ thoại) nằm trong mọi prompt; kịch bản model thật kiểm xưng hô và việc lặp lại | Đã có; độ nhất quán qua nhiều phiên chưa được đo |
+| AI quên chuyện riêng, cuộc trò chuyện cũ và những khoảnh khắc đã cùng trải qua | Ký ức, điều đã biết (cả điều về persona của cô) và tóm tắt theo đợt, được gợi lại ở các lượt sau; cô xem được trong "Cảm xúc & ký ức" và xoá từng mục bằng "Quên" | Đã có, trong một story: story mới với cùng nhân vật bắt đầu từ đầu; trí nhớ chung giữa các story chưa nằm trong kế hoạch |
+| Muốn một mối quan hệ riêng, tiếp diễn, không phải lần nào cũng bắt đầu lại | Story tiếp đúng chỗ đã dừng, kể cả nhiều ngày sau; Story và DM chung một dòng thời gian. Mối quan hệ (bạn thân, anh chị, người dẫn dắt…) được đặt qua xưng hô và bối cảnh của nhân vật, phần mô tả persona và kiểu quan hệ của story (một cặp đôi lãng mạn hoặc "Không lãng mạn") | Đã có; chưa có ô riêng cho vai trò trong quan hệ |
+
+**Phạm Quốc Bảo: khó khăn và Lyris làm gì.**
+
+| Khó khăn hoặc công việc | Lyris làm gì | Trạng thái |
+|---|---|---|
+| Nền tảng hiện có hạn chế độ sâu khi tuỳ chỉnh nhân vật và bối cảnh | Studio nhân vật: tính cách, ngoại hình, hoàn cảnh, mục tiêu, bí mật, cách nói, lời nói đặc trưng, ví dụ thoại, xưng hô, bối cảnh mặc định, lời mở đầu, cảm xúc ban đầu; "AI viết nháp nhân vật" viết cả thẻ từ một dòng ý tưởng; nhập Character Card (V1, V2, V3) và xuất V2 (.json, .png) | Đã có. "Giọng" ở đây là cách nói bằng chữ; truyện audio và gọi điện mới là ý tưởng, chưa thiết kế |
+| Khó tìm bạn nhập vai hợp sở thích, văn phong và khả năng kể chuyện | Một bạn nhập vai AI có mặt bất cứ lúc nào, tiếp nối đúng lượt của cậu và không bao giờ viết lời cho persona của cậu | Đã có |
+| AI phá mạch nhập vai vì quên sự kiện, đổi tính cách hay mâu thuẫn với điều đã đặt | Ký ức, điều đã biết và tóm tắt, lùi lại đúng khi sửa, tạo lại, xoá; mục sổ thế giới được gợi lại theo từ khoá | Đã có; cần đánh giá trên story dài |
+| Câu chuyện dài nhiều nhân vật, nhiều mối quan hệ, nhiều tuyến truyện khó giữ | Tóm tắt theo đợt giúp story dài tiếp diễn. Mỗi story có một nhân vật AI; nhân vật phụ nằm trong sổ thế giới dưới loại "Người", và thẻ nhân vật ghi cách xưng hô với người khác | Đã có; cảnh nhiều nhân vật và đạo diễn truyện là kế hoạch (F40, tuỳ chọn) |
+| Thiếu công cụ gom thế giới, nhân vật, quan hệ và diễn biến truyện vào một chỗ | Sổ thế giới cho từng nhân vật (tới 500 mục: chuyện và bí mật, người, nơi chốn), mỗi mục có từ khoá, độ ưu tiên và "ai biết"; nhập từ `world.md`; dòng thời gian sự kiện trong menu "+". Thời đại, luật lệ, văn hoá là mục viết tự do, quan hệ giữa các nhân vật cũng vậy | Đã có; thế giới thuộc về một nhân vật (chưa có thế giới dùng chung nhiều nhân vật) |
+| Rào cản ngôn ngữ và giá quốc tế | App và prompt ưu tiên tiếng Việt; story có thể viết bằng tiếng Anh; gói coin tính bằng đồng, từ 10.000đ | Đã có (chế độ thử); thanh toán thật là kế hoạch (F56 cho kho ứng dụng, F57 cho VNPay/MoMo) |
+| *Công việc:* sửa, đổi hướng hay mở rộng câu chuyện | Chỉ dẫn ẩn `((…))`, "Sửa", "Tạo lại câu trả lời" (có các phiên bản), "Xoá từ đây", gợi ý trả lời | Đã có |
+| *Công việc:* chia sẻ nhân vật và thế giới với cộng đồng | Nhân vật công khai, người khác chơi bản riêng của họ; bảng "Nhân vật hot"; coin thưởng sáng tác | Đã có; bình luận, đăng ảnh và theo dõi là kế hoạch (F39) |
 
 #### Định vị và vì sao là lúc này
 
@@ -892,7 +952,7 @@ Lyris v1 là một vòng lặp, và bước nào cũng là một sự kiện đ�
 
 **North Star:** số story "sống" mỗi tuần (story có từ 3 lượt người chơi trong tuần). Một **vòng của người viết** nhỏ hơn nuôi vòng này: Studio → bật công khai nhân vật → người khác chơi → nhân vật lên bảng "Nhân vật hot" → coin thưởng sáng tác (`character_published`, `creator_rank_reached`).
 
-**Ngoài phạm vi của v1** (kế hoạch hoặc ý tưởng, chưa làm): nội dung 18+ (sau này chỉ mở sau nút "Nội dung an toàn" và xác nhận 18+), gọi điện và giọng nói (nhóm ý tưởng "Tender Moment"), gửi ảnh, bảng tin và bình luận cộng đồng, đạo diễn story, thanh toán thật, model tự fine-tune, app iOS/Android native và backend nhiều máy chủ. Danh sách ở [Lộ trình](#lộ-trình-lyris-trên-máy-chủ).
+**Ngoài phạm vi của v1** (kế hoạch hoặc ý tưởng, chưa làm): nội dung 18+ (sau này chỉ mở sau nút "Nội dung an toàn" và xác nhận 18+), gọi điện và giọng nói (nhóm ý tưởng "Tender Moment"), gửi ảnh, đăng ảnh, bình luận và theo dõi trong cộng đồng, đạo diễn story, thanh toán thật, model tự fine-tune, app iOS/Android native và backend nhiều máy chủ. Danh sách ở [Lộ trình](#lộ-trình-lyris-trên-máy-chủ).
 
 ### Tính năng chính
 
@@ -937,8 +997,8 @@ Mọi thứ trong các bảng này **đã có** và có test do `verification/ve
 
 | Kênh | Đối tượng | Ở đâu | Làm thế nào | Vì sao hợp |
 |---|---|---|---|---|
-| **1. Khám phá qua cộng đồng** | Độc giả truyện mạng lãng mạn tiếng Việt (ngôn tình, đam mỹ, cổ trang, vườn trường) | Nhóm Facebook Việt Nam, cộng đồng sách và nhập vai trên TikTok, máy chủ Discord, cộng đồng đọc trên Wattpad | Giới thiệu Lyris là app ưu tiên tiếng Việt; clip ngắn về chế độ Story với các thế giới viết tay trong [`worlds/`](worlds/) (Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương; nhập vào app qua hai bước, xem [Dùng thử cho người chấm](#dùng-thử-cho-người-chấm)): bước vào story, trò chuyện, tự làm chủ persona. Với độc giả Wattpad: một cách khác để sống trong truyện xoay quanh nhân vật. | Các cộng đồng này vốn mê nhân vật hư cấu và truyện xoay quanh quan hệ. |
-| **2. Khám phá nhờ tác giả** | Người viết và tạo nhân vật | Cộng đồng viết trên Wattpad, nhóm viết trên Facebook, nhà sáng tạo TikTok, cộng đồng nhập vai | Studio nhân vật và sổ thế giới cho người viết; đăng nhân vật công khai và chia sẻ với người theo dõi; bảng "Nhân vật hot" và coin thưởng sáng tác (đã có) cho tác giả lý do để quảng bá. Về sau: hợp tác với tác giả truyện mạng Việt Nam, kể cả tác giả Wattpad, chỉ khi có phép của người giữ bản quyền. | Mỗi tác giả mang theo nhân vật, thế giới và độc giả của mình. |
+| **1. Khám phá qua cộng đồng** | Độc giả truyện mạng lãng mạn tiếng Việt (ngôn tình, đam mỹ, cổ trang, vườn trường), như chân dung Lê Gia Hân | Nhóm Facebook Việt Nam, cộng đồng sách và nhập vai trên TikTok, máy chủ Discord, cộng đồng đọc trên Wattpad | Giới thiệu Lyris là app ưu tiên tiếng Việt; clip ngắn về chế độ Story với các thế giới viết tay trong [`worlds/`](worlds/) (Lục Bắc Uyên, Yến Hoành Sinh, Cố Hoài Dã, Tần Dương; nhập vào app qua hai bước, xem [Dùng thử cho người chấm](#dùng-thử-cho-người-chấm)): bước vào story, trò chuyện, tự làm chủ persona. Với độc giả Wattpad: một cách khác để sống trong truyện xoay quanh nhân vật. | Các cộng đồng này vốn mê nhân vật hư cấu và truyện xoay quanh quan hệ. |
+| **2. Khám phá nhờ tác giả** | Người viết, người tự tạo nhân vật (OC) và người nhập vai trong fandom, như chân dung Phạm Quốc Bảo | Cộng đồng viết trên Wattpad, nhóm viết trên Facebook, nhóm anime, manga và fandom, nhà sáng tạo TikTok, cộng đồng nhập vai | Studio nhân vật và sổ thế giới cho người viết; đăng nhân vật công khai và chia sẻ với người theo dõi; bảng "Nhân vật hot" và coin thưởng sáng tác (đã có) cho tác giả lý do để quảng bá. Về sau: hợp tác với tác giả truyện mạng Việt Nam, kể cả tác giả Wattpad, chỉ khi có phép của người giữ bản quyền. | Mỗi tác giả mang theo nhân vật, thế giới và độc giả của mình. |
 | **3. Giới thiệu và chia sẻ** | Người dùng hiện có | Trong app | Mã mời (đã có): mỗi thành viên được mời có story riêng tư của mình. Thưởng coin khi giới thiệu bạn bè là kế hoạch (xem Doanh thu). | Lý do tự nhiên để rủ bạn bè. |
 
 #### Phân phối
@@ -1148,7 +1208,7 @@ Bản nộp bài chạy trên một máy (SQLite + Ollama) và vẫn được gi
 - So các model local và model mở cho nhập vai tiếng Việt (xưng hô, quyền người chơi, giọng nhân vật).
 - Độ chính xác khi truy xuất ký ức qua hội thoại dài.
 - Độ nhất quán của nhân vật qua các phiên dài.
-- Thử nghiệm khả dụng với độc giả truyện tương tác tiếng Việt, bắt đầu từ hai [chân dung khách hàng](#chân-dung-khách-hàng-giả-thuyết-cần-kiểm-chứng).
+- Thử nghiệm khả dụng với người dùng Việt, bắt đầu từ hai [chân dung khách hàng](#chân-dung-khách-hàng-giả-thuyết-cần-kiểm-chứng) (Lê Gia Hân, Phạm Quốc Bảo).
 - Fine-tune nhẹ (LoRA) và liệu nó có hơn chỉ dùng prompt hay không.
 
 ### Kế hoạch theo dõi sự kiện
@@ -1364,7 +1424,7 @@ Bot đã tìm ra hai lỗi thật mà unit test bỏ sót:
 | Nguyễn Ngọc Anh Thư | 240065 | Nghiên cứu, kiểm thử | Phát biểu vấn đề, số liệu thị trường và nghiên cứu, Jobs to be done, chân dung khách hàng; dùng thử app và báo lỗi |
 | Nguyễn Thị Hải An | 240032 | Nội dung và thiết kế, kiểm thử | Nhân vật mẫu, thế giới nhân vật và phần mô tả, góp ý giao diện; dùng thử app và báo lỗi |
 | Nguyễn Anh Hồng | 240169 | Kinh doanh | Mô hình doanh thu và giá coin, kênh ra mắt |
-| Huỳnh Quốc Tới | 240193 | Số liệu và kiểm thử | Rà soát kế hoạch tracking, rà soát quyền riêng tư và điều khoản, kiểm thử app |
+| Huỳnh Quốc Tới | 240193 | Số liệu và kiểm thử | Chân dung khách hàng, rà soát kế hoạch tracking, rà soát quyền riêng tư và điều khoản, kiểm thử app |
 
 ### Quyền sở hữu và phát hành
 

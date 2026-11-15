@@ -162,3 +162,4 @@ Các dòng trước "Tạo wiki" được dựng lại từ [docs/plan.md](../do
 - 2026-11-15 · verify.sh: F31 ✅ passing (Nhân vật công khai) · [F31-nhan-vat-cong-khai](features/F31-nhan-vat-cong-khai.md)
 - 2026-11-15 · verify.sh: F47 ✅ passing (Tìm nhân vật ở Khám phá) · [F47-tim-nhan-vat](features/F47-tim-nhan-vat.md)
 - 2026-11-15 · Khám phá gộp một lưới (PO): bỏ mục riêng 'Nhân vật được chia sẻ'; F22/F31/F47 ✅ lại sau verify.
+- 2026-11-15 · README: chân dung khách hàng thay bằng chân dung của PO (Lê Gia Hân, Phạm Quốc Bảo); JTBD theo chân dung mới. Raw: wiki/raw/2026-11-15-chan-dung-khach-hang.md
